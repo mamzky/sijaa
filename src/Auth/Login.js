@@ -25,6 +25,7 @@ function Login() {
     // You can add your form submission logic here
     console.log('Form submitted with data:', formData);
     localStorage.setItem(Constant.ACTIVE_MENU, Constant.MENU_DASHBOARD)
+    localStorage.setItem(Constant.TOKEN, 'abc123')
     navigate('/')
   };
 
