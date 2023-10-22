@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import AppColors from '../Utils/Colors';
+import { useNavigate } from 'react-router-dom';
+import Constant from '../Utils/Constants';
 
 function Login() {
 
@@ -8,6 +10,7 @@ function Login() {
     email: '',
     password: '',
   });
+  const navigate = useNavigate()
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -21,55 +24,11 @@ function Login() {
     e.preventDefault();
     // You can add your form submission logic here
     console.log('Form submitted with data:', formData);
+    localStorage.setItem(Constant.ACTIVE_MENU, Constant.MENU_DASHBOARD)
+    navigate('/')
   };
 
   return (
-    // <div style={{
-    //     height: '100vh',
-    //     width: '100%',
-    //     display: 'flex',
-    //     flex: 1,
-    //     background: '#FFFFF7',
-    //     justifyContent: 'center',
-    //     alignItems: 'center',
-    //     flexDirection: 'column'
-    // }}>
-    //     <h3>Login</h3>
-    //     <Form.Label>Login menggunakan akun JAA</Form.Label>
-    //     <Form
-    //         onSubmit={handleSubmit}
-    //         style={{
-    //             width: "40%",
-    //             padding: 20,
-    //             borderRadius: 20,
-    //             border: '1px solid #1A5D1A'
-    //         }}
-    //     >
-    //         <Form.Group controlId="formBasicEmail">
-    //             <Form.Label>Email address</Form.Label>
-    //             <Form.Control
-    //                 type="input"
-    //                 name="email"
-    //                 value={formData.email}
-    //                 onChange={handleInputChange}
-    //                 placeholder="Enter email"
-    //             />
-    //         </Form.Group>
-    //         <Form.Group controlId="formBasicPassword">
-    //             <Form.Label>Password</Form.Label>
-    //             <Form.Control
-    //                 type="password"
-    //                 name="password"
-    //                 value={formData.password}
-    //                 onChange={handleInputChange}
-    //                 placeholder="Password"
-    //             />
-    //         </Form.Group>
-    //         <Button style={{width:"100%", marginTop: 20}} variant="primary" type="submit">
-    //             Login
-    //         </Button>
-    //     </Form>
-    // </div>
     <div>
       <div className="page-header align-items-start min-vh-100"
         style={{
@@ -118,7 +77,10 @@ function Login() {
                         placeholder="Password"
                       />
                     </Form.Group>
-                    <Button style={{ width: "100%", marginTop: 20, backgroundColor: AppColors.MainBrand }} variant="primary" type="submit">
+                    <Button
+                      style={{ width: "100%", marginTop: 20, backgroundColor: AppColors.MainBrand }}
+                      variant="primary"
+                      type="submit">
                       Login
                     </Button>
                   </Form>
