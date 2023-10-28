@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 // import './App.css';
 import Login from './Auth/Login';
@@ -9,10 +9,18 @@ import Product from './Product/Product';
 import Contact from './Contact/Contact';
 import Stock from './Stock/Stock';
 import Customer from './Customer/Customer';
+import AddNewProduct from './Product/AddNewProduct';
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+import { firebaseConfig } from './Config/FirebaseConfig';
 
 // IMPORT PAGES
 
 function App() {
+
+  const app = initializeApp(firebaseConfig)
+  const analytics = getAnalytics(app)
+
   return (
     <Router>
         {/* <MainNav/> */}
@@ -21,6 +29,7 @@ function App() {
         <Route path='/login' Component={Login}/>
         <Route path='/dashboard' Component={MainDashboard} />
         <Route path='/product' Component={Product}/>
+        <Route path='/product/add-new-product' Component={AddNewProduct}/>
         <Route path='/contact' Component={Contact}/>
         <Route path='/contact' Component={Contact}/>
         <Route path='/customer' Component={Customer}/>

@@ -3,8 +3,12 @@ import { Button, Form } from 'react-bootstrap'
 import TopNavBar from '../Components/TopNavBar'
 import SideNavBar from '../Components/SideNavBar'
 import SmallImageCard from '../Components/SmallImageCard'
+import CustomTable from '../Components/CustomTable'
+import { useNavigate } from 'react-router-dom'
 
 function Product() {
+
+  const navigate = useNavigate()
   return (
     <div>
       <SideNavBar />
@@ -17,14 +21,22 @@ function Product() {
               <h6>Daftar Produk JAA Alkesum</h6>
             </div>
             <div className="col-lg-8 col-md-3" style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
-              <Button style={{ width: '40%', alignSelf: 'flex-end' }}>+ Tambah Produk Baru</Button>
+              <Button
+               style={{ width: '40%', alignSelf: 'flex-end' }}
+               onClick={() => {
+                navigate('/product/add-new-product')
+               }}
+               >+ Tambah Produk Baru</Button>
             </div>
           </div>
           <div class="row mt-4">
-            <SmallImageCard/>
-            <SmallImageCard/>
-            <SmallImageCard/>
-            <SmallImageCard/>
+            <SmallImageCard />
+            <SmallImageCard />
+            <SmallImageCard />
+            <SmallImageCard />
+          </div>
+          <div class="row mt-4">
+            <CustomTable />
           </div>
         </div>
       </main>

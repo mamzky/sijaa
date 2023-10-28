@@ -3,10 +3,11 @@ import SideNavBar from '../Components/SideNavBar'
 import TopNavBar from '../Components/TopNavBar'
 import SmallImageCard from '../Components/SmallImageCard'
 import { Button } from 'react-bootstrap'
+import CustomTable from '../Components/CustomTable'
 
 function Stock() {
-    return (
-      <div>
+  return (
+    <div>
       <SideNavBar />
       <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
         <TopNavBar />
@@ -18,15 +19,18 @@ function Stock() {
             </div>
           </div>
           <div class="row mt-4">
-            <SmallImageCard/>
-            <SmallImageCard/>
-            <SmallImageCard/>
-            <SmallImageCard/>
+            <SmallImageCard />
+            <SmallImageCard />
+            <SmallImageCard />
+            <SmallImageCard />
+          </div>
+          <div class="row mt-4">
+            <CustomTable />
           </div>
         </div>
       </main>
     </div>
-      )
+  )
 }
 
 export default Stock
