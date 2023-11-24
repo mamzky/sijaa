@@ -3,13 +3,18 @@ import { Button, Form } from 'react-bootstrap';
 import AppColors from '../Utils/Colors';
 import { useNavigate } from 'react-router-dom';
 import Constant from '../Utils/Constants';
+import { db } from '../Config/FirebaseConfig';
+import { collection, getDocs, addDoc, doc, query, where } from 'firebase/firestore'
 
 function Login() {
 
   const [formData, setFormData] = useState({
-    email: '',
+    username: '',
     password: '',
   });
+  const [failLogin, setFailLogin] = useState(false)
+  const [showPassword, setShowPassword] = useState(true)
+
   const navigate = useNavigate()
 
   const handleInputChange = (e) => {
@@ -18,15 +23,41 @@ function Login() {
       ...formData,
       [name]: value,
     });
+    setFailLogin(false)
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // You can add your form submission logic here
-    console.log('Form submitted with data:', formData);
-    localStorage.setItem(Constant.ACTIVE_MENU, Constant.MENU_DASHBOARD)
-    localStorage.setItem(Constant.TOKEN, 'abc123')
-    navigate('/')
+    // console.log('Form submitted with data:', formData);
+    // localStorage.setItem(Constant.ACTIVE_MENU, Constant.MENU_DASHBOARD)
+    // localStorage.setItem(Constant.TOKEN, 'abc123')
+    // navigate('/')
+
+    console.log(formData);
+    const q = query(collection(db, "user"),
+      where('username', '==', formData.username),
+      where('password', '==', formData.password))
+
+    try {
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        // Data exists
+        // console.log('Data exists:', querySnapshot.docs.map(doc => doc.data()));
+        const user = querySnapshot.docs.map(doc => doc.data())[0]
+        localStorage.setItem(Constant.USERNAME, user?.username)
+        localStorage.setItem(Constant.ROLE, user?.roleId)
+        setFailLogin(false)
+        navigate('/')
+      } else {
+        // Data does not exist
+        console.log('Data does not exist');
+        setFailLogin(true)
+      }
+    } catch (error) {
+      console.error('Error checking data existence:', error);
+    }
   };
 
   return (
@@ -62,8 +93,8 @@ function Login() {
                       <Form.Label>Username</Form.Label>
                       <Form.Control
                         type="input"
-                        name="email"
-                        value={formData.email}
+                        name="username"
+                        value={formData.username}
                         onChange={handleInputChange}
                         placeholder="Enter Username"
                       />
@@ -71,13 +102,31 @@ function Login() {
                     <Form.Group controlId="formBasicPassword">
                       <Form.Label>Password</Form.Label>
                       <Form.Control
-                        type="password"
+                        type= {showPassword ? "password" : "input"}
                         name="password"
                         value={formData.password}
                         onChange={handleInputChange}
                         placeholder="Password"
                       />
+                      <a style={{ cursor: 'pointer', fontSize: 12, marginLeft: 4 }}
+                        onClick={() => setShowPassword(e => !e)}
+                      >{showPassword ? 'Show Password' : 'Hide Password'}</a>
                     </Form.Group>
+                    {
+                      failLogin &&
+                      <div style={{
+                        width: '100%',
+                        borderRadius: 20,
+                        marginTop: 20,
+                        backgroundColor: AppColors.Error1,
+                        justifyContent: 'center',
+                        display: 'flex',
+                        flexDirection: 'row',
+                        padding: 12,
+                      }}>
+                        <span style={{ color: AppColors.White }}>Username atau password salah</span>
+                      </div>
+                    }
                     <Button
                       style={{ width: "100%", marginTop: 20, backgroundColor: AppColors.MainBrand }}
                       variant="primary"

@@ -11,7 +11,9 @@ MENU_CONTACT:'CONTACT',
 URL_DATABASE:'https://console.firebase.google.com/u/2/project/sijaa-ca714/database/sijaa-ca714-default-rtdb/data/~2F',
 
 // AUTH
-TOKEN: 'TOKEN'
+TOKEN: 'TOKEN',
+USERNAME: 'USERNAME',
+ROLE: 'ROLE'
 }
 
 export default Constant

@@ -19,7 +19,6 @@ function MainDashboard() {
 
   const [users, setUsers] = useState([])
   useEffect(() => {
-    console.log('INITIATE DASHBOARD')
     const getUser = async () => {
       const data = await getDocs(userCollectionRef)
       setUsers(data.docs.map((doc) => ({...doc.data(), id: doc.id})))
@@ -30,7 +29,6 @@ function MainDashboard() {
   }, [])
   
   const addUser = async () => {
-    // await addDoc(use71rCollectionRef, {name: 'Nurakhman', email: 'sijaa@gmail.com', role: 'SADM'})
     await addDoc(productCollectionRef, {
       product_name: 'TLSO', 
       product_size: 'M',

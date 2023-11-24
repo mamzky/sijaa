@@ -1,7 +1,12 @@
 import React from 'react'
 import AppColors from '../Utils/Colors'
 
-function CustomTable() {
+// type Props = {
+//     data : [],
+//     onItemClick : any
+// }
+
+const CustomTable = ({ data, onItemClick }) => {
     return (
         <div className="col-lg-12 col-md-6 mb-md-0 mb-4">
             <div className="card">
@@ -28,6 +33,7 @@ function CustomTable() {
                         </div> */}
                     </div>
                 </div>
+
                 <div className="card-body px-0 pb-2">
                     <div className="table-responsive">
                         <table className="table align-items-center mb-0">
@@ -40,221 +46,45 @@ function CustomTable() {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>
-                                        <div className="ps-3 py-1">
-                                            <div className="d-flex flex-column justify-content-center">
-                                                <h6 className="mb-0 text-sm">1</h6>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div className="ps-3 py-1">
-                                            <div className="d-flex flex-column justify-content-center">
-                                                <h6 className="mb-0 text-sm">Material XD Version</h6>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div className="ps-3 py-1">
-                                            <div className="d-flex flex-column">
-                                                <h6 className="mb-0 text-sm">Material XD Version</h6>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div className="progress-wrapper ps-3 py-1">
-                                            <div className="progress-info">
-                                                <div className="progress-percentage">
-                                                    <span className="text-xs font-weight-bold">60%</span>
+                                {data?.map((item, index) => {
+                                    return (
+                                        <tr>
+                                            <td>
+                                                <div className="ps-3 py-1">
+                                                    <div className="d-flex flex-column justify-content-center">
+                                                        <h6 className="mb-0 text-sm">{index + 1}</h6>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div className="progress">
-                                                <div className="progress-bar bg-gradient-info w-60" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>
-                                        <div className="ps-3 py-1">
-                                            <div className="d-flex flex-column justify-content-center">
-                                                <h6 className="mb-0 text-sm">1</h6>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div className="ps-3 py-1">
-                                            <div className="d-flex flex-column justify-content-center">
-                                                <h6 className="mb-0 text-sm">Material XD Version</h6>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div className="ps-3 py-1">
-                                            <div className="d-flex flex-column">
-                                                <h6 className="mb-0 text-sm">Material XD Version</h6>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div className="progress-wrapper ps-3 py-1">
-                                            <div className="progress-info">
-                                                <div className="progress-percentage">
-                                                    <span className="text-xs font-weight-bold">60%</span>
+                                            </td>
+                                            <td>
+                                                <div className="ps-3 py-1">
+                                                    <div className="d-flex flex-column justify-content-center">
+                                                        <h6 className="mb-0 text-sm">{item?.product_name}</h6>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div className="progress">
-                                                <div className="progress-bar bg-gradient-info w-60" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>
-                                        <div className="ps-3 py-1">
-                                            <div className="d-flex flex-column justify-content-center">
-                                                <h6 className="mb-0 text-sm">1</h6>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div className="ps-3 py-1">
-                                            <div className="d-flex flex-column justify-content-center">
-                                                <h6 className="mb-0 text-sm">Material XD Version</h6>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div className="ps-3 py-1">
-                                            <div className="d-flex flex-column">
-                                                <h6 className="mb-0 text-sm">Material XD Version</h6>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div className="progress-wrapper ps-3 py-1">
-                                            <div className="progress-info">
-                                                <div className="progress-percentage">
-                                                    <span className="text-xs font-weight-bold">60%</span>
+                                            </td>
+                                            <td>
+                                                <div className="ps-3 py-1">
+                                                    <div className="d-flex flex-column">
+                                                        <h6 className="mb-0 text-sm">Material XD Version</h6>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div className="progress">
-                                                <div className="progress-bar bg-gradient-info w-60" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>
-                                        <div className="ps-3 py-1">
-                                            <div className="d-flex flex-column justify-content-center">
-                                                <h6 className="mb-0 text-sm">1</h6>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div className="ps-3 py-1">
-                                            <div className="d-flex flex-column justify-content-center">
-                                                <h6 className="mb-0 text-sm">Material XD Version</h6>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div className="ps-3 py-1">
-                                            <div className="d-flex flex-column">
-                                                <h6 className="mb-0 text-sm">Material XD Version</h6>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div className="progress-wrapper ps-3 py-1">
-                                            <div className="progress-info">
-                                                <div className="progress-percentage">
-                                                    <span className="text-xs font-weight-bold">60%</span>
+                                            </td>
+                                            <td>
+                                                <div className="progress-wrapper ps-3 py-1">
+                                                    <div className="progress-info">
+                                                        <div className="progress-percentage">
+                                                            <span className="text-xs font-weight-bold">60%</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="progress">
+                                                        <div className="progress-bar bg-gradient-info w-60" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div className="progress">
-                                                <div className="progress-bar bg-gradient-info w-60" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>
-                                        <div className="ps-3 py-1">
-                                            <div className="d-flex flex-column justify-content-center">
-                                                <h6 className="mb-0 text-sm">1</h6>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div className="ps-3 py-1">
-                                            <div className="d-flex flex-column justify-content-center">
-                                                <h6 className="mb-0 text-sm">Material XD Version</h6>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div className="ps-3 py-1">
-                                            <div className="d-flex flex-column">
-                                                <h6 className="mb-0 text-sm">Material XD Version</h6>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div className="progress-wrapper ps-3 py-1">
-                                            <div className="progress-info">
-                                                <div className="progress-percentage">
-                                                    <span className="text-xs font-weight-bold">60%</span>
-                                                </div>
-                                            </div>
-                                            <div className="progress">
-                                                <div className="progress-bar bg-gradient-info w-60" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>
-                                        <div className="ps-3 py-1">
-                                            <div className="d-flex flex-column justify-content-center">
-                                                <h6 className="mb-0 text-sm">1</h6>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div className="ps-3 py-1">
-                                            <div className="d-flex flex-column justify-content-center">
-                                                <h6 className="mb-0 text-sm">Material XD Version</h6>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div className="ps-3 py-1">
-                                            <div className="d-flex flex-column">
-                                                <h6 className="mb-0 text-sm">Material XD Version</h6>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div className="progress-wrapper ps-3 py-1">
-                                            <div className="progress-info">
-                                                <div className="progress-percentage">
-                                                    <span className="text-xs font-weight-bold">60%</span>
-                                                </div>
-                                            </div>
-                                            <div className="progress">
-                                                <div className="progress-bar bg-gradient-info w-60" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
+                                            </td>
+                                        </tr>
+                                    )
+                                })}
 
                             </tbody>
                         </table>

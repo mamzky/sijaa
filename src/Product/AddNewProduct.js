@@ -7,6 +7,9 @@ import CustomTable from '../Components/CustomTable'
 import { useNavigate } from 'react-router-dom'
 import { DigitFormatter, OnlyDigit } from '../Utils/General'
 import { empty, isEmpty } from 'ramda'
+import { db } from '../Config/FirebaseConfig';
+import { collection, getDocs, addDoc, doc, updateDoc } from 'firebase/firestore'
+import moment from 'moment/moment'
 
 function AddNewProduct() {
 
@@ -62,9 +65,25 @@ function AddNewProduct() {
         }
     }
 
-    const submitNewProduct = () => {
+    const submitNewProduct = async () => {
         setShowModal(false)
-        navigate('/product')
+        const productCollectionRef = collection(db, "product")
+        await addDoc(productCollectionRef, {
+            product_name: productName,
+            product_size: productSize,
+            base_price: productBasePrice,
+            sell_price: productSellPrice,
+            discount: discount,
+            discout_type: discType,
+            qty: qty,
+            supplier: supplier,
+            productCode: `JAA${moment().format('DDMMYYhhmm')}`,
+            created_at: moment(new Date).toISOString()
+        }).then((res) => {
+            console.log(res);
+            navigate('/product')
+        })
+
     }
 
     return (

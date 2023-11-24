@@ -26,8 +26,9 @@ function SideNavBar() {
   }
 
   const checkLogin = async () => {
-    const isLogin = await localStorage.getItem(Constant.TOKEN)
+    const isLogin = await localStorage.getItem(Constant.USERNAME)
     if (isNil(isLogin)) {
+      localStorage.clear()
       navigate('/login')
     }
   }

@@ -1,14 +1,37 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button, Form } from 'react-bootstrap'
 import TopNavBar from '../Components/TopNavBar'
 import SideNavBar from '../Components/SideNavBar'
 import SmallImageCard from '../Components/SmallImageCard'
 import CustomTable from '../Components/CustomTable'
 import { useNavigate } from 'react-router-dom'
+import { db } from '../Config/FirebaseConfig';
+import { collection, getDocs, addDoc, doc, updateDoc } from 'firebase/firestore'
 
 function Product() {
 
   const navigate = useNavigate()
+  const productCollectionRef = collection(db, "product")
+  const [productData, setProductData] = useState([])
+  const [lowestStock, setLowestStock] = useState([])
+
+
+  const getProduct = async () => {
+    const data = await getDocs(productCollectionRef)
+    const sortedData = data.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+    const lowestData = data.docs.map((doc) => ({ ...doc.data(), id: doc.id })).sort((a, b) => a.qty - b.qty)
+    setProductData(sortedData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)))
+    setLowestStock(lowestData.length > 4 ? lowestData.slice(0,4) : lowestData)
+  }
+  useEffect(() => {
+    getProduct()
+  }, [])
+
+  useEffect(() => {
+    console.log(lowestStock)
+  }, [lowestStock])
+
+
   return (
     <div>
       <SideNavBar />
@@ -22,11 +45,11 @@ function Product() {
             </div>
             <div className="col-lg-8 col-md-3" style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
               <Button
-               style={{ width: '40%', alignSelf: 'flex-end' }}
-               onClick={() => {
-                navigate('/product/add-new-product')
-               }}
-               >+ Tambah Produk Baru</Button>
+                style={{ width: '40%', alignSelf: 'flex-end' }}
+                onClick={() => {
+                  navigate('/product/add-new-product')
+                }}
+              >+ Tambah Produk Baru</Button>
             </div>
           </div>
           <div class="row mt-4">
@@ -36,7 +59,72 @@ function Product() {
             <SmallImageCard />
           </div>
           <div class="row mt-4">
-            <CustomTable />
+            <div className="card-body px-0 pb-2">
+              <div className="table-responsive">
+                <table className="table align-items-center mb-0">
+                  <thead>
+                    <tr>
+                      <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">No.</th>
+                      <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nama Produk</th>
+                      <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Jml. Stock</th>
+                      <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Supplier</th>
+                      <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Harga Dasar</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {productData?.map((item, index) => {
+                      return (
+                        <tr onClick={() => {
+                          console.log(item);
+                        }}>
+                          <td>
+                            <div className="ps-3 py-1">
+                              <div className="d-flex flex-column justify-content-center">
+                                <h6 className="mb-0 text-sm">{index + 1}</h6>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div className="ps-3 py-1">
+                              <div className="d-flex flex-column justify-content-center">
+                                <h6 className="mb-0 text-sm">{item?.product_name}</h6>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div className="ps-3 py-1">
+                              <div className="d-flex flex-column">
+                                <h6 className="mb-0 text-sm">{item?.qty}</h6>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div className="ps-3 py-1">
+                              <div className="d-flex flex-column">
+                                <h6 className="mb-0 text-sm">{item?.supplier}</h6>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div className="progress-wrapper ps-3 py-1">
+                              <div className="progress-info">
+                                <div className="progress-percentage">
+                                  <span className="text-xs font-weight-bold">{item?.base_price}</span>
+                                </div>
+                              </div>
+                              {/* <div className="progress">
+                                <div className="progress-bar bg-gradient-info w-60" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                              </div> */}
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    })}
+
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
       </main>
