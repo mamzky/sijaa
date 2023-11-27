@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import Constant from '../Utils/Constants';
 import { db } from '../Config/FirebaseConfig';
 import { collection, getDocs, addDoc, doc, query, where } from 'firebase/firestore'
+import { addLog } from '../Utils/Utils';
+import moment from 'moment';
 
 function Login() {
 
@@ -49,6 +51,7 @@ function Login() {
         localStorage.setItem(Constant.USERNAME, user?.username)
         localStorage.setItem(Constant.ROLE, user?.roleId)
         setFailLogin(false)
+        addLog('LOGIN', `${user?.username} telah login pada jam ${moment().locale('id').format('DD/MM/YYYY hh:mm:s')}`)
         navigate('/')
       } else {
         // Data does not exist

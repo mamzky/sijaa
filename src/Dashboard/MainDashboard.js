@@ -11,6 +11,7 @@ import SmallImageCard from '../Components/SmallImageCard';
 import Constant from '../Utils/Constants';
 import { db } from '../Config/FirebaseConfig';
 import {collection, getDocs, addDoc, doc, updateDoc} from 'firebase/firestore'
+// import { "product" } from '../Utils/DataUtils';
 
 function MainDashboard() {
 
@@ -37,7 +38,7 @@ function MainDashboard() {
       discount: '0',
       qty: '30',
       supplier: 'JAA',
-      productCode: 'JAA111'  
+      product_code: 'JAA111'  
     })
   }
 

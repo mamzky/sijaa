@@ -13,6 +13,7 @@ import AddNewProduct from './Product/AddNewProduct';
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { firebaseConfig } from './Config/FirebaseConfig';
+import ProductDetail from './Product/ProductDetail';
 
 // IMPORT PAGES
 
@@ -30,6 +31,7 @@ function App() {
         <Route path='/dashboard' Component={MainDashboard} />
         <Route path='/product' Component={Product}/>
         <Route path='/product/add-new-product' Component={AddNewProduct}/>
+        <Route path='/product/product-detail/:product_code' Component={ProductDetail}/>
         <Route path='/contact' Component={Contact}/>
         <Route path='/contact' Component={Contact}/>
         <Route path='/customer' Component={Customer}/>

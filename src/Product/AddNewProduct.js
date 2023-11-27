@@ -1,15 +1,19 @@
-import React, { useState } from 'react'
-import { Button, CloseButton, Col, Form, Modal, Row } from 'react-bootstrap'
+import React, { useEffect, useState } from 'react'
+import { Button, CloseButton, Col, Form, Modal, Row, Spinner } from 'react-bootstrap'
 import TopNavBar from '../Components/TopNavBar'
 import SideNavBar from '../Components/SideNavBar'
 import SmallImageCard from '../Components/SmallImageCard'
 import CustomTable from '../Components/CustomTable'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { DigitFormatter, OnlyDigit } from '../Utils/General'
 import { empty, isEmpty } from 'ramda'
 import { db } from '../Config/FirebaseConfig';
-import { collection, getDocs, addDoc, doc, updateDoc } from 'firebase/firestore'
+import { collection, getDocs, addDoc, doc, updateDoc, query, where } from 'firebase/firestore'
 import moment from 'moment/moment'
+import { LOG_COLLECTION, PRODUCT_COLLECTION } from '../Utils/DataUtils'
+import Constant from '../Utils/Constants'
+import { addLog } from '../Utils/Utils'
+import AppColors from '../Utils/Colors'
 
 function AddNewProduct() {
 
@@ -27,14 +31,17 @@ function AddNewProduct() {
     const [supplier, setSupplier] = useState('')
     const [qty, setQty] = useState('')
     const [showModal, setShowModal] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
 
     // validationFlag
     const [errorName, setErrorName] = useState('')
+    const [errNameExist, setErrNameExist] = useState(false)
     const [errorSize, setErrorSize] = useState('')
     const [errorBasePrice, setErrorBasePrice] = useState('')
     const [errorSellPrice, setErrorSellPrice] = useState('')
     const [errorSupplier, setErrorSupplier] = useState('')
     const [errorQty, setErrorQty] = useState('')
+    const { id } = useParams()
 
 
     const summaryItem = (title, value) => {
@@ -46,45 +53,79 @@ function AddNewProduct() {
         )
     }
 
-    const validation = () => {
-        if (isEmpty(productName)) {
-            console.log(productName);
-            setErrorName(true)
-            window.scrollTo(0, 0)
-        } else if (isEmpty(productSize) && isEmpty(productSizeExtra)) {
-            setErrorSize(true)
-            window.scrollTo(0, 0)
-        } else if (isEmpty(productBasePrice)) {
-            setErrorBasePrice(true)
-        } else if (isEmpty(supplier)) {
-            setErrorSupplier(true)
-        } else if (isEmpty(qty)) {
-            setErrorQty(true)
+    const checkProductExist = async (productName) => {
+        let isExist
+        let productExist = []
+        const q = query(collection(db, PRODUCT_COLLECTION)
+            , where('product_name', '==', productName))
+        const querySnapshot = await getDocs(q);
+        const result = querySnapshot?.docs?.map(doc => doc.data())
+        if (!querySnapshot?.empty) {
+            productExist = result?.findIndex((e) => e.product_name.toLowerCase() === productName.toLowerCase())
+            isExist = productExist >= 0
         } else {
-            setShowModal(true)
+            isExist = false
         }
+        return isExist
+    }
+
+    const validation = () => {
+        checkProductExist(productName)
+            .then((val) => {
+                if (val) {
+                    setErrNameExist(true)
+                    window.scrollTo(0, 0)
+                } else {
+                    if (isEmpty(productName)) {
+                        console.log(productName);
+                        setErrorName(true)
+                        window.scrollTo(0, 0)
+                    } else if (isEmpty(productSize) && isEmpty(productSizeExtra)) {
+                        setErrorSize(true)
+                        window.scrollTo(0, 0)
+                    } else if (isEmpty(productBasePrice)) {
+                        setErrorBasePrice(true)
+                    } else if (isEmpty(supplier)) {
+                        setErrorSupplier(true)
+                    } else if (isEmpty(qty)) {
+                        setErrorQty(true)
+                    } else {
+                        setShowModal(true)
+                    }
+                }
+            })
+            .catch((err) => {
+                setIsLoading(false)
+            })
+            .finally(() => {
+                setIsLoading(false)
+            })
     }
 
     const submitNewProduct = async () => {
         setShowModal(false)
-        const productCollectionRef = collection(db, "product")
+        const productCollectionRef = collection(db, PRODUCT_COLLECTION)
         await addDoc(productCollectionRef, {
             product_name: productName,
             product_size: productSize,
             base_price: productBasePrice,
             sell_price: productSellPrice,
             discount: discount,
-            discout_type: discType,
+            discount_type: discountType,
             qty: qty,
             supplier: supplier,
-            productCode: `JAA${moment().format('DDMMYYhhmm')}`,
-            created_at: moment(new Date).toISOString()
+            product_code: `JAA${moment().format('DDMMYYhhmm')}`,
+            created_at: moment().locale('id').toISOString()
         }).then((res) => {
             console.log(res);
+            addLog(localStorage.getItem(Constant.USERNAME), `add product ${productName}`)
             navigate('/product')
         })
-
     }
+
+    useEffect(() => {
+        console.log('ID', id);
+    }, [])
 
     return (
         <div>
@@ -104,9 +145,9 @@ function AddNewProduct() {
                         summaryItem('Ukuran', productSizeExtra)
                         :
                         summaryItem('Ukuran', productSize)}
-                    {summaryItem('Harga dasar', productBasePrice)}
-                    {summaryItem('Harga jual', setProductSellPrice.length > 0 || isEmpty(productSellPrice) ? '-' : setProductSellPrice)}
-                    {summaryItem('Diskon', isEmpty(discount) ? '0' : `${DigitFormatter(discount)}(${discountType})`)}
+                    {summaryItem('Harga dasar', `Rp${DigitFormatter(productBasePrice)}`)}
+                    {summaryItem('Harga jual', isEmpty(productSellPrice) ? '-' : `Rp${DigitFormatter(productSellPrice)}`)}
+                    {summaryItem('Diskon', isEmpty(discount) ? '0' : `${DigitFormatter(discount)}(${discountType} Rupiah)`)}
                     {summaryItem('Supplier', supplier)}
                     {summaryItem('Jumlah', qty)}
                 </Modal.Body>
@@ -115,6 +156,25 @@ function AddNewProduct() {
                     <Button variant="danger" onClick={() => setShowModal(false)}>Batal</Button>
                     <Button variant="success" onClick={() => submitNewProduct()}>Ya, Daftarkan</Button>
                 </Modal.Footer>
+            </Modal>
+            <Modal show={isLoading} centered>
+
+                <Modal.Body backdrop={'false'} show={true} onHide={() => setShowModal(false)}
+                    size="md"
+                    aria-labelledby="contained-modal-title-vcenter"
+                    style={{
+                        display: 'flex',
+                        flex: 1,
+                        flexDirection: 'row',
+                        justifyContent: 'center'
+                    }}
+                >
+                    <div>
+                        <Spinner animation="border" role="status" style={{ alignSelf: 'center' }}>
+                        </Spinner>
+                    </div>
+                    <h3 style={{ marginLeft: 20 }}>Loading...</h3>
+                </Modal.Body>
             </Modal>
             <SideNavBar />
             <main className="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
@@ -138,9 +198,11 @@ function AddNewProduct() {
                                     onChange={(e) => {
                                         setProductName(e.target.value)
                                         setErrorName(isEmpty(e.target.value))
+                                        setErrNameExist(false)
                                     }}
                                     placeholder="Masukan nama produk"
                                 />
+                                {errNameExist && <p style={{ color: AppColors.Error1 }}>Nama produk telah didaftarkan</p>}
                             </Form.Group>
 
                             {/* SIZE */}
@@ -310,6 +372,7 @@ function AddNewProduct() {
                                     variant='success'
                                     style={{ width: '50%', alignSelf: 'flex-end' }}
                                     onClick={() => {
+                                        setIsLoading(true)
                                         validation()
                                     }}
                                 >Tambah Produk Baru</Button>

@@ -6,12 +6,15 @@ import SmallImageCard from '../Components/SmallImageCard'
 import CustomTable from '../Components/CustomTable'
 import { useNavigate } from 'react-router-dom'
 import { db } from '../Config/FirebaseConfig';
-import { collection, getDocs, addDoc, doc, updateDoc } from 'firebase/firestore'
+import { collection, getDocs, addDoc, doc, updateDoc, query, where } from 'firebase/firestore'
+import { PRODUCT_COLLECTION } from '../Utils/DataUtils'
+import { DigitFormatter } from '../Utils/General'
+// import { "product" } from '../Utils/DataUtils'
 
 function Product() {
 
   const navigate = useNavigate()
-  const productCollectionRef = collection(db, "product")
+  const productCollectionRef = collection(db, PRODUCT_COLLECTION)
   const [productData, setProductData] = useState([])
   const [lowestStock, setLowestStock] = useState([])
 
@@ -21,7 +24,7 @@ function Product() {
     const sortedData = data.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
     const lowestData = data.docs.map((doc) => ({ ...doc.data(), id: doc.id })).sort((a, b) => a.qty - b.qty)
     setProductData(sortedData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)))
-    setLowestStock(lowestData.length > 4 ? lowestData.slice(0,4) : lowestData)
+    setLowestStock(lowestData.length > 4 ? lowestData.slice(0, 4) : lowestData)
   }
   useEffect(() => {
     getProduct()
@@ -30,6 +33,16 @@ function Product() {
   useEffect(() => {
     console.log(lowestStock)
   }, [lowestStock])
+
+  const searchProduct = async (productName) => {
+    const q = query(collection(db, PRODUCT_COLLECTION.toString()))
+    const querySnapshot = await getDocs(q);
+    const result = querySnapshot.docs
+      .map(doc => doc.data())
+      .filter((e) => e.product_name.toLowerCase()
+        .includes(productName.toLowerCase())).sort((a, b) => a.qty - b.qty)
+    setProductData(result)
+  }
 
 
   return (
@@ -52,11 +65,30 @@ function Product() {
               >+ Tambah Produk Baru</Button>
             </div>
           </div>
-          <div class="row mt-4">
+          {/* <div class="row mt-4">
             <SmallImageCard />
             <SmallImageCard />
             <SmallImageCard />
             <SmallImageCard />
+          </div> */}
+          <div>
+            <Form.Group className="col-lg-6 col-md-3" controlId='productName'>
+              <Form.Control
+                isInvalid={false}
+                type="input"
+                name='productName'
+
+                on
+                onChange={(e) => {
+                  setTimeout(() => {
+                    searchProduct(e.target.value)
+                  }, 500);
+                  // setProductName(e.target.value)
+                  // setErrorName(isEmpty(e.target.value))
+                }}
+                placeholder="Cari produk"
+              />
+            </Form.Group>
           </div>
           <div class="row mt-4">
             <div className="card-body px-0 pb-2">
@@ -75,8 +107,12 @@ function Product() {
                     {productData?.map((item, index) => {
                       return (
                         <tr onClick={() => {
-                          console.log(item);
-                        }}>
+                          navigate(`/product/product-detail/${item.product_code}`)
+                        }}
+                          style={{ cursor: 'pointer' }} // Optional: Change cursor on hover
+                          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = 'black')}
+                          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '')}
+                        >
                           <td>
                             <div className="ps-3 py-1">
                               <div className="d-flex flex-column justify-content-center">
@@ -109,7 +145,7 @@ function Product() {
                             <div className="progress-wrapper ps-3 py-1">
                               <div className="progress-info">
                                 <div className="progress-percentage">
-                                  <span className="text-xs font-weight-bold">{item?.base_price}</span>
+                                  <span className="text-xs font-weight-bold">{`Rp${DigitFormatter(item?.base_price)}`}</span>
                                 </div>
                               </div>
                               {/* <div className="progress">

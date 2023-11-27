@@ -1,6 +1,8 @@
 import React from 'react'
+import Constant from '../Utils/Constants'
 
 function TopNavBar() {
+  const username = localStorage?.getItem(Constant.USERNAME)
   return (
     <div>
         {/* <!-- Navbar --> */}
@@ -40,7 +42,7 @@ function TopNavBar() {
                   <a href="javascript:;" className="nav-link text-body p-0" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                   <a href="../pages/sign-in.html" className="nav-link text-body font-weight-bold px-0">
                     <i className="fa fa-user me-sm-1"></i>
-                    <span className="d-sm-inline d-none">Username</span>
+                    <span className="d-sm-inline d-none">{username}</span>
                   </a>
                   </a>
                   <ul className="dropdown-menu  dropdown-menu-end  px-2 py-0 me-sm-n2" aria-labelledby="dropdownMenuButton">
