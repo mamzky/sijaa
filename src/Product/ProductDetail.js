@@ -86,10 +86,10 @@ function ProductDetail() {
         }
         const oldProductDoc = doc(db, PRODUCT_COLLECTION, productData?.id)
         updateDoc(oldProductDoc, newProductData)
-        .then(() => {
-            setIsLoading(false)
-            navigate('/product')
-        })
+            .then(() => {
+                setIsLoading(false)
+                navigate('/product')
+            })
     }
 
     const getProduct = async (product_code) => {
@@ -97,7 +97,7 @@ function ProductDetail() {
         const q = query(collection(db, PRODUCT_COLLECTION)
             , where('product_code', '==', product_code))
         const querySnapshot = await getDocs(q)
-        const result = querySnapshot.docs.map((doc) => ({id: doc.id, ...doc.data()}))
+        const result = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
         if (!querySnapshot.empty) {
             setProductData(result[0])
             console.log('RESULT', result);
@@ -208,19 +208,32 @@ function ProductDetail() {
                             </div>
                             <div>
                                 <p>Diskon</p>
-                                <h4 style={{ marginTop: -20 }}>{isEmpty(productData?.discount) ? '-' :  `${DigitFormatter(productData?.discount)}(${productData?.discount_type})`}</h4>
+                                <h4 style={{ marginTop: -20 }}>{isEmpty(productData?.discount) ? '-' : `${DigitFormatter(productData?.discount)}(${productData?.discount_type})`}</h4>
                             </div>
                             <div>
                                 <p>Supplier</p>
                                 <h4 style={{ marginTop: -20 }}>{productData?.supplier}</h4>
                             </div>
                             <div>
-                                <p>Tanggal Input</p>
-                                <h4 style={{ marginTop: -20 }}>{moment(productData?.created_at).locale('id').format('DD MMMM YYYY HH:mm')}</h4>
+                                <div style={{ display: 'flex', flexDirection: 'row' }}>
+                                    <div>
+                                        <p>Tanggal Input</p>
+                                        <h4 style={{ marginTop: -20 }}>{moment(productData?.created_at).locale('id').format('DD MMMM YYYY HH:mm')}</h4>
+                                    </div>
+                                    {productData?.updated_at ?
+                                        <div style={{marginLeft: 40}}>
+                                            <p>Tanggal update</p>
+                                            <h4 style={{ marginTop: -20 }}>{moment(productData?.updated_at).locale('id').format('DD MMMM YYYY HH:mm')}</h4>
+                                            <p style={{ marginTop: -10 }}>{`(${productData?.latest_update})`}</p>
+                                        </div>
+                                        :
+                                        <div></div>
+                                    }
+                                </div>
                             </div>
                             <div className="col-lg-8 col-md-3 my-4" style={{ display: 'flex', flex: 1, flexDirection: 'row' }}>
                                 <Button
-                                variant='light'
+                                    variant='light'
                                     style={{ width: '25%', alignSelf: 'flex-start', marginRight: 20 }}
                                     onClick={() => {
                                         navigate(-1)
@@ -398,23 +411,6 @@ function ProductDetail() {
                                         placeholder="Masukan nama supplier"
                                     />
                                 </div>
-
-                                {/* QTY */}
-                                {/* <div className="col-lg-6 col-md-3 mt-4">
-                                    <Form.Label>Jumlah</Form.Label>
-                                    <Form.Control
-                                        type="input"
-                                        name='qty'
-                                        isInvalid={errorQty}
-                                        value={qty}
-                                        onChange={(e) => {
-                                            const digitOnly = OnlyDigit(e.target.value)
-                                            setQty(digitOnly)
-                                            setErrorQty(isEmpty(digitOnly))
-                                        }}
-                                        placeholder="Masukan jumlah"
-                                    />
-                                </div> */}
                                 <div className='my-4'>
                                     <Button
                                         type='button'

@@ -77,8 +77,6 @@ function Product() {
                 isInvalid={false}
                 type="input"
                 name='productName'
-
-                on
                 onChange={(e) => {
                   setTimeout(() => {
                     searchProduct(e.target.value)
