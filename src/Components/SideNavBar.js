@@ -71,6 +71,18 @@ function SideNavBar() {
               </a>
             </li>
             <li className="nav-item">
+              <a className={`nav-link text-white bg-gradient-primary ${activeMenu === Constant.MENU_TRANSACTION ? 'active' : ''}`} href="/transaction"
+                onClick={() => {
+                  localStorage.setItem(Constant.ACTIVE_MENU, Constant.MENU_TRANSACTION)
+                }}
+              >
+                <div className="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                  <i className="material-icons opacity-10">table_view</i>
+                </div>
+                <span className="nav-link-text ms-1">Transaksi</span>
+              </a>
+            </li>
+            <li className="nav-item">
               <a className={`nav-link text-white bg-gradient-primary ${activeMenu === Constant.MENU_PRODUCT ? 'active' : ''}`} href="/product"
                 onClick={() => {
                   localStorage.setItem(Constant.ACTIVE_MENU, Constant.MENU_PRODUCT)

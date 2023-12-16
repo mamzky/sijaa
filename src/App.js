@@ -16,6 +16,8 @@ import { firebaseConfig } from './Config/FirebaseConfig';
 import ProductDetail from './Product/ProductDetail';
 import AddNewCustomer from './Customer/AddNewCustomer';
 import CustomerDetail from './Customer/CustomerDetail';
+import Transaction from './Transaction/Transaction';
+import AddNewTransaction from './Transaction/AddNewTransaction';
 
 // IMPORT PAGES
 
@@ -40,6 +42,8 @@ function App() {
         <Route path='/customer/new-customer' Component={AddNewCustomer}/>
         <Route path='/customer/detail/:customer_code' Component={CustomerDetail}/>
         <Route path='/stock' Component={Stock}/>
+        <Route path='/transaction' Component={Transaction}/>
+        <Route path='/transaction/new-transaction' Component={AddNewTransaction}/>
       </Routes>
     </Router>
   );
