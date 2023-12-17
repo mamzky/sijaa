@@ -55,6 +55,7 @@ function AddNewTransaction() {
     const [orderDate, setOrderDate] = useState(new Date());
     const [transactionType, setTransactiontype] = useState()
     const [dp, setDp] = useState(0)
+    const [isActive, setIsActive] = useState(true)
 
     // MODAL
     const [selectedProduct, setSeletedProduct] = useState()
@@ -74,23 +75,6 @@ function AddNewTransaction() {
         )
     }
 
-    const checkCustomerExist = async (name) => {
-        let isExist
-        let customerExist = []
-        const q = query(collection(db, CUSTOMER_COLLECTION)
-            , where('name', '==', name))
-        const querySnapshot = await getDocs(q);
-        const result = querySnapshot?.docs?.map(doc => doc.data())
-        if (!querySnapshot?.empty) {
-            customerExist = result?.findIndex((e) => e.name?.toLowerCase() === name?.toLowerCase())
-            isExist = customerExist >= 0
-        } else {
-            isExist = false
-        }
-        return isExist
-    }
-
-
     useEffect(() => {
         getCustomer()
         getProduct()
@@ -98,7 +82,7 @@ function AddNewTransaction() {
 
     const getCustomer = async () => {
         const data = await getDocs(customerCollectionRef)
-        const sortedData = data.docs.map((doc) => ({ id: doc.id, label: doc.data().name, value: doc.data() }))
+        const sortedData = data.docs.map((doc) => ({ id: doc.id, label: `${doc.data().name}(${doc.data().contact_person})`, value: doc.data() }))
         setCustomerList(sortedData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)))
     }
 
@@ -133,6 +117,7 @@ function AddNewTransaction() {
             type: transactionType,
             dp: dp ?? 0,
             total_bill: DigitFormatter(calculateTotal(orderList)),
+            status: isActive,
             created_at: moment().locale('id').toISOString(),
             updated_at: moment().locale('id').toISOString(),
             created_by: localStorage.getItem(Constant.USERNAME)
@@ -166,7 +151,7 @@ function AddNewTransaction() {
                 <Modal.Body>
                     <Row>
                         <div className='col-lg-6'>
-                            {summaryItem('Nama customer', customerList.find((e) => e.id === selectedCustomer)?.value?.name)}
+                            {summaryItem('Nama customer', customerList.find((e) => e.id === selectedCustomer)?.value?.name ?? customerName)}
                             {summaryItem('Nomor telepon', phone)}
                             {summaryItem('Email', customerList.find((e) => e.id === selectedCustomer)?.value?.email ?? '-')}
                             {summaryItem('Alamat', address)}
@@ -339,6 +324,8 @@ function AddNewTransaction() {
                                     </Row>
 
                                 </Form.Group>
+
+                                {/* DATE */}
                                 <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='date'>
                                     <Form.Label>Tanggal</Form.Label>
                                     <Form.Control
@@ -370,8 +357,6 @@ function AddNewTransaction() {
                                         {
                                             existingCustomer ?
                                                 <Select
-                                                    // styles={{ width: '100%' }} 
-                                                    // value={selectedCustomer}
                                                     options={customerList}
                                                     placeholder="Pilih customer"
                                                     onChange={(e) => {
@@ -386,10 +371,9 @@ function AddNewTransaction() {
                                                 <Form.Control
                                                     type="input"
                                                     name='customerPhone'
-                                                    value={phone}
+                                                    value={customerName}
                                                     onChange={(e) => {
-                                                        const onlyDigits = OnlyDigit(e.target.value)
-                                                        setPhone(onlyDigits)
+                                                        setCustomerName(e.target.value)
                                                     }}
                                                     placeholder="Masukan nama customer"
                                                 />
@@ -489,7 +473,7 @@ function AddNewTransaction() {
                                                     {transactionType ?? 'Jenis Transaksi'}
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu>
-                                                    {['Tunai', 'Konsinyasi', 'Pre Order'].map((label) => {
+                                                    {['Tunai', 'Konsinyasi', 'Purchase Order'].map((label) => {
                                                         return (
                                                             <Dropdown.Item onClick={() => setTransactiontype(label)}>{label}</Dropdown.Item>
                                                         )
@@ -514,11 +498,21 @@ function AddNewTransaction() {
                                         }
 
                                     </Row>
-
-
                                 </Form.Group>
                             </Row>
 
+                            <Row>
+                                {/* Status */}
+                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='contactPerson'>
+                                    <Form.Label>Status</Form.Label>
+                                    <Form.Check // prettier-ignore
+                                        checked={isActive}
+                                        onChange={() => setIsActive((e) => !e)}
+                                        type="switch"
+                                        label={isActive ? 'Aktif' : 'Non-Aktif'}
+                                    />
+                                </Form.Group>
+                            </Row>
 
                             <div class="row mt-4">
                                 <div className="card-body px-0 pb-2">
@@ -530,6 +524,7 @@ function AddNewTransaction() {
                                                     <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nama Barang</th>
                                                     <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Jumlah</th>
                                                     <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Harga</th>
+                                                    <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Diskon</th>
                                                     <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Total</th>
                                                     <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 col-lg-2"></th>
                                                 </tr>
@@ -578,6 +573,24 @@ function AddNewTransaction() {
                                                                     </div>
                                                                 </div>
                                                             </td>
+                                                            <td className='col-lg-2'>
+                                                                <div className="ps-2 py-1">
+                                                                    <div className="d-flex flex-column">
+
+                                                                        {/* <Form.Control
+                                                                            // isInvalid={errorName}
+                                                                            type="input"
+                                                                            name='customerAddress'
+                                                                            // value={address}
+                                                                            onChange={(e) => {
+                                                                                // setAddress(e.target.value)
+                                                                            }}
+                                                                            placeholder="Input Diskon"
+                                                                        /> */}
+
+                                                                    </div>
+                                                                </div>
+                                                            </td>
                                                             <td>
                                                                 <div className="ps-3 py-1">
                                                                     <div className="d-flex flex-column">
@@ -601,27 +614,74 @@ function AddNewTransaction() {
                                                     )
                                                 })}
                                                 {orderList.length > 0 &&
+                                                    <>
                                                     <tr
-                                                        style={{ backgroundColor: AppColors.MainBrand9 }} // Optional: Change cursor on hover
-                                                    >
-                                                        <td />
-                                                        <td />
-                                                        <td />
-                                                        <td>
-                                                            <div className="ps-3 py-1">
-                                                                <div className="d-flex flex-column justify-content-center">
-                                                                    <h6 className="mb-0 text-sm">{'TOTAL'}</h6>
+                                                            style={{ backgroundColor: AppColors.MainBrand9 }} // Optional: Change cursor on hover
+                                                        >
+                                                            <td />
+                                                            <td />
+                                                            <td />
+                                                            <td />
+                                                            <td>
+                                                                <div className="ps-3 py-1">
+                                                                    <div className="d-flex flex-column justify-content-center">
+                                                                        <h6 className="mb-0 text-sm">{'SUBTOTAL'}</h6>
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            <div className="ps-3 py-1">
-                                                                <div className="d-flex flex-column justify-content-center">
-                                                                    <h6 className="mb-0 text-sm">{DigitFormatter(calculateTotal(orderList))}</h6>
+                                                            </td>
+                                                            <td>
+                                                                <div className="ps-3 py-1">
+                                                                    <div className="d-flex flex-column justify-content-center">
+                                                                        <h6 className="mb-0 text-sm">{DigitFormatter(calculateTotal(orderList))}</h6>
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
+                                                            </td>
+                                                        </tr>
+                                                        <tr
+                                                            style={{ backgroundColor: AppColors.MainBrand9 }} // Optional: Change cursor on hover
+                                                        >
+                                                            <td />
+                                                            <td />
+                                                            <td />
+                                                            <td />
+                                                            <td>
+                                                                <div className="ps-3 py-1">
+                                                                    <div className="d-flex flex-column justify-content-center">
+                                                                        <h6 className="mb-0 text-sm">{'Tax'}</h6>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div className="ps-3 py-1">
+                                                                    <div className="d-flex flex-column justify-content-center">
+                                                                        <h6 className="mb-0 text-sm">{DigitFormatter(calculateTotal(orderList) * 0.11)}</h6>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr
+                                                            style={{ backgroundColor: AppColors.MainBrand9 }} // Optional: Change cursor on hover
+                                                        >
+                                                            <td />
+                                                            <td />
+                                                            <td />
+                                                            <td />
+                                                            <td>
+                                                                <div className="ps-3 py-1">
+                                                                    <div className="d-flex flex-column justify-content-center">
+                                                                        <h6 className="mb-0 text-sm">{'TOTAL'}</h6>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div className="ps-3 py-1">
+                                                                    <div className="d-flex flex-column justify-content-center">
+                                                                        <h6 className="mb-0 text-sm">{DigitFormatter(calculateTotal(orderList) + calculateTotal(orderList) * 0.11)}</h6>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </>
                                                 }
 
                                             </tbody>

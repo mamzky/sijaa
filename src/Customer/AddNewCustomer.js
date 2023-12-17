@@ -50,43 +50,51 @@ function AddNewCustomer() {
     }
 
     const checkCustomerExist = async (name) => {
-        let isExist
-        let customerExist = []
-        const q = query(collection(db, CUSTOMER_COLLECTION)
-            , where('name', '==', name))
-        const querySnapshot = await getDocs(q);
-        const result = querySnapshot?.docs?.map(doc => doc.data())
-        if (!querySnapshot?.empty) {
-            customerExist = result?.findIndex((e) => e.name.toLowerCase() === name.toLowerCase())
-            isExist = customerExist >= 0
-        } else {
-            isExist = false
-        }
-        return isExist
+        // let isExist
+        // let customerExist = []
+        // const q = query(collection(db, CUSTOMER_COLLECTION)
+        //     , where('name', '==', name))
+        // const querySnapshot = await getDocs(q);
+        // const result = querySnapshot?.docs?.map(doc => doc.data())
+        // if (!querySnapshot?.empty) {
+        //     customerExist = result?.findIndex((e) => e.name.toLowerCase() === name.toLowerCase())
+        //     isExist = customerExist >= 0
+        // } else {
+        //     isExist = false
+        // }
+        // return isExist
+        return true
     }
 
     const validation = () => {
-        checkCustomerExist(customerName)
-            .then((val) => {
-                if (val) {
-                    setErrNameExist(true)
-                    window.scrollTo(0, 0)
-                } else {
-                    if (isEmpty(customerName)) {
-                        console.log('customerName');
-                        setErrorName(true)
-                        window.scrollTo(0, 0)
-                    } else {
-                        setShowModal(true)
-                    }
-                }
-            })
-            .catch((err) => {
-                setIsLoading(false)
-            })
-            .finally(() => {
-                setIsLoading(false)
-            })
+        if (isEmpty(customerName)) {
+            console.log('customerName');
+            setErrorName(true)
+            window.scrollTo(0, 0)
+        } else {
+            setShowModal(true)
+        }
+        // checkCustomerExist(customerName)
+        //     .then((val) => {
+        //         if (val) {
+        //             setErrNameExist(true)
+        //             window.scrollTo(0, 0)
+        //         } else {
+        //             if (isEmpty(customerName)) {
+        //                 console.log('customerName');
+        //                 setErrorName(true)
+        //                 window.scrollTo(0, 0)
+        //             } else {
+        //                 setShowModal(true)
+        //             }
+        //         }
+        //     })
+        //     .catch((err) => {
+        //         setIsLoading(false)
+        //     })
+        //     .finally(() => {
+        setIsLoading(false)
+        //     })
     }
 
     const submitNewProduct = async () => {
@@ -97,7 +105,7 @@ function AddNewCustomer() {
             phone: phone,
             email: email,
             address: address,
-            contact_person: customerName,
+            contact_person: contactPerson,
             notes,
             customer_code: `JAACST${moment().format('DDMMYYhhmm')}`,
             created_at: moment().locale('id').toISOString()

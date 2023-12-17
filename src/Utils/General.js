@@ -12,3 +12,23 @@ export const DigitFormatter = (number) => {
 export const OnlyDigit = (value) => {
     return value.replace(/[^0-9]/g, '')
 }
+
+export const PaymentTypeList = [
+    {label: 'Tunai', value: 'Tunai'},
+    {label: 'Konsinyasi', value: 'Konsinyasi'},
+    {label: 'Purchase Order', value: 'Purchase Order'},
+]
+
+export const StatusTypeList = [
+    {label: 'Aktif', value: true},
+    {label: 'NonAktif', value: false},
+]
+
+export const filterByList = [
+    { label: 'Nomor Transaksi', value: 'order_number' },
+    { label: 'Customer', value: 'customer_id' },
+    { label: 'Jenis', value: 'type' },
+    { label: 'Tanggal', value: 'order_date' },
+    { label: 'Status', value: 'status' },
+    { label: 'Hapus Filter', value: null }
+  ]

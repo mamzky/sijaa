@@ -19,6 +19,7 @@ import CustomerDetail from './Customer/CustomerDetail';
 import Transaction from './Transaction/Transaction';
 import AddNewTransaction from './Transaction/AddNewTransaction';
 import "react-datepicker/dist/react-datepicker.css";
+import TransactionDetail from './Transaction/TransactionDetail';
 
 // IMPORT PAGES
 
@@ -45,6 +46,7 @@ function App() {
         <Route path='/stock' Component={Stock}/>
         <Route path='/transaction' Component={Transaction}/>
         <Route path='/transaction/new-transaction' Component={AddNewTransaction}/>
+        <Route path='/transaction/detail/:order_number' Component={TransactionDetail}/>
       </Routes>
     </Router>
   );
