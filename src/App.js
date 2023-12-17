@@ -18,6 +18,7 @@ import AddNewCustomer from './Customer/AddNewCustomer';
 import CustomerDetail from './Customer/CustomerDetail';
 import Transaction from './Transaction/Transaction';
 import AddNewTransaction from './Transaction/AddNewTransaction';
+import "react-datepicker/dist/react-datepicker.css";
 
 // IMPORT PAGES
 
