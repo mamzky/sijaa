@@ -96,6 +96,7 @@ function Product() {
                     <tr>
                       <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">No.</th>
                       <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nama Produk</th>
+                      <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Size</th>
                       <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Jml. Stock</th>
                       <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Supplier</th>
                       <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Harga Dasar</th>
@@ -122,6 +123,13 @@ function Product() {
                             <div className="ps-3 py-1">
                               <div className="d-flex flex-column justify-content-center">
                                 <h6 className="mb-0 text-sm">{item?.product_name}</h6>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div className="ps-3 py-1">
+                              <div className="d-flex flex-column justify-content-center">
+                                <h6 className="mb-0 text-sm">{item?.product_size}</h6>
                               </div>
                             </div>
                           </td>
