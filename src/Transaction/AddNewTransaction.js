@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Button, CloseButton, Col, Form, Modal, Row, Spinner } from 'react-bootstrap'
+import { Alert, Button, CloseButton, Col, Dropdown, DropdownDivider, Form, Modal, Row, Spinner } from 'react-bootstrap'
 import TopNavBar from '../Components/TopNavBar'
 import SideNavBar from '../Components/SideNavBar'
 import SmallImageCard from '../Components/SmallImageCard'
@@ -10,11 +10,12 @@ import { empty, isEmpty } from 'ramda'
 import { db } from '../Config/FirebaseConfig';
 import { collection, getDocs, addDoc, doc, updateDoc, query, where } from 'firebase/firestore'
 import moment from 'moment/moment'
-import { CUSTOMER_COLLECTION, LOG_COLLECTION, PRODUCT_COLLECTION } from '../Utils/DataUtils'
+import { CUSTOMER_COLLECTION, LOG_COLLECTION, PRODUCT_COLLECTION, TRANSACTION_COLLECTION } from '../Utils/DataUtils'
 import Constant from '../Utils/Constants'
-import { addLog } from '../Utils/Utils'
+import { addLog, calculateTotal } from '../Utils/Utils'
 import Select from 'react-select'
 import AppColors from '../Utils/Colors'
+import DatePicker from "react-datepicker"
 
 function AddNewTransaction() {
 
@@ -27,7 +28,6 @@ function AddNewTransaction() {
     const [email, setEmail] = useState('')
     const [address, setAddress] = useState('')
     const [contactPerson, setContactPerson] = useState('')
-    const [notes, setNotes] = useState('')
 
     const [showModal, setShowModal] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
@@ -48,10 +48,21 @@ function AddNewTransaction() {
     const [productList, setProductList] = useState([])
 
     //ORDER
-    const [selectedCustomer, setSeletedCustomer] = useState()
-    const [selectedProduct, setSeletedProduct] = useState()
+    const [selectedCustomer, setSelectedCustomer] = useState()
     const [transactionNotes, setTransactionNotes] = useState('')
     const [orderList, setOrderList] = useState([])
+    const [orderNumber, setOrderNumber] = useState('')
+    const [orderDate, setOrderDate] = useState(new Date());
+    const [transactionType, setTransactiontype] = useState()
+    const [dp, setDp] = useState(0)
+
+    // MODAL
+    const [selectedProduct, setSeletedProduct] = useState()
+    const [qtySelectedItem, setQtySelectedItem] = useState(1)
+    const [priceSelectedItem, setPriceSelectedItem] = useState(0)
+    const [productIsExist, setProductIsExist] = useState(false)
+    const [isEditItem, setIsEditItem] = useState(false)
+
 
 
     const summaryItem = (title, value) => {
@@ -71,7 +82,7 @@ function AddNewTransaction() {
         const querySnapshot = await getDocs(q);
         const result = querySnapshot?.docs?.map(doc => doc.data())
         if (!querySnapshot?.empty) {
-            customerExist = result?.findIndex((e) => e.name.toLowerCase() === name.toLowerCase())
+            customerExist = result?.findIndex((e) => e.name?.toLowerCase() === name?.toLowerCase())
             isExist = customerExist >= 0
         } else {
             isExist = false
@@ -79,48 +90,6 @@ function AddNewTransaction() {
         return isExist
     }
 
-    const validation = () => {
-        checkCustomerExist(customerName)
-            .then((val) => {
-                if (val) {
-                    setErrNameExist(true)
-                    window.scrollTo(0, 0)
-                } else {
-                    if (isEmpty(customerName)) {
-                        console.log('customerName');
-                        setErrorName(true)
-                        window.scrollTo(0, 0)
-                    } else {
-                        setShowModal(true)
-                    }
-                }
-            })
-            .catch((err) => {
-                setIsLoading(false)
-            })
-            .finally(() => {
-                setIsLoading(false)
-            })
-    }
-
-    const submitNewProduct = async () => {
-        setShowModal(false)
-        const customerCollectionRef = collection(db, CUSTOMER_COLLECTION)
-        await addDoc(customerCollectionRef, {
-            name: customerName,
-            phone: phone,
-            email: email,
-            address: address,
-            contact_person: customerName,
-            notes,
-            customer_code: `JAACST${moment().format('DDMMYYhhmm')}`,
-            created_at: moment().locale('id').toISOString()
-        }).then((res) => {
-            console.log(res);
-            addLog(localStorage.getItem(Constant.USERNAME), `create customer ${customerName}`)
-            navigate('/customer')
-        })
-    }
 
     useEffect(() => {
         getCustomer()
@@ -137,37 +106,97 @@ function AddNewTransaction() {
         const data = await getDocs(productCollectionRef)
         const sortedData = data.docs.map((doc) => ({ id: doc.id, label: doc.data().product_name, value: doc.data() }))
         setProductList(sortedData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)))
-      }
+    }
 
-    const addItem = () => {
+    const addItem = (data) => {
         setModalItem(false)
+        setOrderList((_) => _.concat(data))
+    }
+
+    const updateItem = (id, newQty, newPrice) => {
+        setOrderList(prevItems =>
+            prevItems.map(item =>
+                item.id === id ? { ...item, qty: newQty, price: newPrice } : item
+            )
+        );
+    };
+
+    const handleSubmit = () => {
+        setShowModal(true)
+        const body = {
+            customer: customerList.find((e) => e.id === selectedCustomer).value,
+            customer_id: customerList.find((e) => e.id === selectedCustomer).value?.customer_code,
+            order_list: orderList,
+            order_number: orderNumber,
+            order_date: orderDate,
+            notes: transactionNotes,
+            type: transactionType,
+            dp: dp ?? 0,
+            total_bill: DigitFormatter(calculateTotal(orderList)),
+            created_at: moment().locale('id').toISOString(),
+            updated_at: moment().locale('id').toISOString(),
+            created_by: localStorage.getItem(Constant.USERNAME)
+        }
+        submitTransaction(body)
+    }
+
+    const submitTransaction = async (body) => {
+        console.log(body);
+        const transactionCollectionRef = collection(db, TRANSACTION_COLLECTION)
+        await addDoc(transactionCollectionRef, body).then(() => {
+            setIsLoading(false)
+            addLog(localStorage.getItem(Constant.USERNAME), `create transaction ${orderNumber}`)
+            navigate('/transaction')
+        })
     }
 
     return (
         <div>
             {/* MODAL SUMMARY */}
             <Modal show={showModal} onHide={() => setShowModal(false)}
-                size="md"
+                size="lg"
                 aria-labelledby="contained-modal-title-vcenter"
                 centered>
                 <Modal.Header>
                     <Modal.Title>
-                        Transaksi Baru
+                        {`Transaksi Baru (${orderNumber} - ${orderDate})`}
                     </Modal.Title>
                     <CloseButton onClick={() => setShowModal(false)} />
                 </Modal.Header>
                 <Modal.Body>
-                    {summaryItem('Nama customer', customerName)}
-                    {summaryItem('Nomor telepon', phone)}
-                    {summaryItem('Email', email)}
-                    {summaryItem('Alamat', address)}
-                    {summaryItem('Contact person', contactPerson)}
-                    {summaryItem('Catatan', notes)}
+                    <Row>
+                        <div className='col-lg-6'>
+                            {summaryItem('Nama customer', customerList.find((e) => e.id === selectedCustomer)?.value?.name)}
+                            {summaryItem('Nomor telepon', phone)}
+                            {summaryItem('Email', customerList.find((e) => e.id === selectedCustomer)?.value?.email ?? '-')}
+                            {summaryItem('Alamat', address)}
+                            {summaryItem('Contact person', contactPerson)}
+                            {summaryItem('Catatan', transactionNotes != '' ? transactionNotes : '-')}
+                            {summaryItem('Jenis Transaksi', transactionType)}
+                        </div>
+                        <div className='col-lg-6'>
+                            <span style={{ fontWeight: 'bold' }}>Order Item</span><br />
+                            {orderList.map((item) => {
+                                return (
+                                    <Row>
+                                        <p className='col-lg-6'>{`(${item.qty}) ${item.name}`}</p>
+                                        <p className='col-lg-6' style={{ textAlign: 'right', fontWeight: 'bolder' }}>{`Rp${DigitFormatter(item.qty * item.price)}`}</p>
+                                    </Row>
+                                )
+                            })}
+                            <div style={{ height: 1, backgroundColor: 'GrayText' }} />
+                            <Row>
+                                <p className='col-lg-6'>{`Total`}</p>
+                                <p className='col-lg-6' style={{ textAlign: 'right', fontWeight: 'bolder' }}>{`Rp${DigitFormatter(calculateTotal(orderList))}`}</p>
+                            </Row>
+                        </div>
+                    </Row>
+
                 </Modal.Body>
                 <Modal.Footer>
                     <p style={{ width: '100%', textAlign: 'center' }}>Apakah data yang dimasukkan sudah benar?</p>
                     <Button variant="danger" onClick={() => setShowModal(false)}>Batal</Button>
-                    <Button variant="success" onClick={() => submitNewProduct()}>Ya, Daftarkan</Button>
+                    <Button variant="success" onClick={() => handleSubmit()}>Ya, Submit</Button>
                 </Modal.Footer>
             </Modal>
             {/* LOADING */}
@@ -197,43 +226,54 @@ function AddNewTransaction() {
                 centered>
                 <Modal.Header>
                     <Modal.Title>
-                        Tambah Barang
+                        {isEditItem ? 'Ubah Keterangan Barang' : 'Tambah Barang'}
                     </Modal.Title>
                     <CloseButton onClick={() => setModalItem(false)} />
                 </Modal.Header>
                 <Modal.Body>
-                    <Row style={{display: 'flex', justifyContent:'space-between'}}>
-                        <div style={{width: '100%'}}>
+                    <Row style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <div style={{ width: '100%' }}>
                             <Select
+                                isDisabled={isEditItem}
                                 value={selectedProduct}
                                 options={productList}
                                 placeholder="Pilih produk"
                                 onChange={(e) => {
-                                    setSeletedProduct(e)
+                                    console.log(e.id)
+                                    console.log()
+                                    if (orderList.findIndex((val) => val.id === e.id) < 0) {
+                                        setProductIsExist(false)
+                                        setSeletedProduct(e)
+                                        setPriceSelectedItem(e.value.base_price)
+                                    } else {
+                                        setSeletedProduct()
+                                        setPriceSelectedItem()
+                                        setProductIsExist(true)
+                                    }
                                 }}
                             />
                         </div>
-                        <div style={{width: '100%', marginTop: 20, display: 'flex', flexDirection: 'row', justifyContent:'space-between' }}>
+                        {productIsExist && <p style={{ color: AppColors.Error1 }}>Produk sudah ada dalam list</p>}
+                        <div style={{ width: '100%', marginTop: productIsExist ? -10 : 20, display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                             <Form.Control
-                            style={{width:'49%'}}
+                                style={{ width: '49%' }}
                                 type="input"
-                                name='customerPhone'
-                                value={DigitFormatter(phone)}
+                                name='qtyModal'
+                                value={DigitFormatter(qtySelectedItem)}
                                 onChange={(e) => {
                                     const onlyDigits = OnlyDigit(e.target.value)
-                                    setPhone(onlyDigits)
+                                    setQtySelectedItem(onlyDigits)
                                 }}
                                 placeholder="Jumlah"
                             />
                             <Form.Control
-                            style={{width:'49%'}}
-
+                                style={{ width: '49%' }}
                                 type="input"
-                                name='customerPhone'
-                                value={phone}
+                                name='priceSelectedItem'
+                                value={DigitFormatter(priceSelectedItem)}
                                 onChange={(e) => {
                                     const onlyDigits = OnlyDigit(e.target.value)
-                                    setPhone(onlyDigits)
+                                    setPriceSelectedItem(onlyDigits)
                                 }}
                                 placeholder="Harga Jual"
                             />
@@ -243,7 +283,27 @@ function AddNewTransaction() {
                 <Modal.Footer>
                     <p style={{ width: '100%', textAlign: 'center' }}>Apakah data yang dimasukkan sudah benar?</p>
                     <Button variant="danger" onClick={() => setModalItem(false)}>Batal</Button>
-                    <Button variant="success" onClick={() => addItem()}>Ya, Tambah Barang</Button>
+                    <Button variant="success"
+                        disabled={productIsExist || parseInt(qtySelectedItem) < 1 || isEmpty(qtySelectedItem)}
+                        onClick={() => {
+                            if (isEditItem) {
+                                updateItem(selectedProduct.id, qtySelectedItem, OnlyDigit(priceSelectedItem))
+                            } else {
+                                const item = {
+                                    item: selectedProduct,
+                                    id: selectedProduct.id,
+                                    name: selectedProduct.value.product_name,
+                                    qty: qtySelectedItem,
+                                    price: OnlyDigit(priceSelectedItem)
+                                }
+                                addItem(item)
+                            }
+
+                            setSeletedProduct()
+                            setQtySelectedItem('')
+                            setPriceSelectedItem('')
+                            setModalItem(false)
+                        }}>{isEditItem ? 'Ubah Barang' : 'Ya, Tambah Barang'}</Button>
                 </Modal.Footer>
             </Modal>
             <SideNavBar />
@@ -256,27 +316,45 @@ function AddNewTransaction() {
                         </div>
                     </div>
                     <div className="row mt-4">
-
                         <Form>
-                            {/* NOMOR ORDER */}
-                            <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='phone'>
-                                <Form.Label>Nomor Order</Form.Label>
-                                <Form.Control
-                                    // isInvalid={errorName}
-                                    type="input"
-                                    name='customerPhone'
-                                    value={phone}
-                                    onChange={(e) => {
-                                        const onlyDigits = OnlyDigit(e.target.value)
-                                        setPhone(onlyDigits)
-                                    }}
-                                    placeholder="Masukan nomor order"
-                                />
-                                {/* {errNameExist && <p style={{ color: AppColors.Error1 }}>Nama customer telah didaftarkan</p>} */}
-                            </Form.Group>
+                            <Row>
+                                {/* NOMOR ORDER */}
+                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='phone'>
+                                    <Form.Label>Nomor Order</Form.Label>
+                                    <Row>
+                                        <Form.Control
+                                            type="input"
+                                            name='orderNumber'
+                                            style={{ width: '90%', height: 40, marginRight: 10 }}
+                                            value={orderNumber}
+                                            onChange={(e) => {
+                                                setOrderNumber(e.target.value)
+                                            }}
+                                            placeholder="Masukan nomor order"
+                                        />
+                                        <Button
+                                            style={{ width: '8%' }}
+                                            onClick={() => { setOrderNumber(`JAA${moment().format('DDMMYYYYhhmm')}`) }}
+                                        ><i className="material-icons opacity-10">cached</i></Button>
+                                    </Row>
+
+                                </Form.Group>
+                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='date'>
+                                    <Form.Label>Tanggal</Form.Label>
+                                    <Form.Control
+                                        type="date"
+                                        name='orderDate'
+                                        value={orderDate}
+                                        onChange={(e) => {
+                                            setOrderDate(e.target.value)
+                                        }}
+                                        placeholder="Tanggal order"
+                                    />
+                                </Form.Group>
+                            </Row>
 
                             {/* NAME */}
-                            <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='productName'>
+                            <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20, paddingRight: 10 }} controlId='productName'>
                                 <Form.Label>Customer</Form.Label>
                                 <div className="col-lg-4 col-md-3" style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                                     <Form.Check
@@ -293,14 +371,15 @@ function AddNewTransaction() {
                                             existingCustomer ?
                                                 <Select
                                                     // styles={{ width: '100%' }} 
-                                                    value={selectedCustomer}
+                                                    // value={selectedCustomer}
                                                     options={customerList}
                                                     placeholder="Pilih customer"
                                                     onChange={(e) => {
-                                                        console.log(e)
+                                                        setSelectedCustomer(e.id)
                                                         setPhone(e.value.phone)
                                                         setAddress(e.value.address)
                                                         setContactPerson(e.value.contact_person)
+                                                        setEmail(e.value.email)
                                                     }}
                                                 />
                                                 :
@@ -320,70 +399,126 @@ function AddNewTransaction() {
                             </Form.Group>
 
                             {/* PHONE */}
-                            <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='phone'>
-                                <Form.Label>Nomor Telepon Customer</Form.Label>
-                                <Form.Control
-                                    type="input"
-                                    name='customerPhone'
-                                    value={phone}
-                                    onChange={(e) => {
-                                        const onlyDigits = OnlyDigit(e.target.value)
-                                        setPhone(onlyDigits)
-                                    }}
-                                    placeholder="Masukan nomor telpon"
-                                />
-                                {/* {errNameExist && <p style={{ color: AppColors.Error1 }}>Nama customer telah didaftarkan</p>} */}
-                            </Form.Group>
+                            <Row>
+                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='phone'>
+                                    <Form.Label>Nomor Telepon Customer</Form.Label>
+                                    <Form.Control
+                                        type="input"
+                                        name='customerPhone'
+                                        value={phone}
+                                        onChange={(e) => {
+                                            const onlyDigits = OnlyDigit(e.target.value)
+                                            setPhone(onlyDigits)
+                                        }}
+                                        placeholder="Masukan nomor telpon"
+                                    />
+                                </Form.Group>
 
-                            {/* ADDRESS */}
-                            <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='address'>
-                                <Form.Label>Alamat Pengiriman</Form.Label>
-                                <Form.Control
-                                    // isInvalid={errorName}
-                                    type="input"
-                                    as="textarea" rows={3}
-                                    name='customerAddress'
-                                    value={address}
-                                    onChange={(e) => {
-                                        setAddress(e.target.value)
-                                    }}
-                                    placeholder="Masukan alamat"
-                                />
-                            </Form.Group>
+                                {/* EMAIL */}
+                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='address'>
+                                    <Form.Label>Email</Form.Label>
+                                    <Form.Control
+                                        // isInvalid={errorName}
+                                        type="input"
+                                        name='customerEmail'
+                                        value={email}
+                                        onChange={(e) => {
+                                            setEmail(e.target.value)
+                                        }}
+                                        placeholder="Masukan email"
+                                    />
+                                </Form.Group>
+                            </Row>
 
-                            {/* CONTACT PERSON */}
-                            <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='contactPerson'>
-                                <Form.Label>Contact Person</Form.Label>
-                                <Form.Control
-                                    // isInvalid={errorName}
-                                    type="input"
-                                    name='customerContactPerson'
-                                    value={contactPerson}
-                                    onChange={(e) => {
-                                        setContactPerson(e.target.value)
-                                        // setErrorName(isEmpty(e.target.value))
-                                        // setErrNameExist(false)
-                                    }}
-                                    placeholder="Masukan nama contact person"
-                                />
-                                {/* {errNameExist && <p style={{ color: AppColors.Error1 }}>Nama customer telah didaftarkan</p>} */}
-                            </Form.Group>
 
-                            {/* NOTES */}
-                            <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='notes'>
-                                <Form.Label>Catatan</Form.Label>
-                                <Form.Control
-                                    // isInvalid={errorName}
-                                    as="textarea" rows={3}
-                                    name='cuctomerNotes'
-                                    value={transactionNotes}
-                                    onChange={(e) => {
-                                        setTransactionNotes(e.target.value)
-                                    }}
-                                    placeholder="Catatan transaksi"
-                                />
-                                {/* {errNameExist && <p style={{ color: AppColors.Error1 }}>Nama customer telah didaftarkan</p>} */}
-                            </Form.Group>
+                            <Row>
+                                {/* CONTACT PERSON */}
+                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='contactPerson'>
+                                    <Form.Label>Contact Person</Form.Label>
+                                    <Form.Control
+                                        // isInvalid={errorName}
+                                        type="input"
+                                        name='customerContactPerson'
+                                        value={contactPerson}
+                                        onChange={(e) => {
+                                            setContactPerson(e.target.value)
+                                        }}
+                                        placeholder="Masukan nama contact person"
+                                    />
+                                </Form.Group>
+                                {/* ADDRESS */}
+                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='address'>
+                                    <Form.Label>Alamat Pengiriman</Form.Label>
+                                    <Form.Control
+                                        // isInvalid={errorName}
+                                        type="input"
+                                        name='customerAddress'
+                                        value={address}
+                                        onChange={(e) => {
+                                            setAddress(e.target.value)
+                                        }}
+                                        placeholder="Masukan alamat"
+                                    />
+                                </Form.Group>
+                            </Row>
+
+
+                            <Row>
+                                {/* NOTES */}
+                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='notes'>
+                                    <Form.Label>Catatan</Form.Label>
+                                    <Form.Control
+                                        as="textarea"
+                                        name='cuctomerNotes'
+                                        value={transactionNotes}
+                                        onChange={(e) => {
+                                            setTransactionNotes(e.target.value)
+                                        }}
+                                        placeholder="Catatan transaksi"
+                                    />
+                                    {/* {errNameExist && <p style={{ color: AppColors.Error1 }}>Nama customer telah didaftarkan</p>} */}
+                                </Form.Group>
+
+                                {/* TRANSACTION TYPE */}
+                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='type'>
+                                    <Row>
+                                        <Col className='col-lg-4'>
+                                            <Form.Label>Jenis Transaksi</Form.Label>
+                                            <Dropdown className='col-lg-12'>
+                                                <Dropdown.Toggle className='col-lg-12' variant="success" id="dropdown-basic">
+                                                    {transactionType ?? 'Jenis Transaksi'}
+                                                </Dropdown.Toggle>
+                                                <Dropdown.Menu>
+                                                    {['Tunai', 'Konsinyasi', 'Pre Order'].map((label) => {
+                                                        return (
+                                                            <Dropdown.Item onClick={() => setTransactiontype(label)}>{label}</Dropdown.Item>
+                                                        )
+                                                    })}
+                                                </Dropdown.Menu>
+                                            </Dropdown>
+                                        </Col>
+                                        {transactionType?.toLowerCase() != 'tunai' &&
+                                            <Col>
+                                                <Form.Label>DP</Form.Label>
+                                                <Form.Control
+                                                    className='col-lg-6'
+                                                    type="input"
+                                                    name='dp'
+                                                    value={DigitFormatter(dp)}
+                                                    onChange={(e) => {
+                                                        setDp(e.target.value)
+                                                    }}
+                                                    placeholder="Jumlah DP"
+                                                />
+                                            </Col>
+                                        }
+
+                                    </Row>
+
+
+                                </Form.Group>
+                            </Row>
+
 
                             <div class="row mt-4">
                                 <div className="card-body px-0 pb-2">
@@ -396,16 +531,13 @@ function AddNewTransaction() {
                                                     <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Jumlah</th>
                                                     <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Harga</th>
                                                     <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Total</th>
+                                                    <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 col-lg-2"></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 {orderList?.map((item, index) => {
                                                     return (
-                                                        <tr
-                                                            style={{ cursor: 'pointer' }} // Optional: Change cursor on hover
-                                                            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = 'black')}
-                                                            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '')}
-                                                        >
+                                                        <tr>
                                                             <td>
                                                                 <div className="ps-3 py-1">
                                                                     <div className="d-flex flex-column justify-content-center">
@@ -413,7 +545,19 @@ function AddNewTransaction() {
                                                                     </div>
                                                                 </div>
                                                             </td>
-                                                            <td>
+                                                            <td
+                                                                style={{ cursor: 'pointer' }} // Optional: Change cursor on hover
+                                                                onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#F5F5F5')}
+                                                                onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '')}
+                                                                onClick={() => {
+                                                                    console.log(item);
+                                                                    setIsEditItem(true)
+                                                                    setSeletedProduct(item.item)
+                                                                    setQtySelectedItem(item.qty)
+                                                                    setPriceSelectedItem(DigitFormatter(item.price))
+                                                                    setModalItem(true)
+                                                                }}
+                                                            >
                                                                 <div className="ps-3 py-1">
                                                                     <div className="d-flex flex-column justify-content-center">
                                                                         <h6 className="mb-0 text-sm">{item?.name}</h6>
@@ -423,32 +567,70 @@ function AddNewTransaction() {
                                                             <td>
                                                                 <div className="ps-3 py-1">
                                                                     <div className="d-flex flex-column">
-                                                                        <h6 className="mb-0 text-sm">{item?.phone}</h6>
+                                                                        <h6 className="mb-0 text-sm">{item?.qty}</h6>
                                                                     </div>
                                                                 </div>
                                                             </td>
                                                             <td>
                                                                 <div className="ps-3 py-1">
                                                                     <div className="d-flex flex-column">
-                                                                        <h6 className="mb-0 text-sm">{item?.email}</h6>
+                                                                        <h6 className="mb-0 text-sm">{DigitFormatter(item?.price)}</h6>
                                                                     </div>
                                                                 </div>
                                                             </td>
                                                             <td>
                                                                 <div className="ps-3 py-1">
                                                                     <div className="d-flex flex-column">
-                                                                        <h6 className="mb-0 text-sm">{item?.contact_person}</h6>
+                                                                        <h6 className="mb-0 text-sm">{DigitFormatter(parseInt(item?.qty) * parseInt(OnlyDigit(item?.price)))}</h6>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div className="col-lg-6 ps-1 py-1">
+                                                                    <div className="d-flex flex-column">
+                                                                        <Button variant='danger'
+                                                                            onClick={() => {
+                                                                                const tempArr = orderList
+                                                                                setOrderList(tempArr.filter((e) => e.id != item.id))
+                                                                            }}
+                                                                        >Hapus</Button>
                                                                     </div>
                                                                 </div>
                                                             </td>
                                                         </tr>
                                                     )
                                                 })}
+                                                {orderList.length > 0 &&
+                                                    <tr
+                                                        style={{ backgroundColor: AppColors.MainBrand9 }} // Optional: Change cursor on hover
+                                                    >
+                                                        <td />
+                                                        <td />
+                                                        <td />
+                                                        <td>
+                                                            <div className="ps-3 py-1">
+                                                                <div className="d-flex flex-column justify-content-center">
+                                                                    <h6 className="mb-0 text-sm">{'TOTAL'}</h6>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div className="ps-3 py-1">
+                                                                <div className="d-flex flex-column justify-content-center">
+                                                                    <h6 className="mb-0 text-sm">{DigitFormatter(calculateTotal(orderList))}</h6>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                }
 
                                             </tbody>
                                         </table>
                                         <div style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'center', paddingTop: 20 }}>
-                                            <Button onClick={() => setModalItem(true)} variant="primary">+Tambah Barang</Button>
+                                            <Button onClick={() => {
+                                                setModalItem(true)
+                                                setIsEditItem(false)
+                                            }} variant="primary">+Tambah Barang</Button>
                                         </div>
                                     </div>
                                 </div>
@@ -459,10 +641,9 @@ function AddNewTransaction() {
                                 <Button
                                     type='button'
                                     variant='success'
-                                    style={{ width: '50%', alignSelf: 'flex-end' }}
+                                    style={{ width: '25%', alignSelf: 'flex-end' }}
                                     onClick={() => {
-                                        setIsLoading(true)
-                                        validation()
+                                        setShowModal(true)
                                     }}
                                 >Buat Transaksi</Button>
                             </div>

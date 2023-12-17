@@ -10,14 +10,16 @@ import { empty, isEmpty } from 'ramda'
 import { db } from '../Config/FirebaseConfig';
 import { collection, getDocs, addDoc, doc, updateDoc, query, where } from 'firebase/firestore'
 import moment from 'moment/moment'
-import { CUSTOMER_COLLECTION, LOG_COLLECTION, PRODUCT_COLLECTION } from '../Utils/DataUtils'
+import { CUSTOMER_COLLECTION, LOG_COLLECTION, PRODUCT_COLLECTION, TRANSACTION_COLLECTION } from '../Utils/DataUtils'
 import Constant from '../Utils/Constants'
-import { addLog } from '../Utils/Utils'
+import { addLog, calculateTotal } from '../Utils/Utils'
 import AppColors from '../Utils/Colors'
 
 function CustomerDetail() {
 
     const navigate = useNavigate()
+    const transactionCollectionRef = collection(db, TRANSACTION_COLLECTION)
+    const [transactionData, setTransactionData] = useState([])
 
     const [customerName, setCustomerName] = useState('')
     const [phone, setPhone] = useState('')
@@ -30,13 +32,6 @@ function CustomerDetail() {
     const [isLoading, setIsLoading] = useState(false)
 
     // validationFlag
-    const [errorName, setErrorName] = useState('')
-    const [errNameExist, setErrNameExist] = useState(false)
-    const [errorSize, setErrorSize] = useState('')
-    const [errorBasePrice, setErrorBasePrice] = useState('')
-    const [errorSellPrice, setErrorSellPrice] = useState('')
-    const [errorSupplier, setErrorSupplier] = useState('')
-    const [errorQty, setErrorQty] = useState('')
     const { customer_code } = useParams()
 
 
@@ -60,6 +55,7 @@ function CustomerDetail() {
 
     useEffect(() => {
         getCustomerData(customer_code)
+        getTransactionList()
     }, [])
 
     const getCustomerData = async (customer_code) => {
@@ -77,6 +73,26 @@ function CustomerDetail() {
             console.log('FAILED');
         }
     }
+    const getTransactionList = async () => {
+        const data = await getDocs(transactionCollectionRef)
+        const sortedData = data.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+        console.log(sortedData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)));
+        setTransactionData(sortedData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)))
+
+        const q = query(collection(db, TRANSACTION_COLLECTION)
+            , where('customer_id', '==', customer_code))
+        const querySnapshot = await getDocs(q)
+        const result = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+        if (!querySnapshot.empty) {
+            setTransactionData(result)
+            console.log('RESULT', result);
+            setIsLoading(false)
+        } else {
+            setIsLoading(false)
+            console.log('FAILED');
+        }
+
+      }
 
     const loadDataToForm = (data) => {
         setCustomerName(data?.name)
@@ -173,121 +189,128 @@ function CustomerDetail() {
                     </div>
                     <div className="row mt-4">
                         <Form>
-                            {/* NAME */}
-                            <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='productName'>
-                                <Form.Label>Nama Customer</Form.Label>
-                                {isEdit ?
-                                    <Form.Control
-                                        // isInvalid={errorName}
-                                        type="input"
-                                        name='customerName'
-                                        value={customerName}
-                                        onChange={(e) => {
-                                            setCustomerName(e.target.value)
-                                        }}
-                                        placeholder="Masukan nama"
-                                    />
-                                    :
-                                    <h4 style={{ marginTop: -10, marginBottom: -10 }}>{customerData?.name}</h4>
-                                }
-                            </Form.Group>
+                            <Row>
+                                {/* NAME */}
+                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='productName'>
+                                    <Form.Label>Nama Customer</Form.Label>
+                                    {isEdit ?
+                                        <Form.Control
+                                            // isInvalid={errorName}
+                                            type="input"
+                                            name='customerName'
+                                            value={customerName}
+                                            onChange={(e) => {
+                                                setCustomerName(e.target.value)
+                                            }}
+                                            placeholder="Masukan nama"
+                                        />
+                                        :
+                                        <h4 style={{ marginTop: -10, marginBottom: -10 }}>{customerData?.name}</h4>
+                                    }
+                                </Form.Group>
 
-                            {/* PHONE */}
-                            <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='phone'>
-                                <Form.Label>Nomor Telepon Customer</Form.Label>
-                                {isEdit ?
-                                    <Form.Control
-                                        // isInvalid={errorName}
-                                        type="input"
-                                        name='customerPhone'
-                                        value={phone}
-                                        onChange={(e) => {
-                                            setPhone(e.target.value)
-                                        }}
-                                        placeholder="Masukan nomor telepon"
-                                    />
-                                    :
-                                    <h4 style={{ marginTop: -10, marginBottom: -10 }}>{customerData?.phone}</h4>
-                                }
-                            </Form.Group>
+                                {/* PHONE */}
+                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='phone'>
+                                    <Form.Label>Nomor Telepon Customer</Form.Label>
+                                    {isEdit ?
+                                        <Form.Control
+                                            // isInvalid={errorName}
+                                            type="input"
+                                            name='customerPhone'
+                                            value={phone}
+                                            onChange={(e) => {
+                                                setPhone(e.target.value)
+                                            }}
+                                            placeholder="Masukan nomor telepon"
+                                        />
+                                        :
+                                        <h4 style={{ marginTop: -10, marginBottom: -10 }}>{customerData?.phone}</h4>
+                                    }
+                                </Form.Group>
+                            </Row>
 
-                            {/* EMAIL */}
-                            <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='email'>
-                                <Form.Label>Email Customer</Form.Label>
-                                {isEdit ?
-                                    <Form.Control
-                                        // isInvalid={errorName}
-                                        type="input"
-                                        name='customerEmail'
-                                        value={email}
-                                        onChange={(e) => {
-                                            setEmail(e.target.value)
-                                        }}
-                                        placeholder="Masukan email"
-                                    />
-                                    :
-                                    <h4 style={{ marginTop: -10, marginBottom: -10 }}>{customerData?.email}</h4>
-                                }
-                            </Form.Group>
+                            <Row>
+                                {/* EMAIL */}
+                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='email'>
+                                    <Form.Label>Email Customer</Form.Label>
+                                    {isEdit ?
+                                        <Form.Control
+                                            // isInvalid={errorName}
+                                            type="input"
+                                            name='customerEmail'
+                                            value={email}
+                                            onChange={(e) => {
+                                                setEmail(e.target.value)
+                                            }}
+                                            placeholder="Masukan email"
+                                        />
+                                        :
+                                        <h4 style={{ marginTop: -10, marginBottom: -10 }}>{customerData?.email}</h4>
+                                    }
+                                </Form.Group>
 
-                            {/* ADDRESS */}
-                            <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='address'>
-                                <Form.Label>Alamat Customer</Form.Label>
-                                {isEdit ?
-                                    <Form.Control
-                                        // isInvalid={errorName}
-                                        type="input"
-                                        as="textarea" rows={3}
-                                        name='customerAddress'
-                                        value={address}
-                                        onChange={(e) => {
-                                            setAddress(e.target.value)
-                                        }}
-                                        placeholder="Masukan alamat"
-                                    />
-                                    :
-                                    <h4 style={{ marginTop: -10, marginBottom: -10 }}>{customerData?.address}</h4>
-                                }
-                            </Form.Group>
+                                {/* ADDRESS */}
+                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='address'>
+                                    <Form.Label>Alamat Customer</Form.Label>
+                                    {isEdit ?
+                                        <Form.Control
+                                            // isInvalid={errorName}
+                                            type="input"
+                                            as="textarea" rows={3}
+                                            name='customerAddress'
+                                            value={address}
+                                            onChange={(e) => {
+                                                setAddress(e.target.value)
+                                            }}
+                                            placeholder="Masukan alamat"
+                                        />
+                                        :
+                                        <h4 style={{ marginTop: -10, marginBottom: -10 }}>{customerData?.address}</h4>
+                                    }
+                                </Form.Group>
+                            </Row>
 
-                            {/* CONTACT PERSON */}
-                            <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='contactPerson'>
-                                <Form.Label>Contact Person</Form.Label>
-                                {isEdit ?
-                                    <Form.Control
-                                        // isInvalid={errorName}
-                                        type="input"
-                                        name='contactPerson'
-                                        value={contactPerson}
-                                        onChange={(e) => {
-                                            setContactPerson(e.target.value)
-                                        }}
-                                        placeholder="Contact person"
-                                    />
-                                    :
-                                    <h4 style={{ marginTop: -10, marginBottom: -10 }}>{customerData?.contact_person}</h4>
-                                }
-                            </Form.Group>
+                            <Row>
+                                {/* CONTACT PERSON */}
+                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='contactPerson'>
+                                    <Form.Label>Contact Person</Form.Label>
+                                    {isEdit ?
+                                        <Form.Control
+                                            // isInvalid={errorName}
+                                            type="input"
+                                            name='contactPerson'
+                                            value={contactPerson}
+                                            onChange={(e) => {
+                                                setContactPerson(e.target.value)
+                                            }}
+                                            placeholder="Contact person"
+                                        />
+                                        :
+                                        <h4 style={{ marginTop: -10, marginBottom: -10 }}>{customerData?.contact_person}</h4>
+                                    }
+                                </Form.Group>
 
-                            {/* NOTES */}
-                            <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='notes'>
-                                <Form.Label>Catatan</Form.Label>
-                                {isEdit ?
-                                    <Form.Control
-                                        // isInvalid={errorName}
-                                        type="input"
-                                        as="textarea" rows={3}
-                                        name='cuctomerNotes'
-                                        value={notes}
-                                        onChange={(e) => {
-                                            setNotes(e.target.value)
-                                        }}
-                                        placeholder="Catatan"
-                                    />
-                                    :
-                                    <h4 style={{ marginTop: -10, marginBottom: -10 }}>{customerData?.notes}</h4>
-                                }
-                            </Form.Group>
+                                {/* NOTES */}
+                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='notes'>
+                                    <Form.Label>Catatan</Form.Label>
+                                    {isEdit ?
+                                        <Form.Control
+                                            // isInvalid={errorName}
+                                            type="input"
+                                            as="textarea" rows={3}
+                                            name='cuctomerNotes'
+                                            value={notes}
+                                            onChange={(e) => {
+                                                setNotes(e.target.value)
+                                            }}
+                                            placeholder="Catatan"
+                                        />
+                                        :
+                                        <h4 style={{ marginTop: -10, marginBottom: -10 }}>{customerData?.notes}</h4>
+                                    }
+                                </Form.Group>
+                            </Row>
+
 
                             <div className="col-lg-8 col-md-3 my-4" style={{ display: 'flex', flex: 1, flexDirection: 'row' }}>
                                 <Button
@@ -310,6 +333,84 @@ function CustomerDetail() {
                                 >{isEdit ? 'Simpan' : 'Edit Data Customer'}</Button>
                             </div>
                         </Form>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div className="card-body px-0 pb-2">
+                            <div className="table-responsive">
+                                <table className="table align-items-center mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">No.</th>
+                                            <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nomor Transaksi</th>
+                                            <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Customer</th>
+                                            <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Jenis</th>
+                                            <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
+                                            <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tanggal</th>
+                                            <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {transactionData?.map((item, index) => {
+                                            return (
+                                                <tr>
+                                                    <td>
+                                                        <div className="ps-3 py-1">
+                                                            <div className="d-flex flex-column justify-content-center">
+                                                                <h6 className="mb-0 text-sm">{index + 1}</h6>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div className="ps-3 py-1">
+                                                            <div className="d-flex flex-column justify-content-center">
+                                                                <h6 style={{ cursor: 'pointer' }} className="mb-0 text-sm">{item?.order_number}</h6>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div className="ps-3 py-1">
+                                                            <div className="d-flex flex-column">
+                                                                <h6 className="mb-0 text-sm">{item?.customer?.name}</h6>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div className="ps-3 py-1">
+                                                            <div className="d-flex flex-column">
+                                                                <h6 className="mb-0 text-sm">{item?.type}</h6>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div className="ps-3 py-1">
+                                                            <div className="d-flex flex-column">
+                                                                <h6 className="mb-0 text-sm">{'Aktif'}</h6>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div className="ps-3 py-1">
+                                                            <div className="d-flex flex-column">
+                                                                <h6 className="mb-0 text-sm">{moment(item.created_at).format('DD MMM YYYY')}</h6>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div className="ps-3 py-1">
+                                                            <div className="d-flex flex-column">
+                                                                <h6 className="mb-0 text-sm">{`Rp${DigitFormatter(calculateTotal(item?.order_list))}`}</h6>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )
+                                        })}
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </main>
