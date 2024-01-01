@@ -26,16 +26,20 @@ function Transaction() {
   // FILTER
   const [filterField, setFilterField] = useState('')
 
-  const getTransactionList = async () => {
-    const data = await getDocs(transactionCollectionRef)
-    const sortedData = data.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
-    setTransactionData(sortedData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)))
+  const getTransactionList = () => {
+    const data = getDocs(transactionCollectionRef)
+    const sortedData = data?.docs?.map((doc) => ({ ...doc?.data(), id: doc?.id }))
+    if(sortedData?.length > 0) {
+      setTransactionData(sortedData?.sort((a, b) => new Date(b?.created_at) - new Date(a?.created_at)))
+    }
   }
 
   const getCustomer = async () => {
     const data = await getDocs(customerCollectionRef)
-    const sortedData = data.docs.map((doc) => ({ id: doc.id, label: `${doc.data().name}(${doc.data().contact_person})`, value: doc.data() }))
-    setCustomerList(sortedData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)))
+    const sortedData = data?.docs?.map((doc) => ({ id: doc?.id, label: `${doc?.data()?.name}(${doc?.data()?.contact_person})`, value: doc?.data() }))
+    if(sortedData.length > 0){
+      setCustomerList(sortedData?.sort((a, b) => new Date(b?.created_at) - new Date(a?.created_at)))
+    }
   }
   useEffect(() => {
     getTransactionList()
@@ -199,7 +203,7 @@ function Transaction() {
                       <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Total</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody style={{visibility : transactionData.length > 0}}>
                     {transactionData?.map((item, index) => {
                       return (
                         <tr>
@@ -246,7 +250,7 @@ function Transaction() {
                           <td>
                             <div className="ps-3 py-1">
                               <div className="d-flex flex-column">
-                                <h6 className="mb-0 text-sm">{moment(item.created_at).format('DD MMM YYYY')}</h6>
+                                <h6 className="mb-0 text-sm">{moment(item?.created_at).format('DD MMM YYYY')}</h6>
                               </div>
                             </div>
                           </td>
@@ -260,7 +264,6 @@ function Transaction() {
                         </tr>
                       )
                     })}
-
                   </tbody>
                 </table>
               </div>
