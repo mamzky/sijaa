@@ -4,7 +4,7 @@ import TopNavBar from '../Components/TopNavBar'
 import SideNavBar from '../Components/SideNavBar'
 import SmallImageCard from '../Components/SmallImageCard'
 import CustomTable from '../Components/CustomTable'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useAsyncError, useNavigate, useParams } from 'react-router-dom'
 import { DigitFormatter, OnlyDigit } from '../Utils/General'
 import { empty, isEmpty } from 'ramda'
 import { db } from '../Config/FirebaseConfig';
@@ -25,9 +25,11 @@ function TransactionDetail() {
     const [address, setAddress] = useState('')
     const [contactPerson, setContactPerson] = useState('')
     const [notes, setNotes] = useState('')
+    const [updatedNotes, setUpdatedNotes] = useState('')
 
     const [showModal, setShowModal] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
+    const [updateModal, setUpdateModal] = useState(false)
 
     // validationFlag
     const { order_number } = useParams()
@@ -50,10 +52,6 @@ function TransactionDetail() {
         )
     }
 
-    const validation = () => {
-        setShowModal(true)
-    }
-
     useEffect(() => {
         getOrderData(order_number)
         setIsLoading(false)
@@ -67,6 +65,7 @@ function TransactionDetail() {
         const result = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
         if (!querySnapshot.empty) {
             setOrderData(result[0])
+            setIsActive(result[0].status)
             console.log('RESULT', result[0]);
             setIsLoading(false)
         } else {
@@ -75,8 +74,18 @@ function TransactionDetail() {
         }
     }
 
-    const getTransactionDetail = async (order_number) => {
-        console.log(order_number)
+    const updateData = () => {
+        const newData = { ...orderData }
+        newData.status = !orderData.status
+        newData.notes = updatedNotes
+        const oldData = doc(db, TRANSACTION_COLLECTION, orderData?.id)
+        updateDoc(oldData, newData)
+            .then((val) => {
+                setIsLoading(false)
+                setUpdateModal(false)
+                addLog('UPDATE STATUS TRANSAKSI', `${localStorage.getItem(Constant.USERNAME)} update status transaksi menjadi ${newData?.status}`)
+                window.location.reload(false)
+            })
     }
 
     return (
@@ -123,6 +132,49 @@ function TransactionDetail() {
                     </div>
                     <h3 style={{ marginLeft: 20 }}>Loading...</h3>
                 </Modal.Body>
+            </Modal>
+            <Modal show={updateModal} centered>
+                <Modal.Header>Apakah anda yakin mengubah status transaksi?</Modal.Header>
+                <Modal.Body backdrop={'false'} show={true} onHide={() => setUpdateModal(false)}
+                    size="lg"
+                    aria-labelledby="contained-modal-title-vcenter"
+                    style={{
+                        display: 'flex',
+                        flex: 1,
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        width: '100%'
+                    }}
+                >
+                    <div style={{ width: '100%' }}>
+                        <Form.Control
+                            as="textarea"
+                            name='transactionNotes'
+                            value={updatedNotes}
+                            onChange={(e) => {
+                                setUpdatedNotes(e.target.value)
+                            }}
+                            placeholder="Catatan..."
+                            style={{ width: '100%' }}
+                        />
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <div style={{ display: 'flex', flexDirection: 'row-reverse' }}>
+                        <Button
+                            variant={'success'}
+                            style={{ alignSelf: 'flex-end' }}
+                            onClick={() => {
+                                updateData()
+                            }}
+                        >Ya, Ubah</Button>
+                        <Button
+                            className='mx-2'
+                            variant={'danger'}
+                            onClick={() => setUpdateModal(false)}
+                        >Tidak</Button>
+                    </div>
+                </Modal.Footer>
             </Modal>
             <SideNavBar />
             <main className="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
@@ -206,7 +258,7 @@ function TransactionDetail() {
                                     <Form.Label>Status</Form.Label>
                                     <Form.Check // prettier-ignore
                                         checked={isActive}
-                                        onChange={() => setIsActive((e) => !e)}
+                                        onChange={() => setUpdateModal(true)}
                                         type="switch"
                                         label={isActive ? 'Aktif' : 'Non-Aktif'}
                                     />

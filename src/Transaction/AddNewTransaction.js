@@ -34,15 +34,6 @@ function AddNewTransaction() {
     const [existingCustomer, setExistingCustomer] = useState(false)
     const [modalItem, setModalItem] = useState(false)
 
-    // validationFlag
-    const [errorName, setErrorName] = useState('')
-    const [errNameExist, setErrNameExist] = useState(false)
-    const [errorSize, setErrorSize] = useState('')
-    const [errorBasePrice, setErrorBasePrice] = useState('')
-    const [errorSellPrice, setErrorSellPrice] = useState('')
-    const [errorSupplier, setErrorSupplier] = useState('')
-    const [errorQty, setErrorQty] = useState('')
-
     // DATA LIST
     const [customerList, setCustomerList] = useState([])
     const [productList, setProductList] = useState([])
@@ -107,10 +98,14 @@ function AddNewTransaction() {
 
     const handleSubmit = () => {
         setShowModal(true)
+        const orderHolder = orderList.map((_) => {
+            delete _.item
+            return _
+        })
         const body = {
             customer: customerList.find((e) => e.id === selectedCustomer).value,
             customer_id: customerList.find((e) => e.id === selectedCustomer).value?.customer_code,
-            order_list: orderList,
+            order_list: orderHolder,
             order_number: orderNumber,
             order_date: orderDate,
             notes: transactionNotes,
@@ -151,7 +146,7 @@ function AddNewTransaction() {
                 <Modal.Body>
                     <Row>
                         <div className='col-lg-6'>
-                            {summaryItem('Nama customer', customerList.find((e) => e.id === selectedCustomer)?.value?.name ?? customerName)}
+                            {summaryItem('Nama customer', `${customerList.find((e) => e.id === selectedCustomer)?.value?.name}(${customerList.find((e) => e.id === selectedCustomer)?.value?.contact_person})` ?? customerName)}
                             {summaryItem('Nomor telepon', phone)}
                             {summaryItem('Email', customerList.find((e) => e.id === selectedCustomer)?.value?.email ?? '-')}
                             {summaryItem('Alamat', address)}
@@ -576,18 +571,6 @@ function AddNewTransaction() {
                                                             <td className='col-lg-2'>
                                                                 <div className="ps-2 py-1">
                                                                     <div className="d-flex flex-column">
-
-                                                                        {/* <Form.Control
-                                                                            // isInvalid={errorName}
-                                                                            type="input"
-                                                                            name='customerAddress'
-                                                                            // value={address}
-                                                                            onChange={(e) => {
-                                                                                // setAddress(e.target.value)
-                                                                            }}
-                                                                            placeholder="Input Diskon"
-                                                                        /> */}
-
                                                                     </div>
                                                                 </div>
                                                             </td>

@@ -88,11 +88,11 @@ function CustomerDetail() {
             console.log('RESULT', result);
             setIsLoading(false)
         } else {
+            setTransactionData([])
             setIsLoading(false)
             console.log('FAILED');
         }
-
-      }
+    }
 
     const loadDataToForm = (data) => {
         setCustomerName(data?.name)
@@ -311,16 +311,17 @@ function CustomerDetail() {
                                 </Form.Group>
                             </Row>
 
-
                             <div className="col-lg-8 col-md-3 my-4" style={{ display: 'flex', flex: 1, flexDirection: 'row' }}>
                                 <Button
                                     variant='light'
-                                    style={{ width: '25%', alignSelf: 'flex-start', marginRight: 20 }}
+                                    style={{ width: '25%', alignSelf: 'flex-start' }}
                                     onClick={() => {
                                         isEdit ? setIsEdit(false) : navigate(-1)
                                     }}
                                 >{isEdit ? 'Batal' : 'Kembali'}</Button>
                                 <Button
+                                    variant='success'
+                                    className='mx-2'
                                     style={{ width: '25%', alignSelf: 'flex-end' }}
                                     onClick={() => {
                                         if (isEdit) {
@@ -331,6 +332,12 @@ function CustomerDetail() {
                                         }
                                     }}
                                 >{isEdit ? 'Simpan' : 'Edit Data Customer'}</Button>
+                                <Button
+                                    style={{ width: '25%', alignSelf: 'flex-end', visibility: isEdit ? 'hidden' : 'visible' }}
+                                    onClick={() => {
+                                        navigate(`/customer/detail/${customer_code}/stock`)
+                                    }}
+                                >{'Lihat Stok Customer'}</Button>
                             </div>
                         </Form>
                     </div>
@@ -353,7 +360,7 @@ function CustomerDetail() {
                                     <tbody>
                                         {transactionData?.map((item, index) => {
                                             return (
-                                                <tr>
+                                                <tr key={item?.id}>
                                                     <td>
                                                         <div className="ps-3 py-1">
                                                             <div className="d-flex flex-column justify-content-center">
@@ -385,7 +392,7 @@ function CustomerDetail() {
                                                     <td>
                                                         <div className="ps-3 py-1">
                                                             <div className="d-flex flex-column">
-                                                                <h6 className="mb-0 text-sm">{'Aktif'}</h6>
+                                                                <h6 className="mb-0 text-sm">{item?.status ? 'Aktif' : 'Non-Aktif'}</h6>
                                                             </div>
                                                         </div>
                                                     </td>
