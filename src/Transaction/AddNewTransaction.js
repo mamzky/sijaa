@@ -51,6 +51,7 @@ function AddNewTransaction() {
     // MODAL
     const [selectedProduct, setSeletedProduct] = useState()
     const [qtySelectedItem, setQtySelectedItem] = useState(1)
+    const [discountSelectedItem, setDiscountSelectedItem] = useState(1)
     const [priceSelectedItem, setPriceSelectedItem] = useState(0)
     const [productIsExist, setProductIsExist] = useState(false)
     const [isEditItem, setIsEditItem] = useState(false)
@@ -157,10 +158,14 @@ function AddNewTransaction() {
                         <div className='col-lg-6'>
                             <span style={{ fontWeight: 'bold' }}>Order Item</span><br />
                             {orderList.map((item) => {
+                                 const price = parseInt(OnlyDigit(item.price));
+                                 const discount = parseInt(item.disc);
+                                 const totalPrice = price * item.qty * (1 - discount / 100);
+                         
                                 return (
                                     <Row>
                                         <p className='col-lg-6'>{`(${item.qty}) ${item.name}`}</p>
-                                        <p className='col-lg-6' style={{ textAlign: 'right', fontWeight: 'bolder' }}>{`Rp${DigitFormatter(item.qty * item.price)}`}</p>
+                                        <p className='col-lg-6' style={{ textAlign: 'right', fontWeight: 'bolder' }}>{`Rp${DigitFormatter(totalPrice)}`}</p>
                                     </Row>
                                 )
                             })}
@@ -236,7 +241,7 @@ function AddNewTransaction() {
                         {productIsExist && <p style={{ color: AppColors.Error1 }}>Produk sudah ada dalam list</p>}
                         <div style={{ width: '100%', marginTop: productIsExist ? -10 : 20, display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                             <Form.Control
-                                style={{ width: '49%' }}
+                                style={{ width: '30%' }}
                                 type="input"
                                 name='qtyModal'
                                 value={DigitFormatter(qtySelectedItem)}
@@ -247,7 +252,7 @@ function AddNewTransaction() {
                                 placeholder="Jumlah"
                             />
                             <Form.Control
-                                style={{ width: '49%' }}
+                                style={{ width: '30%' }}
                                 type="input"
                                 name='priceSelectedItem'
                                 value={DigitFormatter(priceSelectedItem)}
@@ -256,6 +261,17 @@ function AddNewTransaction() {
                                     setPriceSelectedItem(onlyDigits)
                                 }}
                                 placeholder="Harga Jual"
+                            />
+                             <Form.Control
+                                style={{ width: '30%' }}
+                                type="input"
+                                name='DiscModal'
+                                value={DigitFormatter(discountSelectedItem)}
+                                onChange={(e) => {
+                                    const onlyDigits = OnlyDigit(e.target.value)
+                                    setDiscountSelectedItem(onlyDigits)
+                                }}
+                                placeholder="Diskon (%)"
                             />
                         </div>
                     </Row>
@@ -274,6 +290,7 @@ function AddNewTransaction() {
                                     id: selectedProduct.id,
                                     name: selectedProduct.value.product_name,
                                     qty: qtySelectedItem,
+                                    disc: discountSelectedItem,
                                     price: OnlyDigit(priceSelectedItem)
                                 }
                                 addItem(item)
@@ -526,6 +543,9 @@ function AddNewTransaction() {
                                             </thead>
                                             <tbody>
                                                 {orderList?.map((item, index) => {
+                                                    const price = parseInt(OnlyDigit(item?.price));
+                                                    const discount = parseInt(item?.disc);
+                                                    const totalPrice = price * parseInt(item?.qty) * (1 - discount / 100);
                                                     return (
                                                         <tr>
                                                             <td>
@@ -545,6 +565,7 @@ function AddNewTransaction() {
                                                                     setSeletedProduct(item.item)
                                                                     setQtySelectedItem(item.qty)
                                                                     setPriceSelectedItem(DigitFormatter(item.price))
+                                                                    setDiscountSelectedItem(item.disc)
                                                                     setModalItem(true)
                                                                 }}
                                                             >
@@ -571,13 +592,14 @@ function AddNewTransaction() {
                                                             <td className='col-lg-2'>
                                                                 <div className="ps-2 py-1">
                                                                     <div className="d-flex flex-column">
+                                                                    <h6 className="mb-0 text-sm">{item?.disc}%</h6>
                                                                     </div>
                                                                 </div>
                                                             </td>
                                                             <td>
                                                                 <div className="ps-3 py-1">
                                                                     <div className="d-flex flex-column">
-                                                                        <h6 className="mb-0 text-sm">{DigitFormatter(parseInt(item?.qty) * parseInt(OnlyDigit(item?.price)))}</h6>
+                                                                        <h6 className="mb-0 text-sm">{DigitFormatter(totalPrice)}</h6>
                                                                     </div>
                                                                 </div>
                                                             </td>
