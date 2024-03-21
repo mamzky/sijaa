@@ -21,6 +21,8 @@ import AddNewTransaction from './Transaction/AddNewTransaction';
 import "react-datepicker/dist/react-datepicker.css";
 import TransactionDetail from './Transaction/TransactionDetail';
 import StockCustomer from './Customer/StockSuctomer';
+import ContactDetail from './Contact/ContactDetail';
+import AddNewContact from './Contact/AddNewContact';
 
 // IMPORT PAGES
 
@@ -40,7 +42,8 @@ function App() {
         <Route path='/product/add-new-product' Component={AddNewProduct}/>
         <Route path='/product/product-detail/:product_code' Component={ProductDetail}/>
         <Route path='/contact' Component={Contact}/>
-        <Route path='/contact' Component={Contact}/>
+        <Route path='/contact/detail' Component={ContactDetail}/>
+        <Route path='/contact/new-contact' Component={AddNewContact}/>
         <Route path='/customer' Component={Customer}/>
         <Route path='/customer/new-customer' Component={AddNewCustomer}/>
         <Route path='/customer/detail/:customer_code' Component={CustomerDetail}/>

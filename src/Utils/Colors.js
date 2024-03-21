@@ -1,5 +1,5 @@
 const AppColors = {
-    MainBrand: '#52B91F',
+    MainBrand: '#202022',
     MainBrand1: '#61C822',
     MainBrand2: '#70D726',
     MainBrand3: '#7FEC29',

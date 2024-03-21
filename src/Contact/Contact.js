@@ -3,8 +3,10 @@ import SideNavBar from '../Components/SideNavBar'
 import TopNavBar from '../Components/TopNavBar'
 import CustomTable from '../Components/CustomTable'
 import { Button } from 'react-bootstrap'
+import { useNavigate } from 'react-router-dom'
 
 function Contact() {
+  const navigate = useNavigate()
     return (
       <div>
       <SideNavBar />
@@ -17,7 +19,11 @@ function Contact() {
               <h6>Daftar kontak JAA Alkesum</h6>
             </div>
             <div className="col-lg-8 col-md-3" style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
-              <Button style={{ width: '40%', alignSelf: 'flex-end' }}>+ Tambah Kontak Baru</Button>
+              <Button style={{ width: '40%', alignSelf: 'flex-end' }}
+              onClick={() => {
+                navigate('/contact/new-contact')
+              }}
+              >+ Tambah Kontak Baru</Button>
             </div>
           </div>
           <CustomTable/>
