@@ -6,7 +6,7 @@ import SmallImageCard from '../Components/SmallImageCard'
 import CustomTable from '../Components/CustomTable'
 import { useNavigate, useParams } from 'react-router-dom'
 import { DigitFormatter, OnlyDigit } from '../Utils/General'
-import { empty, isEmpty } from 'ramda'
+import { empty, isEmpty, isNil } from 'ramda'
 import { db } from '../Config/FirebaseConfig';
 import { collection, getDocs, addDoc, doc, updateDoc, query, where } from 'firebase/firestore'
 import moment from 'moment/moment'
@@ -50,9 +50,9 @@ function AddNewTransaction() {
 
     // MODAL
     const [selectedProduct, setSeletedProduct] = useState()
-    const [qtySelectedItem, setQtySelectedItem] = useState(1)
-    const [discountSelectedItem, setDiscountSelectedItem] = useState(1)
-    const [priceSelectedItem, setPriceSelectedItem] = useState(0)
+    const [qtySelectedItem, setQtySelectedItem] = useState()
+    const [discountSelectedItem, setDiscountSelectedItem] = useState()
+    const [priceSelectedItem, setPriceSelectedItem] = useState()
     const [productIsExist, setProductIsExist] = useState(false)
     const [isEditItem, setIsEditItem] = useState(false)
 
@@ -158,10 +158,10 @@ function AddNewTransaction() {
                         <div className='col-lg-6'>
                             <span style={{ fontWeight: 'bold' }}>Order Item</span><br />
                             {orderList.map((item) => {
-                                 const price = parseInt(OnlyDigit(item.price));
-                                 const discount = parseInt(item.disc);
-                                 const totalPrice = price * item.qty * (1 - discount / 100);
-                         
+                                const price = parseInt(OnlyDigit(item.price));
+                                const discount = parseInt(item.disc);
+                                const totalPrice = price * item.qty * (1 - discount / 100);
+
                                 return (
                                     <Row>
                                         <p className='col-lg-6'>{`(${item.qty}) ${item.name}`}</p>
@@ -239,40 +239,51 @@ function AddNewTransaction() {
                             />
                         </div>
                         {productIsExist && <p style={{ color: AppColors.Error1 }}>Produk sudah ada dalam list</p>}
-                        <div style={{ width: '100%', marginTop: productIsExist ? -10 : 20, display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                            <Form.Control
-                                style={{ width: '30%' }}
-                                type="input"
-                                name='qtyModal'
-                                value={DigitFormatter(qtySelectedItem)}
-                                onChange={(e) => {
-                                    const onlyDigits = OnlyDigit(e.target.value)
-                                    setQtySelectedItem(onlyDigits)
-                                }}
-                                placeholder="Jumlah"
-                            />
-                            <Form.Control
-                                style={{ width: '30%' }}
-                                type="input"
-                                name='priceSelectedItem'
-                                value={DigitFormatter(priceSelectedItem)}
-                                onChange={(e) => {
-                                    const onlyDigits = OnlyDigit(e.target.value)
-                                    setPriceSelectedItem(onlyDigits)
-                                }}
-                                placeholder="Harga Jual"
-                            />
-                             <Form.Control
-                                style={{ width: '30%' }}
-                                type="input"
-                                name='DiscModal'
-                                value={DigitFormatter(discountSelectedItem)}
-                                onChange={(e) => {
-                                    const onlyDigits = OnlyDigit(e.target.value)
-                                    setDiscountSelectedItem(onlyDigits)
-                                }}
-                                placeholder="Diskon (%)"
-                            />
+                        <div style={{ width: '100%', marginTop: productIsExist ? -10 : 20, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                            <div style={{ display: 'flex', flexDirection: 'row', gap: 12 }}>
+                                <Form.Group style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
+                                    <Form.Label>Jumlah</Form.Label>
+                                    <Form.Control
+                                        style={{ width: '100%' }}
+                                        type="input"
+                                        name='qtyModal'
+                                        value={qtySelectedItem ? DigitFormatter(qtySelectedItem) : null}
+                                        onChange={(e) => {
+                                            const onlyDigits = OnlyDigit(e.target.value)
+                                            setQtySelectedItem(onlyDigits)
+                                        }}
+                                        placeholder="Jumlah"
+                                    />
+                                </Form.Group>
+                                <Form.Group style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
+                                    <Form.Label>Harga</Form.Label>
+                                    <Form.Control
+                                        style={{ width: '100%' }}
+                                        type="input"
+                                        name='priceSelectedItem'
+                                        value={priceSelectedItem ? DigitFormatter(priceSelectedItem) : null}
+                                        onChange={(e) => {
+                                            const onlyDigits = OnlyDigit(e.target.value)
+                                            setPriceSelectedItem(onlyDigits)
+                                        }}
+                                        placeholder="Harga Jual"
+                                    />
+                                </Form.Group>
+                            </div>
+                            <Form.Group style={{ marginTop: 12 }}>
+                                <Form.Label>Diskon</Form.Label>
+                                <Form.Control
+                                    style={{ width: '50%' }}
+                                    type="input"
+                                    name='DiscModal'
+                                    value={discountSelectedItem ? DigitFormatter(discountSelectedItem) : null}
+                                    onChange={(e) => {
+                                        const onlyDigits = OnlyDigit(e.target.value)
+                                        setDiscountSelectedItem(onlyDigits)
+                                    }}
+                                    placeholder="Diskon (%)"
+                                />
+                            </Form.Group>
                         </div>
                     </Row>
                 </Modal.Body>
@@ -280,7 +291,7 @@ function AddNewTransaction() {
                     <p style={{ width: '100%', textAlign: 'center' }}>Apakah data yang dimasukkan sudah benar?</p>
                     <Button variant="danger" onClick={() => setModalItem(false)}>Batal</Button>
                     <Button variant="success"
-                        disabled={productIsExist || parseInt(qtySelectedItem) < 1 || isEmpty(qtySelectedItem)}
+                        disabled={productIsExist || parseInt(qtySelectedItem) < 1 || isEmpty(qtySelectedItem) || isNil(selectedProduct?.id) || discountSelectedItem > 100}
                         onClick={() => {
                             if (isEditItem) {
                                 updateItem(selectedProduct.id, qtySelectedItem, OnlyDigit(priceSelectedItem))
@@ -592,7 +603,7 @@ function AddNewTransaction() {
                                                             <td className='col-lg-2'>
                                                                 <div className="ps-2 py-1">
                                                                     <div className="d-flex flex-column">
-                                                                    <h6 className="mb-0 text-sm">{item?.disc}%</h6>
+                                                                        <h6 className="mb-0 text-sm">{item?.disc}%</h6>
                                                                     </div>
                                                                 </div>
                                                             </td>
@@ -620,7 +631,7 @@ function AddNewTransaction() {
                                                 })}
                                                 {orderList.length > 0 &&
                                                     <>
-                                                    <tr
+                                                        <tr
                                                             style={{ backgroundColor: AppColors.MainBrand9 }} // Optional: Change cursor on hover
                                                         >
                                                             <td />
