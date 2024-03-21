@@ -277,6 +277,7 @@ function TransactionDetail() {
                                             <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nama Barang</th>
                                             <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Jumlah</th>
                                             <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Harga</th>
+                                            <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Diskon</th>
                                             <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Total</th>
                                         </tr>
                                     </thead>
@@ -315,7 +316,14 @@ function TransactionDetail() {
                                                     <td>
                                                         <div className="ps-3 py-1">
                                                             <div className="d-flex flex-column">
-                                                                <h6 className="mb-0 text-sm">{`Rp${DigitFormatter(item?.qty * item.price)}`}</h6>
+                                                                <h6 className="mb-0 text-sm">{item?.discount}</h6>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div className="ps-3 py-1">
+                                                            <div className="d-flex flex-column">
+                                                                <h6 className="mb-0 text-sm">{`Rp${DigitFormatter(item?.qty * item.price )}`}</h6>
                                                             </div>
                                                         </div>
                                                     </td>
