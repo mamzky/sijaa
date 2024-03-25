@@ -34,6 +34,9 @@ function CustomerDetail() {
     // validationFlag
     const { customer_code } = useParams()
 
+    // Order
+    const [orderList, setOrderList] = useState([])
+
 
     // NEW STATE
     const [customerData, setCustomerData] = useState()
@@ -112,6 +115,7 @@ function CustomerDetail() {
             address: address,
             contact_person: contactPerson,
             notes: notes,
+            total_bill: DigitFormatter(calculateTotal(orderList)),
             updated_at: moment(new Date).toISOString(),
             customer_code: customerData?.customer_code,
             updated_at: moment().format('DD/MMM/YYYY hh:mm')
@@ -406,7 +410,7 @@ function CustomerDetail() {
                                                     <td>
                                                         <div className="ps-3 py-1">
                                                             <div className="d-flex flex-column">
-                                                                <h6 className="mb-0 text-sm">{`Rp${DigitFormatter(calculateTotal(item?.order_list))}`}</h6>
+                                                                <h6 className="mb-0 text-sm">{`Rp${item.total_bill}`}</h6>
                                                             </div>
                                                         </div>
                                                     </td>

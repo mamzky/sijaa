@@ -1,12 +1,14 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import SideNavBar from '../Components/SideNavBar'
 import TopNavBar from '../Components/TopNavBar'
 import CustomTable from '../Components/CustomTable'
-import { Button } from 'react-bootstrap'
+import { Button, Form } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 
 function Contact() {
   const navigate = useNavigate()
+  const [customerData, setCustomerData] = useState([])
+
     return (
       <div>
       <SideNavBar />
@@ -26,11 +28,99 @@ function Contact() {
               >+ Tambah Kontak Baru</Button>
             </div>
           </div>
-          <CustomTable/>
+          
+          <div>
+            <Form.Group className="col-lg-6 col-md-3" controlId='customerName'>
+              <Form.Control
+                isInvalid={false}
+                type="input"
+                name='customerName'
+                // onChange={(e) => {
+                //   setTimeout(() => {
+                //     searchCustomer(e.target.value)
+                //   }, 500);
+                //   // setProductName(e.target.value)
+                //   // setErrorName(isEmpty(e.target.value))
+                // }}
+                placeholder="Cari customer"
+              />
+            </Form.Group>
+          </div>
+
+          <div class="row mt-4">
+            <div className="card-body px-0 pb-2">
+              <div className="table-responsive">
+                <table className="table align-items-center mb-0">
+                  <thead>
+                    <tr>
+                      <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">No.</th>
+                      <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nama Contact</th>
+                      <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nomor Telepon</th>
+                      <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Email</th>
+                      <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Alamat</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {/* {customerData?.map((item, index) => {
+                      return ( */}
+                        <tr onClick={() => {
+                          navigate(`/contact/detail/`)
+                        }}
+                          style={{ cursor: 'pointer' }} // Optional: Change cursor on hover
+                          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = 'black')}
+                          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '')}
+                        >
+                          <td>
+                            <div className="ps-3 py-1">
+                              <div className="d-flex flex-column justify-content-center">
+                                <h6 className="mb-0 text-sm">1</h6>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div className="ps-3 py-1">
+                              <div className="d-flex flex-column justify-content-center">
+                                <h6 className="mb-0 text-sm">john doe</h6>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div className="ps-3 py-1">
+                              <div className="d-flex flex-column">
+                                <h6 className="mb-0 text-sm">0812345678910</h6>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div className="ps-3 py-1">
+                              <div className="d-flex flex-column">
+                                <h6 className="mb-0 text-sm">johndoe@gmail.com</h6>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div className="ps-3 py-1">
+                              <div className="d-flex flex-column">
+                                <h6 className="mb-0 text-sm">jl mangga no 12</h6>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      {/* )
+                    })} */}
+
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
         </div>
       </main>
     </div>
-      )
+  )
 }
+
+// 
 
 export default Contact
