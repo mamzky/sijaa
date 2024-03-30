@@ -14,6 +14,7 @@ const ContactDetail = () => {
 
     const [loading, setIsLoading] = useState(false)
     const [contactData, setContactData] = useState()
+    const [isEdit, setIsEdit] = useState(false)
 
     const getContactDetail = async (contact_id) => {
         setIsLoading(true)
@@ -23,13 +24,13 @@ const ContactDetail = () => {
             , where('contactId', '==', contact_id))
         await getDocs(q)
             .then((res) => {
-                if(res?.docs?.length > 0) {
+                if (res?.docs?.length > 0) {
                     const resultHolder = res.docs?.map((doc) => ({ id: doc?.id, ...doc?.data() }))[0]
                     setContactData(resultHolder)
                 }
             })
             .catch((err) => {
-                console.log('ERR',err)
+                console.log('ERR', err)
             })
     }
 
@@ -60,19 +61,20 @@ const ContactDetail = () => {
                                 {/* NAME */}
                                 <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='productName'>
                                     <Form.Label>Nama Customer</Form.Label>
-                                    {/* {isEdit ?
+                                    {isEdit ?
                                         <Form.Control
                                             // isInvalid={errorName}
                                             type="input"
-                                            name='customerName'
-                                            value={customerName}
+                                            name='contactName'
+                                            value={contactData.contactName}
                                             onChange={(e) => {
-                                                setCustomerName(e.target.value)
+                                                setContactData.contactName(e.target.value)
                                             }}
                                             placeholder="Masukan nama"
                                         />
-                                        : */}
-                                    <h4 style={{ marginTop: -10, marginBottom: -10 }}>John Doe</h4>
+                                        :
+                                        <h4 style={{ marginTop: -10, marginBottom: -10 }}>{contactData?.contactName}</h4>
+                                    }
 
                                 </Form.Group>
 
@@ -149,14 +151,9 @@ const ContactDetail = () => {
                                     variant='success'
                                     className='mx-2'
                                     style={{ width: '25%', alignSelf: 'flex-end' }}
-                                // onClick={() => {
-                                //     if (isEdit) {
-                                //         validation()
-                                //     } else {
-                                //         loadDataToForm(customerData)
-                                //         setIsEdit(true)
-                                //     }
-                                // }}
+                                    onClick={() => {
+                                        setIsEdit(true)
+                                    }}
                                 >{'Edit Data Customer'}
                                 </Button>
                                 <Button
