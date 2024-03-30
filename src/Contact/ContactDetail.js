@@ -1,17 +1,57 @@
+import { useEffect, useState } from "react"
 import SideNavBar from "../Components/SideNavBar"
 import TopNavBar from "../Components/TopNavBar"
 import { Button, CloseButton, Col, Form, Modal, Row, Spinner } from 'react-bootstrap'
+import { useParams } from "react-router"
+import { collection, getDoc, getDocs, query, where, doc, } from "@firebase/firestore"
+import { db } from "../Config/FirebaseConfig"
+import { CONTACT_COLLECTION } from "../Utils/DataUtils"
+
 
 const ContactDetail = () => {
+
+    const { contactId } = useParams()
+
+    const [loading, setIsLoading] = useState(false)
+    const [contactData, setContactData] = useState()
+
+    const getContactDetail = async (contact_id) => {
+        setIsLoading(true)
+        console.log('contactId', contact_id)
+
+        const q = query(collection(db, CONTACT_COLLECTION)
+            , where('contactId', '==', contact_id))
+        await getDocs(q)
+            .then((res) => {
+                if(res?.docs?.length > 0) {
+                    const resultHolder = res.docs?.map((doc) => ({ id: doc?.id, ...doc?.data() }))[0]
+                    setContactData(resultHolder)
+                }
+            })
+            .catch((err) => {
+                console.log('ERR',err)
+            })
+    }
+
+    useEffect(() => {
+        if (Boolean(contactId)) {
+            getContactDetail(contactId)
+        } else {
+            alert('KONTAK TIDAK VALID')
+        }
+    }, [])
+
+
+
     return (
         <div>
-        <SideNavBar />
+            <SideNavBar />
             <main className="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
                 <TopNavBar />
                 <div className="container-fluid py-4">
                     <div style={{ display: 'flex', flexDirection: 'row' }}>
                         <div className="col-lg-6 col-md-3 mb-md-0 mb-4">
-                            <h2>John Doe</h2>
+                            <h2>{contactData?.contactName}</h2>
                         </div>
                     </div>
                     <div className="row mt-4">
@@ -32,8 +72,8 @@ const ContactDetail = () => {
                                             placeholder="Masukan nama"
                                         />
                                         : */}
-                                        <h4 style={{ marginTop: -10, marginBottom: -10 }}>John Doe</h4>
-                                    
+                                    <h4 style={{ marginTop: -10, marginBottom: -10 }}>John Doe</h4>
+
                                 </Form.Group>
 
                                 {/* PHONE */}
@@ -51,8 +91,8 @@ const ContactDetail = () => {
                                             placeholder="Masukan nomor telepon"
                                         />
                                         : */}
-                                        <h4 style={{ marginTop: -10, marginBottom: -10 }}>0812345678910</h4>
-                                    
+                                    <h4 style={{ marginTop: -10, marginBottom: -10 }}>{contactData?.contactPhone}</h4>
+
                                 </Form.Group>
                             </Row>
 
@@ -72,8 +112,8 @@ const ContactDetail = () => {
                                             placeholder="Masukan email"
                                         />
                                         : */}
-                                        <h4 style={{ marginTop: -10, marginBottom: -10 }}>JohnDoe@gmail.com</h4>
-                                    
+                                    <h4 style={{ marginTop: -10, marginBottom: -10 }}>JohnDoe@gmail.com</h4>
+
                                 </Form.Group>
 
                                 {/* ADDRESS */}
@@ -92,12 +132,12 @@ const ContactDetail = () => {
                                             placeholder="Masukan alamat"
                                         />
                                         : */}
-                                        <h4 style={{ marginTop: -10, marginBottom: -10 }}>jl mangga no 12</h4>
-                                    
+                                    <h4 style={{ marginTop: -10, marginBottom: -10 }}>jl mangga no 12</h4>
+
                                 </Form.Group>
                             </Row>
 
-                            
+
 
                             <div className="col-lg-8 col-md-3 my-4" style={{ display: 'flex', flex: 1, flexDirection: 'row' }}>
                                 {/* <Button
@@ -109,21 +149,21 @@ const ContactDetail = () => {
                                     variant='success'
                                     className='mx-2'
                                     style={{ width: '25%', alignSelf: 'flex-end' }}
-                                    // onClick={() => {
-                                    //     if (isEdit) {
-                                    //         validation()
-                                    //     } else {
-                                    //         loadDataToForm(customerData)
-                                    //         setIsEdit(true)
-                                    //     }
-                                    // }}
+                                // onClick={() => {
+                                //     if (isEdit) {
+                                //         validation()
+                                //     } else {
+                                //         loadDataToForm(customerData)
+                                //         setIsEdit(true)
+                                //     }
+                                // }}
                                 >{'Edit Data Customer'}
                                 </Button>
                                 <Button
-                                    // style={{ width: '25%', alignSelf: 'flex-end', visibility: isEdit ? 'hidden' : 'visible' }}
-                                    // onClick={() => {
-                                    //     navigate(`/customer/detail/${customer_code}/stock`)
-                                    // }}
+                                // style={{ width: '25%', alignSelf: 'flex-end', visibility: isEdit ? 'hidden' : 'visible' }}
+                                // onClick={() => {
+                                //     navigate(`/customer/detail/${customer_code}/stock`)
+                                // }}
                                 >{'Lihat Stok Customer'}</Button>
                             </div>
                         </Form>

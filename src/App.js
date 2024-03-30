@@ -42,7 +42,7 @@ function App() {
         <Route path='/product/add-new-product' Component={AddNewProduct}/>
         <Route path='/product/product-detail/:product_code' Component={ProductDetail}/>
         <Route path='/contact' Component={Contact}/>
-        <Route path='/contact/detail' Component={ContactDetail}/>
+        <Route path='/contact/detail/:contactId' Component={ContactDetail}/>
         <Route path='/contact/new-contact' Component={AddNewContact}/>
         <Route path='/customer' Component={Customer}/>
         <Route path='/customer/new-customer' Component={AddNewCustomer}/>

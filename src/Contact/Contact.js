@@ -4,13 +4,37 @@ import TopNavBar from '../Components/TopNavBar'
 import CustomTable from '../Components/CustomTable'
 import { Button, Form } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
+import { collection, getDocs } from '@firebase/firestore'
+import { db } from '../Config/FirebaseConfig'
+import { CONTACT, CONTACT_COLLECTION } from '../Utils/DataUtils'
 
 function Contact() {
   const navigate = useNavigate()
-  const [customerData, setCustomerData] = useState([])
+  const [loading, setIsLoading] = useState(false)
+  const contactCollectionRef = collection(db, CONTACT_COLLECTION)
+  const [contactData, setContactData] = useState([])
 
-    return (
-      <div>
+  const getListContact = async () => {
+    setIsLoading(true)
+    await getDocs(contactCollectionRef)
+      .then((res) => {
+        const listData = res.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+        setContactData(listData)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
+  }
+
+  useEffect(() => {
+    getListContact()
+  }, [])
+
+  return (
+    <div>
       <SideNavBar />
       <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
         <TopNavBar />
@@ -22,13 +46,13 @@ function Contact() {
             </div>
             <div className="col-lg-8 col-md-3" style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
               <Button style={{ width: '40%', alignSelf: 'flex-end' }}
-              onClick={() => {
-                navigate('/contact/new-contact')
-              }}
+                onClick={() => {
+                  navigate('/contact/new-contact')
+                }}
               >+ Tambah Kontak Baru</Button>
             </div>
           </div>
-          
+
           <div>
             <Form.Group className="col-lg-6 col-md-3" controlId='customerName'>
               <Form.Control
@@ -61,11 +85,14 @@ function Contact() {
                     </tr>
                   </thead>
                   <tbody>
-                    {/* {customerData?.map((item, index) => {
-                      return ( */}
-                        <tr onClick={() => {
-                          navigate(`/contact/detail/`)
-                        }}
+
+                    {contactData.map((contact, index) => {
+                      return (
+                        <tr
+                          key={contact.contactId}
+                          onClick={() => {
+                            navigate(`/contact/detail/${contact.contactId}`)
+                          }}
                           style={{ cursor: 'pointer' }} // Optional: Change cursor on hover
                           onMouseOver={(e) => (e.currentTarget.style.backgroundColor = 'black')}
                           onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '')}
@@ -73,41 +100,41 @@ function Contact() {
                           <td>
                             <div className="ps-3 py-1">
                               <div className="d-flex flex-column justify-content-center">
-                                <h6 className="mb-0 text-sm">1</h6>
+                                <h6 className="mb-0 text-sm">{index + 1}</h6>
                               </div>
                             </div>
                           </td>
                           <td>
                             <div className="ps-3 py-1">
                               <div className="d-flex flex-column justify-content-center">
-                                <h6 className="mb-0 text-sm">john doe</h6>
+                                <h6 className="mb-0 text-sm">{contact.contactName}</h6>
                               </div>
                             </div>
                           </td>
                           <td>
                             <div className="ps-3 py-1">
                               <div className="d-flex flex-column">
-                                <h6 className="mb-0 text-sm">0812345678910</h6>
+                                <h6 className="mb-0 text-sm">{contact.contactPhone}</h6>
                               </div>
                             </div>
                           </td>
                           <td>
                             <div className="ps-3 py-1">
                               <div className="d-flex flex-column">
-                                <h6 className="mb-0 text-sm">johndoe@gmail.com</h6>
+                                <h6 className="mb-0 text-sm">{contact.contactEmail}</h6>
                               </div>
                             </div>
                           </td>
                           <td>
                             <div className="ps-3 py-1">
                               <div className="d-flex flex-column">
-                                <h6 className="mb-0 text-sm">jl mangga no 12</h6>
+                                <h6 className="mb-0 text-sm">{contact.contactAddress}</h6>
                               </div>
                             </div>
                           </td>
                         </tr>
-                      {/* )
-                    })} */}
+                      )
+                    })}
 
                   </tbody>
                 </table>
