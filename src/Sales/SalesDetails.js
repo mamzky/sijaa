@@ -12,7 +12,7 @@ import moment from 'moment/moment'
 import Constant from '../Utils/Constants'
 
 
-const ContactDetail = () => {
+const SalesDetail = () => {
 
     const { contactId } = useParams()
     const navigate = useNavigate()
@@ -366,4 +366,4 @@ const ContactDetail = () => {
     )
 }
 
-export default ContactDetail
+export default SalesDetail

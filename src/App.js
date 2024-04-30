@@ -9,6 +9,7 @@ import Product from './Product/Product';
 import Contact from './Contact/Contact';
 import Stock from './Stock/Stock';
 import Customer from './Customer/Customer';
+import Sales from './Sales/Sales';
 import AddNewProduct from './Product/AddNewProduct';
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
@@ -23,6 +24,11 @@ import TransactionDetail from './Transaction/TransactionDetail';
 import StockCustomer from './Customer/StockSuctomer';
 import ContactDetail from './Contact/ContactDetail';
 import AddNewContact from './Contact/AddNewContact';
+import AddNewSales from './Sales/AddNewSales';
+import SalesDetail from './Sales/SalesDetails';
+
+
+
 
 // IMPORT PAGES
 
@@ -52,6 +58,12 @@ function App() {
         <Route path='/transaction' Component={Transaction}/>
         <Route path='/transaction/new-transaction' Component={AddNewTransaction}/>
         <Route path='/transaction/detail/:order_number' Component={TransactionDetail}/>
+        <Route path='/sales' Component={Sales}/>
+        <Route path='/sales/detail' Component={SalesDetail}/>
+        <Route path='/sales/new-sales' Component={AddNewSales}/>
+
+        {/* <Route path='/sales/detail/:salesId' Component={SalesDetail}/>
+        <Route path='/contact/new-sales' Component={AddNewSales}/> */}
       </Routes>
     </Router>
   );
