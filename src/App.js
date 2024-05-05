@@ -10,6 +10,7 @@ import Contact from './Contact/Contact';
 import Stock from './Stock/Stock';
 import Customer from './Customer/Customer';
 import Sales from './Sales/Sales';
+import Employee from './Employee/Employee'
 import AddNewProduct from './Product/AddNewProduct';
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
@@ -26,6 +27,8 @@ import ContactDetail from './Contact/ContactDetail';
 import AddNewContact from './Contact/AddNewContact';
 import AddNewSales from './Sales/AddNewSales';
 import SalesDetail from './Sales/SalesDetails';
+import AddNewEmployee from './Employee/AddNewEmployee'
+import EmployeeDetail from './Employee/EmployeeDetails'
 
 
 
@@ -61,6 +64,9 @@ function App() {
         <Route path='/sales' Component={Sales}/>
         <Route path='/sales/detail' Component={SalesDetail}/>
         <Route path='/sales/new-sales' Component={AddNewSales}/>
+        <Route path='/employee' Component={Employee}/>
+        <Route path='/employee/detail/:employeeId' Component={EmployeeDetail}/>
+        <Route path='/employee/new-employee' Component={AddNewEmployee}/>
 
         {/* <Route path='/sales/detail/:salesId' Component={SalesDetail}/>
         <Route path='/contact/new-sales' Component={AddNewSales}/> */}

@@ -130,6 +130,18 @@ function SideNavBar() {
                 <span className="nav-link-text ms-1">sales</span>
               </a>
             </li>
+            <li className='nav-item'>
+            <a className={`nav-link text-white bg-gradient-primary ${activeMenu === Constant.MENU_EMPLOYEE ? 'active' : ''}`} href="/employee"
+                onClick={() => {
+                  localStorage.setItem(Constant.ACTIVE_MENU, Constant.MENU_EMPLOYEE)
+                }}
+              >
+                 <div className="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                  <i className="material-icons opacity-10">group</i>
+                </div>
+                <span className="nav-link-text ms-1">employee</span>
+              </a>
+            </li>
           </ul>
         </div>
       </div>

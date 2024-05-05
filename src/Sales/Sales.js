@@ -59,7 +59,7 @@ function Sales() {
                 onClick={() => {
                   navigate('/sales/new-sales')
                 }}
-              >+ Tambah Kontak Baru</Button>
+              >+ Tambah Sales Baru</Button>
             </div>
           </div>
 
