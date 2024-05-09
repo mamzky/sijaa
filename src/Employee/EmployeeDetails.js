@@ -168,7 +168,7 @@ const EmployeeDetail = () => {
                 <div className="container-fluid py-4">
                     <div style={{ display: 'flex', flexDirection: 'row' }}>
                         <div className="col-lg-6 col-md-3 mb-md-0 mb-4">
-                            <h2>{employeeData?.contactName}</h2>
+                            <h2>{employeeData?.employeeName}</h2>
                         </div>
                     </div>
                     <div className="row mt-4">
@@ -186,70 +186,92 @@ const EmployeeDetail = () => {
                                             onChange={(e) => {
                                                 setEmployeeName(e.target.value)
                                             }}
-                                            placeholder="Masukan nama"
+                                            placeholder="Masukan Nama Karyawan"
                                         />
                                         :
-                                        <h4 style={{ marginTop: -10, marginBottom: -10 }}>{employeeData?.contactName}</h4>
+                                        <h4 style={{ marginTop: -10, marginBottom: -10 }}>{employeeData?.employeeName}</h4>
                                     }
 
                                 </Form.Group>
-
-                                {/* PHONE */}
+                                   {/* ROLE */}
                                 <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='role'>
-                                    <Form.Label>Role Karyawan</Form.Label>
-                                   {isEdit?
-                                   <Form.Control
-                                   type="input"
-                                   name='role'
-                                   value={employeeRole}
-                                   onChange={(e) => {
-                                    setEmployeeRole(e.target.value)
-                                   }}
-                                   placeholder="masukan nomor telepon"
-                                   />
-                                   :
-                                    <h4 style={{ marginTop: -10, marginBottom: -10 }}>{employeeData?.contactPhone}</h4>
+                                <Form.Label>Role Karyawan</Form.Label>
+                                {isEdit ?
+                                    <Form.Select
+                                        name='role'
+                                        value={employeeRole}
+                                        onChange={(e) => {
+                                            setEmployeeRole(e.target.value)
+                                        }}
+                                    >
+                                        <option value="">Pilih Role Karyawan</option>
+                                        <option value="gudang">Gudang</option>
+                                        <option value="sales">Sales</option>
+                                        <option value="marketing">Marketing</option>
+                                        <option value="admin">Admin</option>
+                                        <option value="superadmin">Super Admin</option>
+                                    </Form.Select>
+                                    :
+                                    <h4 style={{ marginTop: -10, marginBottom: -10 }}>{employeeData?.employeeRole}</h4>
                                 }
-                                </Form.Group>
+                            </Form.Group>
+
                             </Row>
 
                             <Row>
-                                {/* EMAIL */}
+                                {/* STATUS */}
                                 <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='status'>
-                                    <Form.Label>Status Karyawan</Form.Label>
-                                    {isEdit?
-                                   <Form.Control
-                                   type="input"
-                                   name='status'
-                                   value={employeeStatus}
-                                   onChange={(e) => {
-                                    setEmployeeStatus(e.target.value)
-                                   }}
-                                   placeholder="masukan alamat email"
-                                   />
-                                   :
-                                    <h4 style={{ marginTop: -10, marginBottom: -10 }}>{employeeData?.contactEmail}</h4>
-                                }
+                            <Form.Label>Status Karyawan</Form.Label>
+                            {isEdit ?
+                                <>
+                                    <Form.Check
+                                        type="radio"
+                                        label="Active"
+                                        name="status"
+                                        id="active"
+                                        value="active"
+                                        checked={employeeStatus === 'active'}
+                                        onChange={(e) => {
+                                            setEmployeeStatus(e.target.value)
+                                        }}
+                                    />
+                                    <Form.Check
+                                        type="radio"
+                                        label="Inactive"
+                                        name="status"
+                                        id="inactive"
+                                        value="inactive"
+                                        checked={employeeStatus === 'inactive'}
+                                        onChange={(e) => {
+                                            setEmployeeStatus(e.target.value)
+                                        }}
+                                    />
+                                </>
+                                :
+                                <h4 style={{ marginTop: -10, marginBottom: -10 }}>{employeeData?.employeeStatus}</h4>
+                            }
+                        </Form.Group>
+
+
+                                    {/* KONTAK */}
+                                    <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='contact'>
+                                    <Form.Label>Kontak Karyawan</Form.Label>
+                                    {isEdit ?
+                                        <Form.Control
+                                            type="number" // Change type to "number"
+                                            name='contact'
+                                            value={employeeContact}
+                                            onChange={(e) => {
+                                                setEmployeeContact(e.target.value)
+                                            }}
+                                            placeholder="Masukan Kontak Karyawan"
+                                        />
+                                        :
+                                        <h4 style={{ marginTop: -10, marginBottom: -10 }}>{employeeData?.employeeContact}</h4>
+                                    }
                                 </Form.Group>
 
-                                {/* ADDRESS */}
-                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='contact'>
-                                    <Form.Label>Kontak Karyawan</Form.Label>
-                                    {isEdit?
-                                   <Form.Control
-                                   type="input"
-                                   name='contact'
-                                   value={employeeContact}
-                                   onChange={(e) => {
-                                    employeeContact(e.target.value)
-                                   }}
-                                   
-                                   />
-                                   :
-                                    <h4 style={{ marginTop: -10, marginBottom: -10 }}>{employeeData?.contactAddress}</h4>
-                                }
-                                </Form.Group>
-                            </Row>
+                                </Row>
 
 
                             <div className="col-lg-8 col-md-3 my-4" style={{ display: 'flex', flex: 1, flexDirection: 'row' }}>

@@ -10,7 +10,7 @@ import { EMPLOYEE_COLLECTION } from '../Utils/DataUtils'
 import Constant from '../Utils/Constants';
 import { addLog } from '../Utils/Utils';
 
-function Contact() {
+function Employee() {
   const navigate = useNavigate()
   const [showModal, setShowModal] = useState(false)
   const [loading, setIsLoading] = useState(false)
@@ -19,7 +19,7 @@ function Contact() {
   const [employeeData, setEmployeeData] = useState([])
   const [deleteEmployee, setDeleteEmployee] = useState(false)
   const [selectedEmployee, setSelectedEmployee] = useState('')
-
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const getListContact = async () => {
     setIsLoading(true)
@@ -54,15 +54,29 @@ function Contact() {
 
   const deletekaryawan = async () => {
     console.log(selectedEmployee);
-    const productDoc = doc(db, EMPLOYEE_COLLECTION, selectedEmployee.employeeId);
+    const productDoc = doc(db, EMPLOYEE_COLLECTION, selectedEmployee.id);
     await deleteDoc(productDoc).then(() => {
-        addLog('DELETE PRODUCT', `${localStorage.getItem(Constant.USERNAME)} deleted product "${selectedEmployee?.employeeName}"`);
-        getEmployee();
-        setDeleteEmployee(false);
-        setIsLoading(false);
+      addLog('DELETE PRODUCT', `${localStorage.getItem(Constant.USERNAME)} deleted product "${selectedEmployee?.employeeName}"`);
+      getListContact();
+      setShowDeleteModal(false);
+      setIsLoading(false);
     });
-};
+  };
+//   const deletekaryawan = async () => {
+//     console.log(selectedEmployee);
+//     const productDoc = doc(db, EMPLOYEE_COLLECTION, selectedEmployee.employeeId);
+//     await deleteDoc(productDoc).then(() => {
+//         addLog('DELETE PRODUCT', `${localStorage.getItem(Constant.USERNAME)} deleted product "${selectedEmployee?.employeeName}"`);
+//         getEmployee();
+//         setDeleteEmployee(false);
+//         setIsLoading(false);
+//     });
+// };
 
+const handleDeleteClick = (employee) => {
+  setSelectedEmployee(employee);
+  setShowDeleteModal(true);
+};
   
 
   const searchContact = async (contactName) => {
@@ -78,7 +92,23 @@ function Contact() {
 
   return (
     <div>
-      <Modal show={showModal} onHide={() => setShowModal(false)}
+      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} size="md" aria-labelledby="contained-modal-title-vcenter" centered>
+        <Modal.Header>
+          <Modal.Title>Hapus Karyawan</Modal.Title>
+          <CloseButton onClick={() => setShowDeleteModal(false)} />
+        </Modal.Header>
+        <Modal.Body>
+          <div>
+            <h3 style={{ marginBottom: 40, textAlign: 'center' }}>{selectedEmployee?.employeeName ?? '-'}</h3>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <p style={{ width: '100%', textAlign: 'center' }}>Apakah Yakin Ingin Menghapus Karyawan?</p>
+          <Button variant="danger" onClick={() => setShowDeleteModal(false)}>Batal</Button>
+          <Button variant="success" onClick={() => deletekaryawan()}>Ya, Hapus</Button>
+        </Modal.Footer>
+      </Modal>
+      {/* <Modal show={showModal} onHide={() => setShowModal(false)}
                 size="md"
                 aria-labelledby="contained-modal-title-vcenter"
                 centered>
@@ -96,9 +126,9 @@ function Contact() {
                 <Modal.Footer>
                     <p style={{ width: '100%', textAlign: 'center' }}>Apakah Yakin Ingin Menghapus Karyawan?</p>
                     <Button variant="danger" onClick={() => setShowModal(false)}>Batal</Button>
-                    <Button variant="success" onClick={() => deletekaryawan()}>Ya, Daftarkan</Button>
+                    <Button variant="success" onClick={() => deletekaryawan()}>Ya, Hapus</Button>
                 </Modal.Footer>
-            </Modal>
+            </Modal> */}
       <SideNavBar />
       <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
         <TopNavBar />
@@ -203,20 +233,24 @@ function Contact() {
                           </td>
                           <td>
                                 <div style={{ display: 'flex', flexDirection: 'row' }}>
-                                  <Button
-                                    style={{ width: '50%', marginTop: 10, justifyContent:'center' }}
-                                    variant="danger"
-                                    onClick={() => {
-                                      // navigate('/product/add-new-product')
-                                      tampilpopup()
-                                    }}
-                                  >Hapus</Button>
+                                <Button
+                                style={{ width: '50%', marginTop: 10, justifyContent:'center',zIndex: 20 }}
+                                variant="danger"
+                                key={employee.employeeId}
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleDeleteClick(employee);
+                                }}
+                              >Hapus</Button>
                                 </div>
                               </td>
-                        </tr>
+                              
+                        </tr >
                       )
                     })}
-
+                  
+                   
+                                 
                   </tbody>
                 </table>
               </div>
@@ -231,4 +265,4 @@ function Contact() {
 
 // 
 
-export default Contact
+export default Employee
