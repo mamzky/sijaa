@@ -8,12 +8,13 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { DigitFormatter, OnlyDigit } from '../Utils/General'
 import { empty, isEmpty } from 'ramda'
 import { db } from '../Config/FirebaseConfig';
-import { collection, getDocs, addDoc, doc, updateDoc, query, where } from 'firebase/firestore'
+import { collection, getDocs, addDoc, doc, updateDoc, query, where, deleteDoc } from 'firebase/firestore'
 import moment from 'moment/moment'
 import { CUSTOMER_COLLECTION, LOG_COLLECTION, PRODUCT_COLLECTION, TRANSACTION_COLLECTION } from '../Utils/DataUtils'
 import Constant from '../Utils/Constants'
 import { addLog, calculateTotal } from '../Utils/Utils'
 import AppColors from '../Utils/Colors'
+import { toast } from 'react-toastify'
 
 function CustomerDetail() {
 
@@ -30,6 +31,7 @@ function CustomerDetail() {
 
     const [showModal, setShowModal] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
+    const [modalDelete, setModalDelete] = useState(false)
 
     // validationFlag
     const { customer_code } = useParams()
@@ -137,6 +139,22 @@ function CustomerDetail() {
             })
     }
 
+    const deleteCustomer = async () => {
+        setIsLoading(true)
+        const selectedCustomer = doc(db, CUSTOMER_COLLECTION, customerData?.id)
+        console.log('SELECTED', selectedCustomer)
+        await deleteDoc(selectedCustomer)
+            .then((res) => {
+                toast.success('Berhasil menghapus data')
+                navigate(-1)
+            })
+            .catch((err) => console.log(err))
+            .finally(() => {
+                setIsLoading(false)
+            })
+        setModalDelete(false)
+    }
+
     return (
         <div>
             <Modal show={showModal} onHide={() => setShowModal(false)}
@@ -164,7 +182,6 @@ function CustomerDetail() {
                 </Modal.Footer>
             </Modal>
             <Modal show={isLoading} centered>
-
                 <Modal.Body backdrop={'false'} show={true} onHide={() => setShowModal(false)}
                     size="md"
                     aria-labelledby="contained-modal-title-vcenter"
@@ -182,13 +199,39 @@ function CustomerDetail() {
                     <h3 style={{ marginLeft: 20 }}>Loading...</h3>
                 </Modal.Body>
             </Modal>
+            <Modal show={modalDelete} onHide={() => setModalDelete(false)}
+                size="md"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered>
+                <Modal.Header>
+                    <Modal.Title>
+                        Hapus Data Customer
+                    </Modal.Title>
+                    <CloseButton onClick={() => setModalDelete(false)} />
+                </Modal.Header>
+                <Modal.Body>
+                    <span>{`Apakah anda yakin akan menghapus data `}<span style={{ fontWeight: 'bold' }}>{customerData?.name}</span>{` dari sistem ?`}</span>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="danger" onClick={() => setModalDelete(false)}>Batal</Button>
+                    <Button variant="success" onClick={() => { deleteCustomer() }}>Ya, Hapus</Button>
+                </Modal.Footer>
+            </Modal>
             <SideNavBar />
             <main className="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
                 <TopNavBar />
                 <div className="container-fluid py-4">
-                    <div style={{ display: 'flex', flexDirection: 'row' }}>
+                    <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                         <div className="col-lg-6 col-md-3 mb-md-0 mb-4">
                             <h2>{customerData?.name}</h2>
+                        </div>
+                        <div className="col-lg-6 col-md-3 mb-md-0 mb-4" style={{ display: 'flex', flexDirection: 'row-reverse', paddingRight: 16 }}>
+                            <Button
+                                variant="danger"
+                                onClick={(e) => {
+                                    setModalDelete(true)
+                                }}
+                            ><i className="material-icons opacity-10">delete</i>Hapus</Button>
                         </div>
                     </div>
                     <div className="row mt-4">

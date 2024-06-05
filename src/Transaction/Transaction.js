@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import SideNavBar from '../Components/SideNavBar'
 import TopNavBar from '../Components/TopNavBar'
 import CustomTable from '../Components/CustomTable'
-import { Button, Dropdown, Form, Row } from 'react-bootstrap'
+import { Button, Dropdown, Form, Modal, Row, Spinner } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 import { CUSTOMER_COLLECTION, TRANSACTION_COLLECTION } from '../Utils/DataUtils'
 import { db } from '../Config/FirebaseConfig';
@@ -12,6 +12,7 @@ import { calculateTotal } from '../Utils/Utils'
 import { DigitFormatter, PaymentTypeList, StatusTypeList, filterByList } from '../Utils/General'
 import { isEmpty } from 'ramda'
 import Select from 'react-select'
+import ModalLoading from '../Components/ModalLoading'
 
 function Transaction() {
 
@@ -21,29 +22,46 @@ function Transaction() {
 
   const [transactionData, setTransactionData] = useState([])
   const [customerList, setCustomerList] = useState([])
-  const [productList, setProductList] = useState([])
+  const [loading, setLoading] = useState(false)
 
   // FILTER
   const [filterField, setFilterField] = useState('')
 
-  const getTransactionList = () => {
-    const data = getDocs(transactionCollectionRef)
-    const sortedData = data?.docs?.map((doc) => ({ ...doc?.data(), id: doc?.id }))
-    if(sortedData?.length > 0) {
-      setTransactionData(sortedData?.sort((a, b) => new Date(b?.created_at) - new Date(a?.created_at)))
+  const getTransactionList = async () => {
+    try {
+      const data = await getDocs(transactionCollectionRef)
+      const sortedData = data?.docs?.map((doc) => ({ ...doc?.data(), id: doc?.id }))
+      console.log('SORTED DATA', data)
+      if (sortedData?.length > 0) {
+        setTransactionData(sortedData?.sort((a, b) => new Date(b?.created_at) - new Date(a?.created_at)))
+      }
+    } catch (error) {
+      console.log('ERROR', error);
     }
   }
 
   const getCustomer = async () => {
     const data = await getDocs(customerCollectionRef)
     const sortedData = data?.docs?.map((doc) => ({ id: doc?.id, label: `${doc?.data()?.name}(${doc?.data()?.contact_person})`, value: doc?.data() }))
-    if(sortedData.length > 0){
+    if (sortedData?.length > 0) {
       setCustomerList(sortedData?.sort((a, b) => new Date(b?.created_at) - new Date(a?.created_at)))
     }
   }
   useEffect(() => {
-    getTransactionList()
+    setLoading(true)
     getCustomer()
+    getDocs(transactionCollectionRef).then((res) => {
+      const rawData = res?.docs?.map((doc) => ({ ...doc?.data(), id: doc?.id }))
+      setTransactionData(rawData?.sort((a, b) => new Date(b?.created_at) - new Date(a?.created_at)))
+      console.log('RES', rawData)
+    })
+      .catch((err) => {
+        console.log('ERR 2', err);
+      })
+      .finally(() => {
+        console.log('DONE');
+        setLoading(false)
+      })
   }, [])
 
   const filterByOrderNumber = async (order_number) => {
@@ -52,28 +70,7 @@ function Transaction() {
     const querySnapshot = await getDocs(q)
     const result = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
     setTransactionData(result)
-
-    // if (!querySnapshot.empty) {
-    //   setTransactionData(result)
-    //   console.log('RESULT', result[0]);
-    // } else {
-    //   console.log('FAILED');
-    // }
   }
-
-  // const searchCustomer = async (customerName) => {
-  //   const q = query(collection(db, CUSTOMER_COLLECTION.toString()))
-  //   const querySnapshot = await getDocs(q);
-  //   console.log(querySnapshot.docs
-  //     .map(doc => doc.data()))
-  //   const result = querySnapshot.docs
-  //     .map(doc => doc.data())
-  //     .filter((e) => e.name.toLowerCase()
-  //       .includes(customerName.toLowerCase()))
-  //   setTransactionData(result)
-  // }
-
-
 
   const searchElement = () => {
     switch (filterField) {
@@ -151,6 +148,24 @@ function Transaction() {
       <SideNavBar />
       <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
         <TopNavBar />
+        <Modal show={loading} centered>
+          <Modal.Body backdrop={'false'} show={true} onHide={() => setLoading(false)}
+            size="md"
+            aria-labelledby="contained-modal-title-vcenter"
+            style={{
+              display: 'flex',
+              flex: 1,
+              flexDirection: 'row',
+              justifyContent: 'center'
+            }}
+          >
+            <div>
+              <Spinner animation="border" role="status" style={{ alignSelf: 'center' }}>
+              </Spinner>
+            </div>
+            <h3 style={{ marginLeft: 20 }}>Loading...</h3>
+          </Modal.Body>
+        </Modal>
         <div class="container-fluid py-4">
           <div style={{ display: 'flex', flexDirection: 'row' }}>
             <div className="col-lg-6 col-md-3 mb-md-0 mb-4">
@@ -203,7 +218,7 @@ function Transaction() {
                       <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Total</th>
                     </tr>
                   </thead>
-                  <tbody style={{visibility : transactionData.length > 0}}>
+                  <tbody style={{ visibility: transactionData.length > 0 }}>
                     {transactionData?.map((item, index) => {
                       return (
                         <tr>
@@ -218,7 +233,7 @@ function Transaction() {
                             <div className="ps-3 py-1">
                               <div className="d-flex flex-column justify-content-center">
                                 <h6
-                                  style={{ cursor: 'pointer' }}
+                                  style={{ cursor: 'pointer', color: 'blue' }}
                                   onClick={() => {
                                     navigate(`/transaction/detail/${item?.order_number}`)
                                   }}

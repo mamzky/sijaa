@@ -7,6 +7,8 @@ import { db } from '../Config/FirebaseConfig';
 import { collection, getDocs, addDoc, doc, query, where } from 'firebase/firestore'
 import { addLog } from '../Utils/Utils';
 import moment from 'moment';
+import { USER_COLLECTION } from '../Utils/DataUtils';
+import { toast } from 'react-toastify';
 
 function Login() {
 
@@ -30,14 +32,9 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // You can add your form submission logic here
-    // console.log('Form submitted with data:', formData);
-    // localStorage.setItem(Constant.ACTIVE_MENU, Constant.MENU_DASHBOARD)
-    // localStorage.setItem(Constant.TOKEN, 'abc123')
-    // navigate('/')
 
     console.log(formData);
-    const q = query(collection(db, "user"),
+    const q = query(collection(db, USER_COLLECTION),
       where('username', '==', formData.username),
       where('password', '==', formData.password))
 
@@ -53,6 +50,7 @@ function Login() {
         setFailLogin(false)
         addLog('LOGIN', `${user?.username} telah login pada jam ${moment().locale('id').format('DD/MM/YYYY hh:mm:s')}`)
         navigate('/')
+        toast.success(`Berhasil login! Selamat datang ${user?.username}`)
       } else {
         // Data does not exist
         console.log('Data does not exist');

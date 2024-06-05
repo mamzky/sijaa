@@ -10,6 +10,7 @@ MENU_STOCK:'STOCK',
 MENU_CONTACT:'CONTACT',
 MENU_SALES:'SALES',
 MENU_TRANSACTION: 'TRANSACTION',
+MENU_EMPLOYEE:'EMPLOYEE',
 URL_DATABASE:'https://console.firebase.google.com/u/2/project/sijaa-ca714/database/sijaa-ca714-default-rtdb/data/~2F',
 
 // AUTH

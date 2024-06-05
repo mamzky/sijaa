@@ -5,48 +5,38 @@ import { Button, CloseButton, Col, Form, Modal, Row, Spinner } from 'react-boots
 import { useParams } from "react-router"
 import { collection, getDoc, getDocs, query, where, doc, updateDoc } from "@firebase/firestore"
 import { db } from "../Config/FirebaseConfig"
-import { CONTACT_COLLECTION } from "../Utils/DataUtils"
+import { EMPLOYEE_COLLECTION } from "../Utils/DataUtils"
 import { useNavigate } from 'react-router-dom'
 import { addLog } from '../Utils/Utils'
 import moment from 'moment/moment'
 import Constant from '../Utils/Constants'
 
 
-const ContactDetail = () => {
+const EmployeeDetail = () => {
 
-    const { contactId } = useParams()
+    const { employeeId } = useParams()
     const navigate = useNavigate()
-
-    
-
-    const [contactData, setContactData] = useState()
-    const [contactName, setContactName] = useState('')
-    const [contactPhone, setContactPhone] = useState('')
-    const [contactEmail, setContactEmail] = useState('')    
-    const [contactAddress, setContactAddress] = useState('')
-    
-
+    const [employeeData, setEmployeeData] = useState()
+    const [employeeName, setEmployeeName] = useState('')
+    const [employeeRole, setEmployeeRole] = useState('')
+    const [employeeStatus, setEmployeeStatus] = useState('')
+    const [employeeContact, setEmployeeContact] = useState('')
     const [showModal, setShowModal] = useState(false)
     const [isLoading, setIsLoading] = useState()
-
-
+    const [employeeDetail, setEmployeeDetail] = useState()
     const [isEdit, setIsEdit] = useState(false)
-
-
     const [formData, setFormData] = useState({})
-    const getContactDetail = async (contact_id) => {
+    const getEmployeeDetail = async (employee_id) => {
         setIsLoading(true)
-        console.log('contactId', contact_id)
+        console.log('employeeId', employee_id)
 
-   
-
-        const q = query(collection(db, CONTACT_COLLECTION)
-            , where('contactId', '==', contact_id))
+        const q = query(collection(db, EMPLOYEE_COLLECTION)
+            , where('employeeId', '==', employee_id))
         await getDocs(q)
             .then((res) => {
                 if (res?.docs?.length > 0) {
                     const resultHolder = res.docs?.map((doc) => ({ id: doc?.id, ...doc?.data() }))[0]
-                    setContactData(resultHolder)
+                    setEmployeeData(resultHolder)
                 }
             })
             .catch((err) => {
@@ -55,10 +45,11 @@ const ContactDetail = () => {
     }
 
     useEffect(() => {
-        if (Boolean(contactId)) {
-            getContactDetail(contactId)
+        console.log(employeeId)
+        if (Boolean(employeeId)) {
+            getEmployeeDetail(employeeId)
         } else {
-            alert('KONTAK TIDAK VALID')
+            alert('KARYAWAN TIDAK VALID')
         }
         setIsLoading(false)
     }, [])
@@ -77,33 +68,33 @@ const ContactDetail = () => {
     }
 
     const loadDataToForm = (data) => {
-        setContactName(data?.name)
-        setContactPhone(data?.phone)
-        setContactEmail(data?.email)
-        setContactAddress(data?.address)
+        setEmployeeName(data?.name)
+        setEmployeeRole(data?.role)
+        setEmployeeStatus(data?.status)
+        setEmployeeContact(data?.contact)
     }
 
-    const updateDataContact = async () => {
+    const updateDataEmployee = async () => {
         setIsLoading(true)
-        const newContactData = {
-            name: contactName,
-            phone: contactPhone,
-            email: contactEmail,
-            address: contactAddress,
+        const newEmployeeData = {
+            name: employeeName,
+            role: employeeRole,
+            status: employeeStatus,
+            contact: employeeContact,
             updated_at: moment(new Date).toISOString(),
-            contactId: contactData?.contactId,
+            employeeId: employeeData?.employeeId,
             updated_at: moment().format('DD/MMM/YYYY hh:mm')
         }
-        const oldContactDoc = doc(db, CONTACT_COLLECTION, contactData?.id)
-        updateDoc(oldContactDoc, newContactData)
+        const oldContactDoc = doc(db, EMPLOYEE_COLLECTION, employeeData.employeeId)
+        updateDoc(oldContactDoc, newEmployeeData)
             .then(() => {
                 setIsLoading(false)
                 setShowModal(false)
-                addLog('UPDATE CONTACT DATA', `${localStorage.getItem(Constant.USERNAME)} update contact ${contactName}, from ${JSON.stringify(contactData)} to ${JSON.stringify({
-                    name: contactName,
-                    phone: contactPhone,
-                    email: contactEmail,
-                    address: contactAddress,
+                addLog('UPDATE CONTACT DATA', `${localStorage.getItem(Constant.USERNAME)} update contact ${employeeName}, from ${JSON.stringify(employeeData)} to ${JSON.stringify({
+                    name: employeeName,
+                    role: employeeRole,
+                    status: employeeStatus,
+                    contact: employeeContact,
                 })}`)
                 navigate('/contact')
             })
@@ -124,15 +115,15 @@ const ContactDetail = () => {
                     <CloseButton onClick={() => setShowModal(false)} />
                 </Modal.Header>
                 <Modal.Body>
-                    {summaryItem('Nama kontak', contactName)}
-                    {summaryItem('Nomor telepon', contactPhone)}
-                    {summaryItem('Email', contactEmail)}
-                    {summaryItem('Alamat', contactAddress)}
+                    {summaryItem('Nama karyawan', employeeName)}
+                    {summaryItem('Role Karyawan', employeeRole)}
+                    {summaryItem('Status Karyawan', employeeStatus)}
+                    {summaryItem('kontak Karyawan', employeeContact)}
                 </Modal.Body>
                 <Modal.Footer>
                     <p style={{ width: '100%', textAlign: 'center' }}>Apakah data yang dimasukkan sudah benar?</p>
                     <Button variant="danger" onClick={() => setShowModal(false)}>Batal</Button>
-                    <Button variant="success" onClick={() => { updateDataContact() }}>Ya, Ubah</Button>
+                    <Button variant="success" onClick={() => { updateDataEmployee() }}>Ya, Ubah</Button>
                 </Modal.Footer>
             </Modal>
             <Modal show={isLoading} centered>
@@ -160,87 +151,109 @@ const ContactDetail = () => {
                 <div className="container-fluid py-4">
                     <div style={{ display: 'flex', flexDirection: 'row' }}>
                         <div className="col-lg-6 col-md-3 mb-md-0 mb-4">
-                            <h2>{contactData?.contactName}</h2>
+                            <h2>{employeeData?.employeeName}</h2>
                         </div>
                     </div>
                     <div className="row mt-4">
                         <Form>
                             <Row>
                                 {/* NAME */}
-                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='productName'>
-                                    <Form.Label>Nama Customer</Form.Label>
+                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='name'>
+                                    <Form.Label>Nama karyawan</Form.Label>
                                     {isEdit ?
                                         <Form.Control
                                             // isInvalid={errorName}
                                             type="input"
-                                            name='contactName'
-                                            value={contactName}
+                                            name='name'
+                                            value={employeeName}
                                             onChange={(e) => {
-                                                setContactName(e.target.value)
+                                                setEmployeeName(e.target.value)
                                             }}
-                                            placeholder="Masukan nama"
+                                            placeholder="Masukan Nama Karyawan"
                                         />
                                         :
-                                        <h4 style={{ marginTop: -10, marginBottom: -10 }}>{contactData?.contactName}</h4>
+                                        <h4 style={{ marginTop: -10, marginBottom: -10 }}>{employeeData?.employeeName}</h4>
                                     }
 
                                 </Form.Group>
-
-                                {/* PHONE */}
-                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='phone'>
-                                    <Form.Label>Nomor Telepon Customer</Form.Label>
-                                   {isEdit?
-                                   <Form.Control
-                                   type="input"
-                                   name='contactPhone'
-                                   value={contactPhone}
-                                   onChange={(e) => {
-                                    setContactPhone(e.target.value)
-                                   }}
-                                   placeholder="masukan nomor telepon"
-                                   />
-                                   :
-                                    <h4 style={{ marginTop: -10, marginBottom: -10 }}>{contactData?.contactPhone}</h4>
-                                }
+                                {/* ROLE */}
+                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='role'>
+                                    <Form.Label>Role Karyawan</Form.Label>
+                                    {isEdit ?
+                                        <Form.Select
+                                            name='role'
+                                            value={employeeRole}
+                                            onChange={(e) => {
+                                                setEmployeeRole(e.target.value)
+                                            }}
+                                        >
+                                            <option value="">Pilih Role Karyawan</option>
+                                            <option value="gudang">Gudang</option>
+                                            <option value="sales">Sales</option>
+                                            <option value="marketing">Marketing</option>
+                                            <option value="admin">Admin</option>
+                                            <option value="superadmin">Super Admin</option>
+                                        </Form.Select>
+                                        :
+                                        <h4 style={{ marginTop: -10, marginBottom: -10 }}>{employeeData?.employeeRole}</h4>
+                                    }
                                 </Form.Group>
+
                             </Row>
 
                             <Row>
-                                {/* EMAIL */}
-                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='email'>
-                                    <Form.Label>Email Customer</Form.Label>
-                                    {isEdit?
-                                   <Form.Control
-                                   type="input"
-                                   name='contactPhone'
-                                   value={contactEmail}
-                                   onChange={(e) => {
-                                    setContactEmail(e.target.value)
-                                   }}
-                                   placeholder="masukan alamat email"
-                                   />
-                                   :
-                                    <h4 style={{ marginTop: -10, marginBottom: -10 }}>{contactData?.contactEmail}</h4>
-                                }
+                                {/* STATUS */}
+                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='status'>
+                                    <Form.Label>Status Karyawan</Form.Label>
+                                    {isEdit ?
+                                        <>
+                                            <Form.Check
+                                                type="radio"
+                                                label="Active"
+                                                name="status"
+                                                id="active"
+                                                value="active"
+                                                checked={employeeStatus === 'active'}
+                                                onChange={(e) => {
+                                                    setEmployeeStatus(e.target.value)
+                                                }}
+                                            />
+                                            <Form.Check
+                                                type="radio"
+                                                label="Inactive"
+                                                name="status"
+                                                id="inactive"
+                                                value="inactive"
+                                                checked={employeeStatus === 'inactive'}
+                                                onChange={(e) => {
+                                                    setEmployeeStatus(e.target.value)
+                                                }}
+                                            />
+                                        </>
+                                        :
+                                        <h4 style={{ marginTop: -10, marginBottom: -10 }}>{employeeData?.employeeStatus}</h4>
+                                    }
                                 </Form.Group>
 
-                                {/* ADDRESS */}
-                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='address'>
-                                    <Form.Label>Alamat Customer</Form.Label>
-                                    {isEdit?
-                                   <Form.Control
-                                   type="input"
-                                   name='contactPhone'
-                                   value={contactAddress}
-                                   onChange={(e) => {
-                                    setContactAddress(e.target.value)
-                                   }}
-                                   placeholder="masukan alamat email"
-                                   />
-                                   :
-                                    <h4 style={{ marginTop: -10, marginBottom: -10 }}>{contactData?.contactAddress}</h4>
-                                }
+
+                                {/* KONTAK */}
+                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='contact'>
+                                    <Form.Label>Kontak Karyawan</Form.Label>
+                                    {isEdit ?
+                                        <Form.Control
+                                            type="number" // Change type to "number"
+                                            name='contact'
+                                            value={employeeContact}
+                                            onChange={(e) => {
+                                                setEmployeeContact(e.target.value)
+                                            }}
+                                            placeholder="Masukan Kontak Karyawan"
+                                        />
+                                        :
+                                        <h4 style={{ marginTop: -10, marginBottom: -10 }}>{employeeData?.employeeContact}</h4>
+                                    }
                                 </Form.Group>
+
                             </Row>
 
 
@@ -260,7 +273,7 @@ const ContactDetail = () => {
                                         if (isEdit) {
                                             validation()
                                         } else {
-                                            loadDataToForm(contactData)
+                                            loadDataToForm(employeeData)
                                             setIsEdit(true)
                                         }
                                     }}
@@ -268,7 +281,7 @@ const ContactDetail = () => {
                                 <Button
                                     style={{ width: '25%', alignSelf: 'flex-end', visibility: isEdit ? 'hidden' : 'visible' }}
                                     onClick={() => {
-                                        navigate(`/contact/detail/${contactId}`)
+                                        navigate(`/employee/detail/${employeeId}`)
                                     }}
                                 >{'Lihat Contact'}</Button>
                             </div>
@@ -358,4 +371,4 @@ const ContactDetail = () => {
     )
 }
 
-export default ContactDetail
+export default EmployeeDetail
