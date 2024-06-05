@@ -216,7 +216,7 @@ function Stock() {
                               <td>
                                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
                                   <Button
-                                    style={{ width: '40%', marginTop: 10 }}
+                                    style={{ width: '60%', marginTop: 10 }}
                                     onClick={() => {
                                       // navigate('/product/add-new-product')
                                       setSelectedProduct(item)

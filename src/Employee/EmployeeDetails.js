@@ -16,29 +16,19 @@ const EmployeeDetail = () => {
 
     const { employeeId } = useParams()
     const navigate = useNavigate()
-
-    
-
     const [employeeData, setEmployeeData] = useState()
     const [employeeName, setEmployeeName] = useState('')
     const [employeeRole, setEmployeeRole] = useState('')
-    const [employeeStatus, setEmployeeStatus] = useState('')    
+    const [employeeStatus, setEmployeeStatus] = useState('')
     const [employeeContact, setEmployeeContact] = useState('')
-    
-
     const [showModal, setShowModal] = useState(false)
     const [isLoading, setIsLoading] = useState()
-
     const [employeeDetail, setEmployeeDetail] = useState()
     const [isEdit, setIsEdit] = useState(false)
-
-
     const [formData, setFormData] = useState({})
     const getEmployeeDetail = async (employee_id) => {
         setIsLoading(true)
         console.log('employeeId', employee_id)
-
-   
 
         const q = query(collection(db, EMPLOYEE_COLLECTION)
             , where('employeeId', '==', employee_id))
@@ -55,6 +45,7 @@ const EmployeeDetail = () => {
     }
 
     useEffect(() => {
+        console.log(employeeId)
         if (Boolean(employeeId)) {
             getEmployeeDetail(employeeId)
         } else {
@@ -62,14 +53,6 @@ const EmployeeDetail = () => {
         }
         setIsLoading(false)
     }, [])
-
-    // const handleInputChange = (e) => {
-    //     const { name, value } = e.target;
-    //     setFormData(prevState => ({
-    //         ...prevState,
-    //         [name]: value
-    //     }));
-    // };
 
     const validation = () => {
         setShowModal(true)
@@ -193,68 +176,68 @@ const EmployeeDetail = () => {
                                     }
 
                                 </Form.Group>
-                                   {/* ROLE */}
+                                {/* ROLE */}
                                 <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='role'>
-                                <Form.Label>Role Karyawan</Form.Label>
-                                {isEdit ?
-                                    <Form.Select
-                                        name='role'
-                                        value={employeeRole}
-                                        onChange={(e) => {
-                                            setEmployeeRole(e.target.value)
-                                        }}
-                                    >
-                                        <option value="">Pilih Role Karyawan</option>
-                                        <option value="gudang">Gudang</option>
-                                        <option value="sales">Sales</option>
-                                        <option value="marketing">Marketing</option>
-                                        <option value="admin">Admin</option>
-                                        <option value="superadmin">Super Admin</option>
-                                    </Form.Select>
-                                    :
-                                    <h4 style={{ marginTop: -10, marginBottom: -10 }}>{employeeData?.employeeRole}</h4>
-                                }
-                            </Form.Group>
+                                    <Form.Label>Role Karyawan</Form.Label>
+                                    {isEdit ?
+                                        <Form.Select
+                                            name='role'
+                                            value={employeeRole}
+                                            onChange={(e) => {
+                                                setEmployeeRole(e.target.value)
+                                            }}
+                                        >
+                                            <option value="">Pilih Role Karyawan</option>
+                                            <option value="gudang">Gudang</option>
+                                            <option value="sales">Sales</option>
+                                            <option value="marketing">Marketing</option>
+                                            <option value="admin">Admin</option>
+                                            <option value="superadmin">Super Admin</option>
+                                        </Form.Select>
+                                        :
+                                        <h4 style={{ marginTop: -10, marginBottom: -10 }}>{employeeData?.employeeRole}</h4>
+                                    }
+                                </Form.Group>
 
                             </Row>
 
                             <Row>
                                 {/* STATUS */}
                                 <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='status'>
-                            <Form.Label>Status Karyawan</Form.Label>
-                            {isEdit ?
-                                <>
-                                    <Form.Check
-                                        type="radio"
-                                        label="Active"
-                                        name="status"
-                                        id="active"
-                                        value="active"
-                                        checked={employeeStatus === 'active'}
-                                        onChange={(e) => {
-                                            setEmployeeStatus(e.target.value)
-                                        }}
-                                    />
-                                    <Form.Check
-                                        type="radio"
-                                        label="Inactive"
-                                        name="status"
-                                        id="inactive"
-                                        value="inactive"
-                                        checked={employeeStatus === 'inactive'}
-                                        onChange={(e) => {
-                                            setEmployeeStatus(e.target.value)
-                                        }}
-                                    />
-                                </>
-                                :
-                                <h4 style={{ marginTop: -10, marginBottom: -10 }}>{employeeData?.employeeStatus}</h4>
-                            }
-                        </Form.Group>
+                                    <Form.Label>Status Karyawan</Form.Label>
+                                    {isEdit ?
+                                        <>
+                                            <Form.Check
+                                                type="radio"
+                                                label="Active"
+                                                name="status"
+                                                id="active"
+                                                value="active"
+                                                checked={employeeStatus === 'active'}
+                                                onChange={(e) => {
+                                                    setEmployeeStatus(e.target.value)
+                                                }}
+                                            />
+                                            <Form.Check
+                                                type="radio"
+                                                label="Inactive"
+                                                name="status"
+                                                id="inactive"
+                                                value="inactive"
+                                                checked={employeeStatus === 'inactive'}
+                                                onChange={(e) => {
+                                                    setEmployeeStatus(e.target.value)
+                                                }}
+                                            />
+                                        </>
+                                        :
+                                        <h4 style={{ marginTop: -10, marginBottom: -10 }}>{employeeData?.employeeStatus}</h4>
+                                    }
+                                </Form.Group>
 
 
-                                    {/* KONTAK */}
-                                    <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='contact'>
+                                {/* KONTAK */}
+                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='contact'>
                                     <Form.Label>Kontak Karyawan</Form.Label>
                                     {isEdit ?
                                         <Form.Control
@@ -271,7 +254,7 @@ const EmployeeDetail = () => {
                                     }
                                 </Form.Group>
 
-                                </Row>
+                            </Row>
 
 
                             <div className="col-lg-8 col-md-3 my-4" style={{ display: 'flex', flex: 1, flexDirection: 'row' }}>

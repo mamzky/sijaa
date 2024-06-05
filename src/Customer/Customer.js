@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import SideNavBar from '../Components/SideNavBar'
 import TopNavBar from '../Components/TopNavBar'
 import CustomTable from '../Components/CustomTable'
-import { Button, Form } from 'react-bootstrap'
+import { Button, Form, Modal, Spinner } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 import { CUSTOMER_COLLECTION } from '../Utils/DataUtils'
 import { db } from '../Config/FirebaseConfig';
@@ -13,13 +13,16 @@ function Customer() {
   const navigate = useNavigate()
   const customerCollectionRef = collection(db, CUSTOMER_COLLECTION)
   const [customerData, setCustomerData] = useState([])
+  const [loading, setLoading] = useState(false)
 
   const getCustomerList = async () => {
     const data = await getDocs(customerCollectionRef)
     const sortedData = data.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
     setCustomerData(sortedData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)))
+    setLoading(false)
   }
   useEffect(() => {
+    setLoading(true)
     getCustomerList()
   }, [])
 
@@ -30,8 +33,8 @@ function Customer() {
       .map(doc => doc.data()))
     const result = querySnapshot.docs
       .map(doc => doc.data())
-      .filter((e) => e.name.toLowerCase()
-        .includes(customerName.toLowerCase()))
+      .filter((e) => e?.name?.toLowerCase()
+        .includes(customerName?.toLowerCase()))
     setCustomerData(result)
   }
 
@@ -40,6 +43,24 @@ function Customer() {
       <SideNavBar />
       <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
         <TopNavBar />
+        <Modal show={loading} centered>
+          <Modal.Body backdrop={'false'} show={true} onHide={() => setLoading(false)}
+            size="md"
+            aria-labelledby="contained-modal-title-vcenter"
+            style={{
+              display: 'flex',
+              flex: 1,
+              flexDirection: 'row',
+              justifyContent: 'center'
+            }}
+          >
+            <div>
+              <Spinner animation="border" role="status" style={{ alignSelf: 'center' }}>
+              </Spinner>
+            </div>
+            <h3 style={{ marginLeft: 20 }}>Loading...</h3>
+          </Modal.Body>
+        </Modal>
         <div class="container-fluid py-4">
           <div style={{ display: 'flex', flexDirection: 'row' }}>
             <div className="col-lg-6 col-md-3 mb-md-0 mb-4">
@@ -66,8 +87,6 @@ function Customer() {
                   setTimeout(() => {
                     searchCustomer(e.target.value)
                   }, 500);
-                  // setProductName(e.target.value)
-                  // setErrorName(isEmpty(e.target.value))
                 }}
                 placeholder="Cari customer"
               />

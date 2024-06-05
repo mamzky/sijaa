@@ -10,7 +10,7 @@ import { empty, isEmpty, isNil } from 'ramda'
 import { db } from '../Config/FirebaseConfig';
 import { collection, getDocs, addDoc, doc, updateDoc, query, where } from 'firebase/firestore'
 import moment from 'moment/moment'
-import { CUSTOMER_COLLECTION, LOG_COLLECTION, PRODUCT_COLLECTION, TRANSACTION_COLLECTION } from '../Utils/DataUtils'
+import { CUSTOMER_COLLECTION, EMPLOYEE_COLLECTION, LOG_COLLECTION, PRODUCT_COLLECTION, TRANSACTION_COLLECTION } from '../Utils/DataUtils'
 import Constant from '../Utils/Constants'
 import { addLog, calculateTotal } from '../Utils/Utils'
 import Select from 'react-select'
@@ -22,12 +22,14 @@ function AddNewTransaction() {
     const navigate = useNavigate()
     const customerCollectionRef = collection(db, CUSTOMER_COLLECTION)
     const productCollectionRef = collection(db, PRODUCT_COLLECTION)
+    const employeeCollectionRef = collection(db, EMPLOYEE_COLLECTION)
 
     const [customerName, setCustomerName] = useState('')
     const [phone, setPhone] = useState('')
     const [email, setEmail] = useState('')
     const [address, setAddress] = useState('')
     const [contactPerson, setContactPerson] = useState('')
+    const [selectedPIC, setSelectedPIC] = useState('')
 
     const [showModal, setShowModal] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
@@ -37,6 +39,7 @@ function AddNewTransaction() {
     // DATA LIST
     const [customerList, setCustomerList] = useState([])
     const [productList, setProductList] = useState([])
+    const [employeeData, setEmployeeData] = useState([])
 
     //ORDER
     const [selectedCustomer, setSelectedCustomer] = useState()
@@ -44,15 +47,15 @@ function AddNewTransaction() {
     const [orderList, setOrderList] = useState([])
     const [orderNumber, setOrderNumber] = useState('')
     const [orderDate, setOrderDate] = useState(new Date());
-    const [transactionType, setTransactiontype] = useState()
+    const [transactionType, setTransactiontype] = useState('')
     const [dp, setDp] = useState(0)
     const [isActive, setIsActive] = useState(true)
 
     // MODAL
-    const [selectedProduct, setSeletedProduct] = useState()
-    const [qtySelectedItem, setQtySelectedItem] = useState()
-    const [discountSelectedItem, setDiscountSelectedItem] = useState()
-    const [priceSelectedItem, setPriceSelectedItem] = useState()
+    const [selectedProduct, setSeletedProduct] = useState('')
+    const [qtySelectedItem, setQtySelectedItem] = useState('')
+    const [discountSelectedItem, setDiscountSelectedItem] = useState('0')
+    const [priceSelectedItem, setPriceSelectedItem] = useState('')
     const [productIsExist, setProductIsExist] = useState(false)
     const [isEditItem, setIsEditItem] = useState(false)
 
@@ -70,6 +73,7 @@ function AddNewTransaction() {
     useEffect(() => {
         getCustomer()
         getProduct()
+        getListEmployee()
     }, [])
 
     const getCustomer = async () => {
@@ -82,6 +86,22 @@ function AddNewTransaction() {
         const data = await getDocs(productCollectionRef)
         const sortedData = data.docs.map((doc) => ({ id: doc.id, label: doc.data().product_name, value: doc.data() }))
         setProductList(sortedData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)))
+    }
+
+    const getListEmployee = async () => {
+        setIsLoading(true)
+        await getDocs(employeeCollectionRef)
+            .then((res) => {
+                const listData = res.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+                setEmployeeData(listData)
+                console.log('EMPLOYEE', listData)
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+            .finally(() => {
+                setIsLoading(false)
+            })
     }
 
     const addItem = (data) => {
@@ -112,6 +132,7 @@ function AddNewTransaction() {
             notes: transactionNotes,
             type: transactionType,
             dp: dp ?? 0,
+            pic: selectedPIC,
             total_bill: DigitFormatter(calculateTotal(orderList)),
             status: isActive,
             created_at: moment().locale('id').toISOString(),
@@ -224,8 +245,6 @@ function AddNewTransaction() {
                                 options={productList}
                                 placeholder="Pilih produk"
                                 onChange={(e) => {
-                                    console.log(e.id)
-                                    console.log()
                                     if (orderList.findIndex((val) => val.id === e.id) < 0) {
                                         setProductIsExist(false)
                                         setSeletedProduct(e)
@@ -271,7 +290,7 @@ function AddNewTransaction() {
                                 </Form.Group>
                             </div>
                             <Form.Group style={{ marginTop: 12 }}>
-                                <Form.Label>Diskon</Form.Label>
+                                <Form.Label>Diskon(%)</Form.Label>
                                 <Form.Control
                                     style={{ width: '50%' }}
                                     type="input"
@@ -301,12 +320,11 @@ function AddNewTransaction() {
                                     id: selectedProduct.id,
                                     name: selectedProduct.value.product_name,
                                     qty: qtySelectedItem,
-                                    disc: discountSelectedItem,
+                                    disc: discountSelectedItem === '' ? 0 : discountSelectedItem,
                                     price: OnlyDigit(priceSelectedItem)
                                 }
                                 addItem(item)
                             }
-
                             setSeletedProduct()
                             setQtySelectedItem('')
                             setPriceSelectedItem('')
@@ -536,6 +554,19 @@ function AddNewTransaction() {
                                     />
                                 </Form.Group>
                             </Row>
+                            <Row>
+                                {/* EMPLOYEE */}
+                                <Select
+                                className='col-lg-6'
+                                    options={employeeData.map((e) => {
+                                        return { label: e?.employeeName ?? '', value: e?.employeeName ?? '' }
+                                    })}
+                                    placeholder="Pilih PIC"
+                                    onChange={(e) => {
+                                        setSelectedPIC(e.value)
+                                    }}
+                                />
+                            </Row>
 
                             <div class="row mt-4">
                                 <div className="card-body px-0 pb-2">
@@ -571,12 +602,12 @@ function AddNewTransaction() {
                                                                 onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#F5F5F5')}
                                                                 onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '')}
                                                                 onClick={() => {
-                                                                    console.log(item);
+                                                                    console.log('ITEM', item);
                                                                     setIsEditItem(true)
                                                                     setSeletedProduct(item.item)
                                                                     setQtySelectedItem(item.qty)
                                                                     setPriceSelectedItem(DigitFormatter(item.price))
-                                                                    setDiscountSelectedItem(item.disc)
+                                                                    setDiscountSelectedItem(item.disc ?? 0)
                                                                     setModalItem(true)
                                                                 }}
                                                             >

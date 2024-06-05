@@ -54,7 +54,6 @@ function TransactionDetail() {
 
     useEffect(() => {
         getOrderData(order_number)
-        setIsLoading(false)
     }, [])
 
     const getOrderData = async (order_number) => {
@@ -115,7 +114,6 @@ function TransactionDetail() {
                 </Modal.Footer>
             </Modal>
             <Modal show={isLoading} centered>
-
                 <Modal.Body backdrop={'false'} show={true} onHide={() => setShowModal(false)}
                     size="md"
                     aria-labelledby="contained-modal-title-vcenter"
@@ -190,7 +188,7 @@ function TransactionDetail() {
                                     onClick={() => navigate(-1)}
                                 >arrow_back_ios</i>
                                 {`Order Detail : ${order_number}`}</h2>
-                            <p style={{ paddingLeft: 24 }}>{`Dibuat pada : ${moment(orderData?.created_at).format('DD MMM YYYY hh:mm')}`}</p>
+                            <p style={{ paddingLeft: 24 }}>{`Dibuat pada : ${moment(orderData?.created_at).format('DD MMM YYYY hh:mm')} oleh ${orderData?.created_by}`}</p>
                         </div>
                     </div>
                     <div className="row mt-4">
@@ -254,7 +252,7 @@ function TransactionDetail() {
                             </Row>
                             <Row>
                                 {/* Status */}
-                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='contactPerson'>
+                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='status'>
                                     <Form.Label>Status</Form.Label>
                                     <Form.Check // prettier-ignore
                                         checked={isActive}
@@ -262,6 +260,10 @@ function TransactionDetail() {
                                         type="switch"
                                         label={isActive ? 'Aktif' : 'Non-Aktif'}
                                     />
+                                </Form.Group>
+                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='pic'>
+                                    <Form.Label>PIC</Form.Label>
+                                    <h4 style={{ marginTop: -10, marginBottom: -10 }}>{orderData?.pic ?? '-'}</h4>
                                 </Form.Group>
                             </Row>
                         </Form>
@@ -323,7 +325,7 @@ function TransactionDetail() {
                                                     <td>
                                                         <div className="ps-3 py-1">
                                                             <div className="d-flex flex-column">
-                                                                <h6 className="mb-0 text-sm">{`Rp${DigitFormatter(item?.qty * item.price )}`}</h6>
+                                                                <h6 className="mb-0 text-sm">{`Rp${DigitFormatter(item?.qty * item.price)}`}</h6>
                                                             </div>
                                                         </div>
                                                     </td>

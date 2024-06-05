@@ -63,14 +63,6 @@ const ContactDetail = () => {
         setIsLoading(false)
     }, [])
 
-    // const handleInputChange = (e) => {
-    //     const { name, value } = e.target;
-    //     setFormData(prevState => ({
-    //         ...prevState,
-    //         [name]: value
-    //     }));
-    // };
-
     const validation = () => {
         setShowModal(true)
     }

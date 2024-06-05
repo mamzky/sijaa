@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import Login from './Auth/Login';
 import MainDashboard from './Dashboard/MainDashboard';
 import 'bootstrap/dist/css/bootstrap.min.css'
-import MainNav from './Navigation/MainNav';
+import { ToastContainer, toast } from 'react-toastify';
 import Product from './Product/Product';
 import Contact from './Contact/Contact';
 import Stock from './Stock/Stock';
@@ -29,6 +29,7 @@ import AddNewSales from './Sales/AddNewSales';
 import SalesDetail from './Sales/SalesDetails';
 import AddNewEmployee from './Employee/AddNewEmployee'
 import EmployeeDetail from './Employee/EmployeeDetails'
+import 'react-toastify/dist/ReactToastify.css';
 
 
 
@@ -42,31 +43,31 @@ function App() {
 
   return (
     <Router>
-        {/* <MainNav/> */}
+      <ToastContainer />
       <Routes>
         <Route path='/' Component={MainDashboard} />
-        <Route path='/login' Component={Login}/>
+        <Route path='/login' Component={Login} />
         <Route path='/dashboard' Component={MainDashboard} />
-        <Route path='/product' Component={Product}/>
-        <Route path='/product/add-new-product' Component={AddNewProduct}/>
-        <Route path='/product/product-detail/:product_code' Component={ProductDetail}/>
-        <Route path='/contact' Component={Contact}/>
-        <Route path='/contact/detail/:contactId' Component={ContactDetail}/>
-        <Route path='/contact/new-contact' Component={AddNewContact}/>
-        <Route path='/customer' Component={Customer}/>
-        <Route path='/customer/new-customer' Component={AddNewCustomer}/>
-        <Route path='/customer/detail/:customer_code' Component={CustomerDetail}/>
-        <Route path='/customer/detail/:customer_code/stock' Component={StockCustomer}/>
-        <Route path='/stock' Component={Stock}/>
-        <Route path='/transaction' Component={Transaction}/>
-        <Route path='/transaction/new-transaction' Component={AddNewTransaction}/>
-        <Route path='/transaction/detail/:order_number' Component={TransactionDetail}/>
-        <Route path='/sales' Component={Sales}/>
-        <Route path='/sales/detail' Component={SalesDetail}/>
-        <Route path='/sales/new-sales' Component={AddNewSales}/>
-        <Route path='/employee' Component={Employee}/>
-        <Route path='/employee/detail/:employeeId' Component={EmployeeDetail}/>
-        <Route path='/employee/new-employee' Component={AddNewEmployee}/>
+        <Route path='/product' Component={Product} />
+        <Route path='/product/add-new-product' Component={AddNewProduct} />
+        <Route path='/product/product-detail/:product_code' Component={ProductDetail} />
+        <Route path='/contact' Component={Contact} />
+        <Route path='/contact/detail/:contactId' Component={ContactDetail} />
+        <Route path='/contact/new-contact' Component={AddNewContact} />
+        <Route path='/customer' Component={Customer} />
+        <Route path='/customer/new-customer' Component={AddNewCustomer} />
+        <Route path='/customer/detail/:customer_code' Component={CustomerDetail} />
+        <Route path='/customer/detail/:customer_code/stock' Component={StockCustomer} />
+        <Route path='/stock' Component={Stock} />
+        <Route path='/transaction' Component={Transaction} />
+        <Route path='/transaction/new-transaction' Component={AddNewTransaction} />
+        <Route path='/transaction/detail/:order_number' Component={TransactionDetail} />
+        <Route path='/sales' Component={Sales} />
+        <Route path='/sales/detail' Component={SalesDetail} />
+        <Route path='/sales/new-sales' Component={AddNewSales} />
+        <Route path='/employee' Component={Employee} />
+        <Route path='/employee/detail/:employeeId' Component={EmployeeDetail} />
+        <Route path='/employee/new-employee' Component={AddNewEmployee} />
 
         {/* <Route path='/sales/detail/:salesId' Component={SalesDetail}/>
         <Route path='/contact/new-sales' Component={AddNewSales}/> */}

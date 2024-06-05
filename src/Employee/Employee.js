@@ -50,34 +50,34 @@ function Employee() {
     // Melakukan sesuatu dengan data JSON, misalnya menampilkan di konsol
     setShowModal(true);
     // Jika Anda ingin melakukan sesuatu yang lain dengan data JSON, Anda bisa menambahkan kode di sini
-};
+  };
 
   const deletekaryawan = async () => {
     console.log(selectedEmployee);
     const productDoc = doc(db, EMPLOYEE_COLLECTION, selectedEmployee.id);
     await deleteDoc(productDoc).then(() => {
-      addLog('DELETE PRODUCT', `${localStorage.getItem(Constant.USERNAME)} deleted product "${selectedEmployee?.employeeName}"`);
+      addLog('DELETE KARYAWAN', `${localStorage.getItem(Constant.USERNAME)} deleted product "${selectedEmployee?.employeeName}"`);
       getListContact();
       setShowDeleteModal(false);
       setIsLoading(false);
     });
   };
-//   const deletekaryawan = async () => {
-//     console.log(selectedEmployee);
-//     const productDoc = doc(db, EMPLOYEE_COLLECTION, selectedEmployee.employeeId);
-//     await deleteDoc(productDoc).then(() => {
-//         addLog('DELETE PRODUCT', `${localStorage.getItem(Constant.USERNAME)} deleted product "${selectedEmployee?.employeeName}"`);
-//         getEmployee();
-//         setDeleteEmployee(false);
-//         setIsLoading(false);
-//     });
-// };
+  //   const deletekaryawan = async () => {
+  //     console.log(selectedEmployee);
+  //     const productDoc = doc(db, EMPLOYEE_COLLECTION, selectedEmployee.employeeId);
+  //     await deleteDoc(productDoc).then(() => {
+  //         addLog('DELETE PRODUCT', `${localStorage.getItem(Constant.USERNAME)} deleted product "${selectedEmployee?.employeeName}"`);
+  //         getEmployee();
+  //         setDeleteEmployee(false);
+  //         setIsLoading(false);
+  //     });
+  // };
 
-const handleDeleteClick = (employee) => {
-  setSelectedEmployee(employee);
-  setShowDeleteModal(true);
-};
-  
+  const handleDeleteClick = (employee) => {
+    setSelectedEmployee(employee);
+    setShowDeleteModal(true);
+  };
+
 
   const searchContact = async (contactName) => {
     const q = query(collection(db, EMPLOYEE_COLLECTION.toString()))
@@ -88,7 +88,7 @@ const handleDeleteClick = (employee) => {
         .includes(contactName.toLowerCase())).sort((a, b) => a.qty - b.qty)
     setEmployeeData(result)
   }
-   
+
 
   return (
     <div>
@@ -149,7 +149,7 @@ const handleDeleteClick = (employee) => {
 
           <div>
             <Form.Group className="col-lg-6 col-md-3" controlId='employeeName'>
-            <Form.Control
+              <Form.Control
                 isInvalid={false}
                 type="input"
                 name='employeeName'
@@ -185,10 +185,7 @@ const handleDeleteClick = (employee) => {
                       return (
                         <tr
                           key={employee.employeeId}
-                          onClick={() => {
-                            navigate(`/employee/detail/${employee.employeeId}`)
-                          }}
-                          style={{ cursor: 'pointer' }} // Optional: Change cursor on hover
+
                           onMouseOver={(e) => (e.currentTarget.style.backgroundColor = 'black')}
                           onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '')}
                         >
@@ -201,7 +198,11 @@ const handleDeleteClick = (employee) => {
                           </td>
                           <td>
                             <div className="ps-3 py-1">
-                              <div className="d-flex flex-column justify-content-center">
+                              <div onClick={() => {
+                                navigate(`/employee/detail/${employee.employeeId}`)
+                              }}
+                                style={{ cursor: 'pointer' }}
+                                className="d-flex flex-column justify-content-center">
                                 <h6 className="mb-0 text-sm">{employee.employeeName}</h6>
                               </div>
                             </div>
@@ -214,15 +215,15 @@ const handleDeleteClick = (employee) => {
                             </div>
                           </td>
                           <td>
-                              <div className="ps-3 py-1">
-                                  <div className="d-flex flex-column">
-                                  {employee.employeeStatus === 'active' ? (
-                                    <Button style={{ display: 'flex', flexDirection: 'row', backgroundColor:'green', width:'50%', justifyContent:'center'}}>AKTIF</Button>
-                                    ) : (
-                                      <Button style={{ display: 'flex', flexDirection: 'row', backgroundColor:'red', width:'50%', justifyContent:'center'}}>NON AKTIF</Button>
-                                    )}
-                                  </div>
+                            <div className="ps-3 py-1">
+                              <div className="d-flex flex-column">
+                                {employee.employeeStatus === 'active' ? (
+                                  <Button style={{ display: 'flex', flexDirection: 'row', backgroundColor: 'green', width: '50%', justifyContent: 'center' }}>AKTIF</Button>
+                                ) : (
+                                  <Button style={{ display: 'flex', flexDirection: 'row', backgroundColor: 'red', width: '50%', justifyContent: 'center' }}>NON AKTIF</Button>
+                                )}
                               </div>
+                            </div>
                           </td>
                           <td>
                             <div className="ps-3 py-1">
@@ -232,9 +233,9 @@ const handleDeleteClick = (employee) => {
                             </div>
                           </td>
                           <td>
-                                <div style={{ display: 'flex', flexDirection: 'row' }}>
-                                <Button
-                                style={{ width: '50%', marginTop: 10, justifyContent:'center',zIndex: 20 }}
+                            <div style={{ display: 'flex', flexDirection: 'row' }}>
+                              <Button
+                                style={{ width: '50%', marginTop: 10, justifyContent: 'center', zIndex: 20 }}
                                 variant="danger"
                                 key={employee.employeeId}
                                 onClick={(e) => {
@@ -242,15 +243,15 @@ const handleDeleteClick = (employee) => {
                                   handleDeleteClick(employee);
                                 }}
                               >Hapus</Button>
-                                </div>
-                              </td>
-                              
+                            </div>
+                          </td>
+
                         </tr >
                       )
                     })}
-                  
-                   
-                                 
+
+
+
                   </tbody>
                 </table>
               </div>

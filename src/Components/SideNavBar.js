@@ -9,15 +9,21 @@ import isNil from 'ramda/src/isNil'
 function SideNavBar() {
 
   const [activeMenu, setActiveMenu] = useState('')
+  const [role, setRole] = useState('')
   const navigate = useNavigate()
 
   const getActiveMenu = async () => {
     setActiveMenu(localStorage.getItem(Constant.ACTIVE_MENU))
   }
 
+  const getRole = () => {
+    setRole(localStorage.getItem(Constant.ROLE))
+  }
+
   useEffect(() => {
     checkLogin()
     getActiveMenu()
+    getRole()
   }, [])
 
   const performLogout = () => {
@@ -70,30 +76,38 @@ function SideNavBar() {
                 <span className="nav-link-text ms-1">Customer</span>
               </a>
             </li>
-            <li className="nav-item">
-              <a className={`nav-link text-white bg-gradient-primary ${activeMenu === Constant.MENU_TRANSACTION ? 'active' : ''}`} href="/transaction"
-                onClick={() => {
-                  localStorage.setItem(Constant.ACTIVE_MENU, Constant.MENU_TRANSACTION)
-                }}
-              >
-                <div className="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                  <i className="material-icons opacity-10">table_view</i>
-                </div>
-                <span className="nav-link-text ms-1">Transaksi</span>
-              </a>
-            </li>
-            <li className="nav-item">
-              <a className={`nav-link text-white bg-gradient-primary ${activeMenu === Constant.MENU_PRODUCT ? 'active' : ''}`} href="/product"
-                onClick={() => {
-                  localStorage.setItem(Constant.ACTIVE_MENU, Constant.MENU_PRODUCT)
-                }}
-              >
-                <div className="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                  <i className="material-icons opacity-10">receipt_long</i>
-                </div>
-                <span className="nav-link-text ms-1">Produk</span>
-              </a>
-            </li>
+            {/* TRANSAKSI */}
+            {['ADM', 'SADM'].includes(role) && (
+              <li className={`nav-item`}>
+                <a className={`nav-link text-white bg-gradient-primary ${activeMenu === Constant.MENU_TRANSACTION ? 'active' : ''}`} href="/transaction"
+                  onClick={() => {
+                    localStorage.setItem(Constant.ACTIVE_MENU, Constant.MENU_TRANSACTION)
+                  }}
+                >
+                  <div className="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                    <i className="material-icons opacity-10">table_view</i>
+                  </div>
+                  <span className="nav-link-text ms-1">Transaksi</span>
+                </a>
+              </li>
+            )}
+            {/* PRODUK */}
+            {['ADM', 'SADM', 'PROD'].includes(role) && (
+              <li className="nav-item">
+                <a className={`nav-link text-white bg-gradient-primary ${activeMenu === Constant.MENU_PRODUCT ? 'active' : ''}`} href="/product"
+                  onClick={() => {
+                    localStorage.setItem(Constant.ACTIVE_MENU, Constant.MENU_PRODUCT)
+                  }}
+                >
+                  <div className="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                    <i className="material-icons opacity-10">receipt_long</i>
+                  </div>
+                  <span className="nav-link-text ms-1">Produk</span>
+                </a>
+              </li>
+            )
+            }
+
             <li className="nav-item">
               <a className={`nav-link text-white bg-gradient-primary ${activeMenu === Constant.MENU_STOCK ? 'active' : ''}`} href="/stock"
                 onClick={() => {
@@ -118,30 +132,34 @@ function SideNavBar() {
                 <span className="nav-link-text ms-1">Kontak</span>
               </a>
             </li>
-            <li className='nav-item'>
-            <a className={`nav-link text-white bg-gradient-primary ${activeMenu === Constant.MENU_SALES ? 'active' : ''}`} href="/sales"
+            {/* SALES */}
+            {/* <li className='nav-item'>
+              <a className={`nav-link text-white bg-gradient-primary ${activeMenu === Constant.MENU_SALES ? 'active' : ''}`} href="/sales"
                 onClick={() => {
                   localStorage.setItem(Constant.ACTIVE_MENU, Constant.MENU_SALES)
                 }}
               >
-                 <div className="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                <div className="text-white text-center me-2 d-flex align-items-center justify-content-center">
                   <i className="material-icons opacity-10">receipt_long</i>
                 </div>
                 <span className="nav-link-text ms-1">sales</span>
               </a>
-            </li>
-            <li className='nav-item'>
-            <a className={`nav-link text-white bg-gradient-primary ${activeMenu === Constant.MENU_EMPLOYEE ? 'active' : ''}`} href="/employee"
-                onClick={() => {
-                  localStorage.setItem(Constant.ACTIVE_MENU, Constant.MENU_EMPLOYEE)
-                }}
-              >
-                 <div className="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                  <i className="material-icons opacity-10">group</i>
-                </div>
-                <span className="nav-link-text ms-1">employee</span>
-              </a>
-            </li>
+            </li> */}
+            {['ADM'].includes(role) && (
+              <li className='nav-item'>
+                <a className={`nav-link text-white bg-gradient-primary ${activeMenu === Constant.MENU_EMPLOYEE ? 'active' : ''}`} href="/employee"
+                  onClick={() => {
+                    localStorage.setItem(Constant.ACTIVE_MENU, Constant.MENU_EMPLOYEE)
+                  }}
+                >
+                  <div className="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                    <i className="material-icons opacity-10">group</i>
+                  </div>
+                  <span className="nav-link-text ms-1">Karyawan</span>
+                </a>
+              </li>
+            )}
+
           </ul>
         </div>
       </div>
@@ -154,7 +172,7 @@ function SideNavBar() {
             Logout
           </Button>
         </div>
-      </div>     
+      </div>
     </aside>
 
   )

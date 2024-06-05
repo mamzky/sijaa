@@ -55,7 +55,8 @@ function AddNewCustomer() {
             contact_person: contactPerson,
             notes,
             customer_code: `JAACST${moment().format('DDMMYYhhmm')}`,
-            created_at: moment().locale('id').toISOString()
+            created_at: moment().locale('id').toISOString(),
+            created_by: localStorage.getItem(Constant.USERNAME) ?? '-'
         }).then((res) => {
             console.log(res);
             addLog(localStorage.getItem(Constant.USERNAME), `create customer ${customerName}`)

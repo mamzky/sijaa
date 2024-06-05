@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Form } from 'react-bootstrap'
+import { Button, Form, Modal, Spinner } from 'react-bootstrap'
 import TopNavBar from '../Components/TopNavBar'
 import SideNavBar from '../Components/SideNavBar'
 import SmallImageCard from '../Components/SmallImageCard'
@@ -17,6 +17,7 @@ function Product() {
   const productCollectionRef = collection(db, PRODUCT_COLLECTION)
   const [productData, setProductData] = useState([])
   const [lowestStock, setLowestStock] = useState([])
+  const [loading, setLoading] = useState(false)
 
 
   const getProduct = async () => {
@@ -25,8 +26,10 @@ function Product() {
     const lowestData = data.docs.map((doc) => ({ ...doc.data(), id: doc.id })).sort((a, b) => a.qty - b.qty)
     setProductData(sortedData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)))
     setLowestStock(lowestData.length > 4 ? lowestData.slice(0, 4) : lowestData)
+    setLoading(false)
   }
   useEffect(() => {
+    setLoading(true)
     getProduct()
   }, [])
 
@@ -50,6 +53,24 @@ function Product() {
       <SideNavBar />
       <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
         <TopNavBar />
+        <Modal show={loading} centered>
+          <Modal.Body backdrop={'false'} show={true} onHide={() => setLoading(false)}
+            size="md"
+            aria-labelledby="contained-modal-title-vcenter"
+            style={{
+              display: 'flex',
+              flex: 1,
+              flexDirection: 'row',
+              justifyContent: 'center'
+            }}
+          >
+            <div>
+              <Spinner animation="border" role="status" style={{ alignSelf: 'center' }}>
+              </Spinner>
+            </div>
+            <h3 style={{ marginLeft: 20 }}>Loading...</h3>
+          </Modal.Body>
+        </Modal>
         <div class="container-fluid py-4">
           <div style={{ display: 'flex', flexDirection: 'row' }}>
             <div className="col-lg-6 col-md-3 mb-md-0 mb-4">
@@ -65,12 +86,6 @@ function Product() {
               >+ Tambah Produk Baru</Button>
             </div>
           </div>
-          {/* <div class="row mt-4">
-            <SmallImageCard />
-            <SmallImageCard />
-            <SmallImageCard />
-            <SmallImageCard />
-          </div> */}
           <div>
             <Form.Group className="col-lg-6 col-md-3" controlId='productName'>
               <Form.Control
