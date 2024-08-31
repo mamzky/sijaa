@@ -40,9 +40,6 @@ function Customer() {
 
   return (
     <div>
-      <SideNavBar />
-      <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
-        <TopNavBar />
         <Modal show={loading} centered>
           <Modal.Body backdrop={'false'} show={true} onHide={() => setLoading(false)}
             size="md"
@@ -162,7 +159,6 @@ function Customer() {
           </div>
 
         </div>
-      </main>
     </div>
   )
 }

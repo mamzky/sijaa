@@ -108,30 +108,6 @@ function Employee() {
           <Button variant="success" onClick={() => deletekaryawan()}>Ya, Hapus</Button>
         </Modal.Footer>
       </Modal>
-      {/* <Modal show={showModal} onHide={() => setShowModal(false)}
-                size="md"
-                aria-labelledby="contained-modal-title-vcenter"
-                centered>
-                <Modal.Header>
-                    <Modal.Title>
-                        Hapus Karyawan
-                    </Modal.Title>
-                    <CloseButton onClick={() => setShowModal(false)} />
-                </Modal.Header>
-                <Modal.Body>
-                <div>
-            <h3 style={{ marginBottom: 40, textAlign: 'center' }}>{selectedEmployee?.employeeName ?? '-'}</h3>
-               </div>
-                </Modal.Body>
-                <Modal.Footer>
-                    <p style={{ width: '100%', textAlign: 'center' }}>Apakah Yakin Ingin Menghapus Karyawan?</p>
-                    <Button variant="danger" onClick={() => setShowModal(false)}>Batal</Button>
-                    <Button variant="success" onClick={() => deletekaryawan()}>Ya, Hapus</Button>
-                </Modal.Footer>
-            </Modal> */}
-      <SideNavBar />
-      <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
-        <TopNavBar />
         <div class="container-fluid py-4">
           <div style={{ display: 'flex', flexDirection: 'row' }}>
             <div className="col-lg-6 col-md-3 mb-md-0 mb-4">
@@ -259,7 +235,6 @@ function Employee() {
           </div>
 
         </div>
-      </main>
     </div>
   )
 }

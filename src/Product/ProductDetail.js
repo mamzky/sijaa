@@ -171,269 +171,265 @@ function ProductDetail() {
                     <h3 style={{ marginLeft: 20 }}>Loading...</h3>
                 </Modal.Body>
             </Modal>
-            <SideNavBar />
-            <main className="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
-                <TopNavBar />
-                <div className="container-fluid py-4">
-                    <div style={{ display: 'flex', flexDirection: 'row' }}>
-                        <div className="col-lg-6 col-md-3 mb-md-0 mb-4">
-                            <h2>Detail Produk</h2>
+            <div className="container-fluid py-4">
+                <div style={{ display: 'flex', flexDirection: 'row' }}>
+                    <div className="col-lg-6 col-md-3 mb-md-0 mb-4">
+                        <h2>Detail Produk</h2>
+                    </div>
+                </div>
+                {product_code && !isEdit ?
+                    <div className="row mt-4">
+                        <div>
+                            <p>Nama Barang</p>
+                            <h4 style={{ marginTop: -20 }}>{productData?.product_name}</h4>
+                        </div>
+                        <div>
+                            <p>Kode Barang</p>
+                            <h4 style={{ marginTop: -20 }}>{productData?.product_code}</h4>
+                        </div>
+                        <div>
+                            <p>Ukuran</p>
+                            <h4 style={{ marginTop: -20 }}>{productData?.product_size}</h4>
+                        </div>
+                        <div>
+                            <p>Stok saat ini</p>
+                            <h4 style={{ marginTop: -20 }}>{productData?.qty}</h4>
+                        </div>
+                        <div>
+                            <p>Harga Pokok</p>
+                            <h4 style={{ marginTop: -20 }}>{DigitFormatter(productData?.base_price)}</h4>
+                        </div>
+                        <div>
+                            <p>Harga Jual</p>
+                            <h4 style={{ marginTop: -20 }}>{isEmpty(productData?.sell_price) ? '-' : DigitFormatter(productData?.sell_price)}</h4>
+                        </div>
+                        <div>
+                            <p>Diskon</p>
+                            <h4 style={{ marginTop: -20 }}>{isEmpty(productData?.discount) ? '-' : `${DigitFormatter(productData?.discount)}(${productData?.discount_type})`}</h4>
+                        </div>
+                        <div>
+                            <p>Supplier</p>
+                            <h4 style={{ marginTop: -20 }}>{productData?.supplier}</h4>
+                        </div>
+                        <div>
+                            <div style={{ display: 'flex', flexDirection: 'row' }}>
+                                <div>
+                                    <p>Tanggal Input</p>
+                                    <h4 style={{ marginTop: -20 }}>{moment(productData?.created_at).locale('id').format('DD MMMM YYYY HH:mm')}</h4>
+                                </div>
+                                {productData?.updated_at ?
+                                    <div style={{ marginLeft: 40 }}>
+                                        <p>Tanggal update</p>
+                                        <h4 style={{ marginTop: -20 }}>{moment(productData?.updated_at).locale('id').format('DD MMMM YYYY HH:mm')}</h4>
+                                        <p style={{ marginTop: -10 }}>{`(${productData?.latest_update})`}</p>
+                                    </div>
+                                    :
+                                    <div></div>
+                                }
+                            </div>
+                        </div>
+                        <div className="col-lg-8 col-md-3 my-4" style={{ display: 'flex', flex: 1, flexDirection: 'row' }}>
+                            <Button
+                                variant='light'
+                                style={{ width: '25%', alignSelf: 'flex-start', marginRight: 20 }}
+                                onClick={() => {
+                                    navigate(-1)
+                                }}
+                            >Kembali</Button>
+                            <Button
+                                style={{ width: '25%', alignSelf: 'flex-end' }}
+                                onClick={() => {
+                                    loadDataToForm()
+                                    setIsEdit(true)
+                                }}
+                            >Edit Produk</Button>
                         </div>
                     </div>
-                    {product_code && !isEdit ?
-                        <div className="row mt-4">
-                            <div>
-                                <p>Nama Barang</p>
-                                <h4 style={{ marginTop: -20 }}>{productData?.product_name}</h4>
-                            </div>
-                            <div>
-                                <p>Kode Barang</p>
-                                <h4 style={{ marginTop: -20 }}>{productData?.product_code}</h4>
-                            </div>
-                            <div>
-                                <p>Ukuran</p>
-                                <h4 style={{ marginTop: -20 }}>{productData?.product_size}</h4>
-                            </div>
-                            <div>
-                                <p>Stok saat ini</p>
-                                <h4 style={{ marginTop: -20 }}>{productData?.qty}</h4>
-                            </div>
-                            <div>
-                                <p>Harga Pokok</p>
-                                <h4 style={{ marginTop: -20 }}>{DigitFormatter(productData?.base_price)}</h4>
-                            </div>
-                            <div>
-                                <p>Harga Jual</p>
-                                <h4 style={{ marginTop: -20 }}>{isEmpty(productData?.sell_price) ? '-' : DigitFormatter(productData?.sell_price)}</h4>
-                            </div>
-                            <div>
-                                <p>Diskon</p>
-                                <h4 style={{ marginTop: -20 }}>{isEmpty(productData?.discount) ? '-' : `${DigitFormatter(productData?.discount)}(${productData?.discount_type})`}</h4>
-                            </div>
-                            <div>
-                                <p>Supplier</p>
-                                <h4 style={{ marginTop: -20 }}>{productData?.supplier}</h4>
-                            </div>
-                            <div>
-                                <div style={{ display: 'flex', flexDirection: 'row' }}>
-                                    <div>
-                                        <p>Tanggal Input</p>
-                                        <h4 style={{ marginTop: -20 }}>{moment(productData?.created_at).locale('id').format('DD MMMM YYYY HH:mm')}</h4>
-                                    </div>
-                                    {productData?.updated_at ?
-                                        <div style={{marginLeft: 40}}>
-                                            <p>Tanggal update</p>
-                                            <h4 style={{ marginTop: -20 }}>{moment(productData?.updated_at).locale('id').format('DD MMMM YYYY HH:mm')}</h4>
-                                            <p style={{ marginTop: -10 }}>{`(${productData?.latest_update})`}</p>
-                                        </div>
-                                        :
-                                        <div></div>
-                                    }
-                                </div>
-                            </div>
-                            <div className="col-lg-8 col-md-3 my-4" style={{ display: 'flex', flex: 1, flexDirection: 'row' }}>
-                                <Button
-                                    variant='light'
-                                    style={{ width: '25%', alignSelf: 'flex-start', marginRight: 20 }}
-                                    onClick={() => {
-                                        navigate(-1)
+                    :
+                    <div className="row mt-4">
+                        <Form>
+                            {/* NAME */}
+                            <Form.Group className="col-lg-6 col-md-3" controlId='productName'>
+                                <Form.Label>Nama barang</Form.Label>
+                                <Form.Control
+                                    isInvalid={errorName}
+                                    type="input"
+                                    name='productName'
+                                    value={productName}
+                                    onChange={(e) => {
+                                        setProductName(e.target.value)
+                                        setErrorName(isEmpty(e.target.value))
                                     }}
-                                >Kembali</Button>
-                                <Button
-                                    style={{ width: '25%', alignSelf: 'flex-end' }}
-                                    onClick={() => {
-                                        loadDataToForm()
-                                        setIsEdit(true)
-                                    }}
-                                >Edit Produk</Button>
-                            </div>
-                        </div>
-                        :
-                        <div className="row mt-4">
-                            <Form>
-                                {/* NAME */}
-                                <Form.Group className="col-lg-6 col-md-3" controlId='productName'>
-                                    <Form.Label>Nama barang</Form.Label>
-                                    <Form.Control
-                                        isInvalid={errorName}
-                                        type="input"
-                                        name='productName'
-                                        value={productName}
-                                        onChange={(e) => {
-                                            setProductName(e.target.value)
-                                            setErrorName(isEmpty(e.target.value))
-                                        }}
-                                        placeholder="Masukan nama produk"
-                                    />
-                                </Form.Group>
+                                    placeholder="Masukan nama produk"
+                                />
+                            </Form.Group>
 
-                                {/* SIZE */}
-                                <div
-                                    className="col-lg-6 col-md-3 mt-4"
-                                    style={{
-                                        border: 'solid',
-                                        borderWidth: '1px',
-                                        borderColor: errorSize ? 'red' : 'transparent',
-                                        borderRadius: 5
-                                    }}>
-                                    <Form.Label>Ukuran</Form.Label>
-                                    <Row className='p2'>
-                                        {size.map((size) => {
-                                            return (
-                                                <Col
-                                                    key={size}
-                                                    sm={8}
-                                                    md={6}
-                                                    lg={4}
-                                                >
-                                                    <Form.Check
-                                                        type="radio"
-                                                        name='productSize'
-                                                        value={size}
-                                                        checked={size === productSize}
-                                                        label={size}
-                                                        placeholder="Ukuran produk"
-                                                        onChange={(e) => {
-                                                            if (e.target.value === 'Lainnya...') {
-                                                                setProductSize('')
-                                                            } else {
-                                                                setProductSize(e.target.value)
-                                                                setProductSizeExtra('')
-                                                            }
-                                                            setErrorSize(isEmpty(productSizeExtra) && isEmpty(productSize))
-                                                        }}
-                                                    />
-                                                </Col>
-                                            )
-                                        })}
-                                    </Row>
-                                    {(productSize === 'Lainnya...') &&
-                                        <Form.Control
-                                            style={{ marginLeft: 20, marginBottom: 10, width: '50%', alignSelf: 'center', visibility: productSize === 'Lainnya...' ? 'visible' : 'hidden' }}
-                                            type="input"
-                                            name='productSizeExtra'
-                                            value={productSizeExtra}
-                                            onChange={(e) => {
-                                                setProductSizeExtra(e.target.value)
-                                                setErrorSize(isEmpty(productSizeExtra) && isEmpty(productSize))
-                                            }}
-                                            placeholder="Masukan ukuran produk"
-                                        />
-                                    }
-                                </div>
-
-                                {/* PRICE */}
-                                <Row className='mt-4'>
-                                    {/* BASE PRICE */}
-                                    <Col className="col-lg-6 col-md-3">
-                                        <Form.Label>Harga dasar</Form.Label>
-                                        <Form.Control
-                                            type="input"
-                                            isInvalid={errorBasePrice}
-                                            name='productBasePrice'
-                                            value={`Rp${DigitFormatter(productBasePrice)}`}
-                                            onChange={(e) => {
-                                                const onlyDigits = OnlyDigit(e.target.value)
-                                                setProductBasePrice(onlyDigits)
-                                                setErrorBasePrice(isEmpty(onlyDigits))
-                                            }}
-                                            placeholder="Masukan harga dasar"
-                                        />
-                                    </Col>
-
-                                    {/* SELL PRICE */}
-                                    <Col className="col-lg-6 col-md-3">
-                                        <Form.Label>Harga jual</Form.Label>
-                                        <Form.Control
-                                            type="input"
-                                            name='productSellPrice'
-                                            isInvalid={errorSellPrice}
-                                            value={`Rp${DigitFormatter(productSellPrice)}`}
-                                            onChange={(e) => {
-                                                const onlyDigits = OnlyDigit(e.target.value)
-                                                setProductSellPrice(onlyDigits)
-                                            }}
-                                            placeholder="Masukan harga jual"
-                                        />
-                                    </Col>
+                            {/* SIZE */}
+                            <div
+                                className="col-lg-6 col-md-3 mt-4"
+                                style={{
+                                    border: 'solid',
+                                    borderWidth: '1px',
+                                    borderColor: errorSize ? 'red' : 'transparent',
+                                    borderRadius: 5
+                                }}>
+                                <Form.Label>Ukuran</Form.Label>
+                                <Row className='p2'>
+                                    {size.map((size) => {
+                                        return (
+                                            <Col
+                                                key={size}
+                                                sm={8}
+                                                md={6}
+                                                lg={4}
+                                            >
+                                                <Form.Check
+                                                    type="radio"
+                                                    name='productSize'
+                                                    value={size}
+                                                    checked={size === productSize}
+                                                    label={size}
+                                                    placeholder="Ukuran produk"
+                                                    onChange={(e) => {
+                                                        if (e.target.value === 'Lainnya...') {
+                                                            setProductSize('')
+                                                        } else {
+                                                            setProductSize(e.target.value)
+                                                            setProductSizeExtra('')
+                                                        }
+                                                        setErrorSize(isEmpty(productSizeExtra) && isEmpty(productSize))
+                                                    }}
+                                                />
+                                            </Col>
+                                        )
+                                    })}
                                 </Row>
+                                {(productSize === 'Lainnya...') &&
+                                    <Form.Control
+                                        style={{ marginLeft: 20, marginBottom: 10, width: '50%', alignSelf: 'center', visibility: productSize === 'Lainnya...' ? 'visible' : 'hidden' }}
+                                        type="input"
+                                        name='productSizeExtra'
+                                        value={productSizeExtra}
+                                        onChange={(e) => {
+                                            setProductSizeExtra(e.target.value)
+                                            setErrorSize(isEmpty(productSizeExtra) && isEmpty(productSize))
+                                        }}
+                                        placeholder="Masukan ukuran produk"
+                                    />
+                                }
+                            </div>
 
-                                {/* DISCOUNT */}
-                                <div className="col-lg-6 col-md-3 mt-4">
-                                    <Form.Label>Diskon</Form.Label>
-                                    <Row>
-                                        {discType.map((disc) => {
-                                            return (
-                                                <Col
-                                                    key={disc}
-                                                    sm={8}
-                                                    md={6}
-                                                    lg={4}
-                                                >
-                                                    <Form.Check
-                                                        type="radio"
-                                                        name='discountType'
-                                                        value={disc}
-                                                        checked={disc === discountType}
-                                                        label={disc}
-                                                        onChange={(e) => {
-                                                            setDiscountType(e.target.value)
-                                                        }}
-                                                    />
-                                                </Col>
-                                            )
-                                        })}
-                                    </Row>
+                            {/* PRICE */}
+                            <Row className='mt-4'>
+                                {/* BASE PRICE */}
+                                <Col className="col-lg-6 col-md-3">
+                                    <Form.Label>Harga dasar</Form.Label>
                                     <Form.Control
                                         type="input"
-                                        name='discount'
-                                        value={DigitFormatter(discount)}
+                                        isInvalid={errorBasePrice}
+                                        name='productBasePrice'
+                                        value={`Rp${DigitFormatter(productBasePrice)}`}
                                         onChange={(e) => {
                                             const onlyDigits = OnlyDigit(e.target.value)
-                                            setDiscount(onlyDigits)
+                                            setProductBasePrice(onlyDigits)
+                                            setErrorBasePrice(isEmpty(onlyDigits))
                                         }}
-                                        placeholder="Masukan diskon"
+                                        placeholder="Masukan harga dasar"
                                     />
-                                </div>
+                                </Col>
 
-                                {/* SUPPLIER */}
-                                <div className="col-lg-6 col-md-3 mt-4">
-                                    <Form.Label>Nama supplier</Form.Label>
+                                {/* SELL PRICE */}
+                                <Col className="col-lg-6 col-md-3">
+                                    <Form.Label>Harga jual</Form.Label>
                                     <Form.Control
                                         type="input"
-                                        name='supplier'
-                                        value={supplier}
-                                        isInvalid={errorSupplier}
+                                        name='productSellPrice'
+                                        isInvalid={errorSellPrice}
+                                        value={`Rp${DigitFormatter(productSellPrice)}`}
                                         onChange={(e) => {
-                                            setSupplier(e.target.value)
-                                            setErrorSupplier(isEmpty(e.target.value))
+                                            const onlyDigits = OnlyDigit(e.target.value)
+                                            setProductSellPrice(onlyDigits)
                                         }}
-                                        placeholder="Masukan nama supplier"
+                                        placeholder="Masukan harga jual"
                                     />
-                                </div>
-                                <div className='my-4'>
-                                    <Button
-                                        type='button'
-                                        variant='danger'
-                                        style={{ width: '25%', marginRight: 20 }}
-                                        onClick={() => {
-                                            setIsEdit(false)
-                                        }}
-                                    >Batal</Button>
-                                    <Button
-                                        type='button'
-                                        variant='success'
-                                        style={{ width: '25%' }}
-                                        onClick={() => {
-                                            validation()
-                                        }}
-                                    >Simpan Produk</Button>
-                                </div>
-                            </Form>
-                        </div>
-                    }
-                </div>
-            </main>
+                                </Col>
+                            </Row>
+
+                            {/* DISCOUNT */}
+                            <div className="col-lg-6 col-md-3 mt-4">
+                                <Form.Label>Diskon</Form.Label>
+                                <Row>
+                                    {discType.map((disc) => {
+                                        return (
+                                            <Col
+                                                key={disc}
+                                                sm={8}
+                                                md={6}
+                                                lg={4}
+                                            >
+                                                <Form.Check
+                                                    type="radio"
+                                                    name='discountType'
+                                                    value={disc}
+                                                    checked={disc === discountType}
+                                                    label={disc}
+                                                    onChange={(e) => {
+                                                        setDiscountType(e.target.value)
+                                                    }}
+                                                />
+                                            </Col>
+                                        )
+                                    })}
+                                </Row>
+                                <Form.Control
+                                    type="input"
+                                    name='discount'
+                                    value={DigitFormatter(discount)}
+                                    onChange={(e) => {
+                                        const onlyDigits = OnlyDigit(e.target.value)
+                                        setDiscount(onlyDigits)
+                                    }}
+                                    placeholder="Masukan diskon"
+                                />
+                            </div>
+
+                            {/* SUPPLIER */}
+                            <div className="col-lg-6 col-md-3 mt-4">
+                                <Form.Label>Nama supplier</Form.Label>
+                                <Form.Control
+                                    type="input"
+                                    name='supplier'
+                                    value={supplier}
+                                    isInvalid={errorSupplier}
+                                    onChange={(e) => {
+                                        setSupplier(e.target.value)
+                                        setErrorSupplier(isEmpty(e.target.value))
+                                    }}
+                                    placeholder="Masukan nama supplier"
+                                />
+                            </div>
+                            <div className='my-4'>
+                                <Button
+                                    type='button'
+                                    variant='danger'
+                                    style={{ width: '25%', marginRight: 20 }}
+                                    onClick={() => {
+                                        setIsEdit(false)
+                                    }}
+                                >Batal</Button>
+                                <Button
+                                    type='button'
+                                    variant='success'
+                                    style={{ width: '25%' }}
+                                    onClick={() => {
+                                        validation()
+                                    }}
+                                >Simpan Produk</Button>
+                            </div>
+                        </Form>
+                    </div>
+                }
+            </div>
         </div>
     )
 }

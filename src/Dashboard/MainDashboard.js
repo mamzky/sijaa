@@ -31,9 +31,6 @@ function MainDashboard() {
 
   return (
     <div>
-      <SideNavBar />
-      <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
-        <TopNavBar />
         <div class="py-4 flex-row justify-center h-[100vh]">
           <>
             <h1 className='text-center'>Welcome to SIJAA</h1>
@@ -54,10 +51,7 @@ function MainDashboard() {
             <CustomTable/>
           </div> */}
 
-        </div>
-      </main>
-
-
+      </div>
     </div>
   );
 }

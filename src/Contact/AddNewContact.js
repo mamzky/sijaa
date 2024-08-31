@@ -116,9 +116,6 @@ function AddNewContact() {
                     <h3 style={{ marginLeft: 20 }}>Loading...</h3>
                 </Modal.Body>
             </Modal>
-            <SideNavBar />
-            <main className="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
-                <TopNavBar />
                 <div className="container-fluid py-4">
                     <div style={{ display: 'flex', flexDirection: 'row' }}>
                         <div className="col-lg-6 col-md-3 mb-md-0 mb-4">
@@ -211,7 +208,6 @@ function AddNewContact() {
                         </Form>
                     </div>
                 </div>
-            </main>
         </div>
     )
 }

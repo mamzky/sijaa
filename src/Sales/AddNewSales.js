@@ -116,61 +116,58 @@ function AddNewSales() {
                     <h3 style={{ marginLeft: 20 }}>Loading...</h3>
                 </Modal.Body>
             </Modal>
-            <SideNavBar />
-            <main className="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
-                <TopNavBar />
-                <div className="container-fluid py-4">
-                    <div style={{ display: 'flex', flexDirection: 'row' }}>
-                        <div className="col-lg-6 col-md-3 mb-md-0 mb-4">
-                            <h2>Tambah Sales</h2>
-                        </div>
+            <div className="container-fluid py-4">
+                <div style={{ display: 'flex', flexDirection: 'row' }}>
+                    <div className="col-lg-6 col-md-3 mb-md-0 mb-4">
+                        <h2>Tambah Sales</h2>
                     </div>
-                    <div className="row mt-4">
-                        <Form>
-                            {/* NAME */}
-                            <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='contactName'>
-                                <Form.Label>Nama Sales</Form.Label>
-                                <Form.Control
-                                    type="input"
-                                    name='contactName'
-                                    value={formData.contactName}
-                                    onChange={handleInputChange}
-                                    placeholder="Masukan nama"
-                                />
-                            </Form.Group>
+                </div>
+                <div className="row mt-4">
+                    <Form>
+                        {/* NAME */}
+                        <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='contactName'>
+                            <Form.Label>Nama Sales</Form.Label>
+                            <Form.Control
+                                type="input"
+                                name='contactName'
+                                value={formData.contactName}
+                                onChange={handleInputChange}
+                                placeholder="Masukan nama"
+                            />
+                        </Form.Group>
 
-                            {/* PHONE */}
-                            <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='phone'>
-                                <Form.Label>Tujuan</Form.Label>
-                                <Form.Control
-                                    type="input"
-                                    name='contactPhone'
-                                    id='phone'
-                                    value={formData.contactPhone}
-                                    onChange={(e) => {
-                                        if (/^\d*$/.test(e.target.value) && e.target.value.length < 14) {
-                                            handleInputChange(e)
-                                        }
-                                    }}
-                                    placeholder="Masukan Tujuan"
-                                />
-                            </Form.Group>
+                        {/* PHONE */}
+                        <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='phone'>
+                            <Form.Label>Tujuan</Form.Label>
+                            <Form.Control
+                                type="input"
+                                name='contactPhone'
+                                id='phone'
+                                value={formData.contactPhone}
+                                onChange={(e) => {
+                                    if (/^\d*$/.test(e.target.value) && e.target.value.length < 14) {
+                                        handleInputChange(e)
+                                    }
+                                }}
+                                placeholder="Masukan Tujuan"
+                            />
+                        </Form.Group>
 
-                            {/* EMAIL */}
-                            <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='email'>
-                                <Form.Label>Tanggal</Form.Label>
-                                <Form.Control
-                                    type="input"
-                                    name='contactEmail'
-                                    id='email'
-                                    value={formData.contactEmail}
-                                    onChange={handleInputChange}
-                                    placeholder="Masukan Tanggal"
-                                />
-                            </Form.Group>
+                        {/* EMAIL */}
+                        <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='email'>
+                            <Form.Label>Tanggal</Form.Label>
+                            <Form.Control
+                                type="input"
+                                name='contactEmail'
+                                id='email'
+                                value={formData.contactEmail}
+                                onChange={handleInputChange}
+                                placeholder="Masukan Tanggal"
+                            />
+                        </Form.Group>
 
-                            {/* ADDRESS */}
-                            {/* <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='address'>
+                        {/* ADDRESS */}
+                        {/* <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='address'>
                                 <Form.Label>Alamat Contact</Form.Label>
                                 <Form.Control
                                     type="input"
@@ -184,7 +181,7 @@ function AddNewSales() {
                             </Form.Group>
 
                             {/* NOTES */}
-                            {/* <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='notes'>
+                        {/* <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='notes'>
                                 <Form.Label>Catatan</Form.Label>
                                 <Form.Control
                                     as="textarea" rows={3}
@@ -194,24 +191,23 @@ function AddNewSales() {
                                     onChange={handleInputChange}
                                     placeholder="Catatan"
                                 />
-                            </Form.Group> */} 
+                            </Form.Group> */}
 
 
-                            <div className='my-4'>
-                                <Button
-                                    type='button'
-                                    variant='success'
-                                    style={{ width: '50%', alignSelf: 'flex-end' }}
-                                    onClick={() => {
-                                        tampilpopup()
-                                        console.log(formData)
-                                    }}
-                                >Tambah Sales Baru</Button>
-                            </div>
-                        </Form>
-                    </div>
+                        <div className='my-4'>
+                            <Button
+                                type='button'
+                                variant='success'
+                                style={{ width: '50%', alignSelf: 'flex-end' }}
+                                onClick={() => {
+                                    tampilpopup()
+                                    console.log(formData)
+                                }}
+                            >Tambah Sales Baru</Button>
+                        </div>
+                    </Form>
                 </div>
-            </main>
+            </div>
         </div>
     )
 }

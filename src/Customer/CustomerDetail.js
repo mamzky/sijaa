@@ -10,7 +10,7 @@ import { empty, isEmpty } from 'ramda'
 import { db } from '../Config/FirebaseConfig';
 import { collection, getDocs, addDoc, doc, updateDoc, query, where, deleteDoc } from 'firebase/firestore'
 import moment from 'moment/moment'
-import { CUSTOMER_COLLECTION, LOG_COLLECTION, PRODUCT_COLLECTION, TRANSACTION_COLLECTION } from '../Utils/DataUtils'
+import { CUSTOMER_COLLECTION, LOG_COLLECTION, PRODUCT_COLLECTION, ORDER_COLLECTION } from '../Utils/DataUtils'
 import Constant from '../Utils/Constants'
 import { addLog, calculateTotal } from '../Utils/Utils'
 import AppColors from '../Utils/Colors'
@@ -19,8 +19,8 @@ import { toast } from 'react-toastify'
 function CustomerDetail() {
 
     const navigate = useNavigate()
-    const transactionCollectionRef = collection(db, TRANSACTION_COLLECTION)
-    const [transactionData, setTransactionData] = useState([])
+    const orderCollectionRef = collection(db, ORDER_COLLECTION)
+    const [orderData, setOrderData] = useState([])
 
     const [customerName, setCustomerName] = useState('')
     const [phone, setPhone] = useState('')
@@ -60,7 +60,7 @@ function CustomerDetail() {
 
     useEffect(() => {
         getCustomerData(customer_code)
-        getTransactionList()
+        getOrderList()
     }, [])
 
     const getCustomerData = async (customer_code) => {
@@ -78,22 +78,22 @@ function CustomerDetail() {
             console.log('FAILED');
         }
     }
-    const getTransactionList = async () => {
-        const data = await getDocs(transactionCollectionRef)
+    const getOrderList = async () => {
+        const data = await getDocs(orderCollectionRef)
         const sortedData = data.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
         console.log(sortedData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)));
-        setTransactionData(sortedData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)))
+        setOrderData(sortedData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)))
 
-        const q = query(collection(db, TRANSACTION_COLLECTION)
+        const q = query(collection(db, ORDER_COLLECTION)
             , where('customer_id', '==', customer_code))
         const querySnapshot = await getDocs(q)
         const result = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
         if (!querySnapshot.empty) {
-            setTransactionData(result)
+            setOrderData(result)
             console.log('RESULT', result);
             setIsLoading(false)
         } else {
-            setTransactionData([])
+            setOrderData([])
             setIsLoading(false)
             console.log('FAILED');
         }
@@ -217,9 +217,6 @@ function CustomerDetail() {
                     <Button variant="success" onClick={() => { deleteCustomer() }}>Ya, Hapus</Button>
                 </Modal.Footer>
             </Modal>
-            <SideNavBar />
-            <main className="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
-                <TopNavBar />
                 <div className="container-fluid py-4">
                     <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                         <div className="col-lg-6 col-md-3 mb-md-0 mb-4">
@@ -405,7 +402,7 @@ function CustomerDetail() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {transactionData?.map((item, index) => {
+                                        {orderData?.map((item, index) => {
                                             return (
                                                 <tr key={item?.id}>
                                                     <td>
@@ -418,7 +415,11 @@ function CustomerDetail() {
                                                     <td>
                                                         <div className="ps-3 py-1">
                                                             <div className="d-flex flex-column justify-content-center">
-                                                                <h6 style={{ cursor: 'pointer' }} className="mb-0 text-sm">{item?.order_number}</h6>
+                                                                <h6 style={{ cursor: 'pointer', color: 'blue' }} className="mb-0 text-sm"
+                                                                    onClick={() => {
+                                                                        navigate(`/order/detail/${item?.order_number}`)
+                                                                    }}
+                                                                >{item?.order_number}</h6>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -467,7 +468,6 @@ function CustomerDetail() {
                         </div>
                     </div>
                 </div>
-            </main>
         </div>
     )
 }

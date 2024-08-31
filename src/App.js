@@ -12,16 +12,14 @@ import Customer from './Customer/Customer';
 import Sales from './Sales/Sales';
 import Employee from './Employee/Employee'
 import AddNewProduct from './Product/AddNewProduct';
+import "react-datepicker/dist/react-datepicker.css";
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { firebaseConfig } from './Config/FirebaseConfig';
 import ProductDetail from './Product/ProductDetail';
 import AddNewCustomer from './Customer/AddNewCustomer';
 import CustomerDetail from './Customer/CustomerDetail';
-import Transaction from './Transaction/Transaction';
-import AddNewTransaction from './Transaction/AddNewTransaction';
-import "react-datepicker/dist/react-datepicker.css";
-import TransactionDetail from './Transaction/TransactionDetail';
+
 import StockCustomer from './Customer/StockSuctomer';
 import ContactDetail from './Contact/ContactDetail';
 import AddNewContact from './Contact/AddNewContact';
@@ -30,6 +28,16 @@ import SalesDetail from './Sales/SalesDetails';
 import AddNewEmployee from './Employee/AddNewEmployee'
 import EmployeeDetail from './Employee/EmployeeDetails'
 import 'react-toastify/dist/ReactToastify.css';
+import SideNavBar from './Components/SideNavBar';
+import TopNavBar from './Components/TopNavBar';
+import Layout from './Components/Layout';
+import Order from './Order/Order.page';
+import OrderDetail from './Order/OrderDetail.page';
+import AddNewOrder from './Order/AddNewTransaction';
+import Packing from './Packing/Packing.page';
+import PackingDetailPage from './Packing/PackingDetail.page';
+import Delivery from './Devlivery/Delivery.page';
+import DeliveryDetail from './Devlivery/DeliveryDetail.page';
 
 
 
@@ -45,34 +53,39 @@ function App() {
     <Router>
       <ToastContainer />
       <Routes>
-        <Route path='/' Component={MainDashboard} />
+        {/* <Route path='/' Component={MainDashboard} /> */}
         <Route path='/login' Component={Login} />
-        <Route path='/dashboard' Component={MainDashboard} />
-        <Route path='/product' Component={Product} />
-        <Route path='/product/add-new-product' Component={AddNewProduct} />
-        <Route path='/product/product-detail/:product_code' Component={ProductDetail} />
-        <Route path='/contact' Component={Contact} />
-        <Route path='/contact/detail/:contactId' Component={ContactDetail} />
-        <Route path='/contact/new-contact' Component={AddNewContact} />
-        <Route path='/customer' Component={Customer} />
-        <Route path='/customer/new-customer' Component={AddNewCustomer} />
-        <Route path='/customer/detail/:customer_code' Component={CustomerDetail} />
-        <Route path='/customer/detail/:customer_code/stock' Component={StockCustomer} />
-        <Route path='/stock' Component={Stock} />
-        <Route path='/transaction' Component={Transaction} />
-        <Route path='/transaction/new-transaction' Component={AddNewTransaction} />
-        <Route path='/transaction/detail/:order_number' Component={TransactionDetail} />
-        <Route path='/sales' Component={Sales} />
-        <Route path='/sales/detail' Component={SalesDetail} />
-        <Route path='/sales/new-sales' Component={AddNewSales} />
-        <Route path='/employee' Component={Employee} />
-        <Route path='/employee/detail/:employeeId' Component={EmployeeDetail} />
-        <Route path='/employee/new-employee' Component={AddNewEmployee} />
 
-        {/* <Route path='/sales/detail/:salesId' Component={SalesDetail}/>
-        <Route path='/contact/new-sales' Component={AddNewSales}/> */}
+        <Route element={<Layout />}>
+          <Route path='/' Component={MainDashboard} />
+          <Route path='/dashboard' Component={MainDashboard} />
+          <Route path='/product' Component={Product} />
+          <Route path='/product/add-new-product' Component={AddNewProduct} />
+          <Route path='/product/product-detail/:product_code' Component={ProductDetail} />
+          <Route path='/contact' Component={Contact} />
+          <Route path='/contact/detail/:contactId' Component={ContactDetail} />
+          <Route path='/contact/new-contact' Component={AddNewContact} />
+          <Route path='/customer' Component={Customer} />
+          <Route path='/customer/new-customer' Component={AddNewCustomer} />
+          <Route path='/customer/detail/:customer_code' Component={CustomerDetail} />
+          <Route path='/customer/detail/:customer_code/stock' Component={StockCustomer} />
+          <Route path='/stock' Component={Stock} />
+          <Route path='/order' Component={Order} />
+          <Route path='/order/add-order' Component={AddNewOrder} />
+          <Route path='/order/detail/:order_number' Component={OrderDetail} />
+          <Route path='/packing' Component={Packing} />
+          <Route path='/packing/detail/:order_number' Component={PackingDetailPage} />
+          <Route path='/delivery' Component={Delivery} />
+          <Route path='/delivery/detail/:order_number' Component={DeliveryDetail} />
+          <Route path='/sales' Component={Sales} />
+          <Route path='/sales/detail' Component={SalesDetail} />
+          <Route path='/sales/new-sales' Component={AddNewSales} />
+          <Route path='/employee' Component={Employee} />
+          <Route path='/employee/detail/:employeeId' Component={EmployeeDetail} />
+          <Route path='/employee/new-employee' Component={AddNewEmployee} />
+        </Route>
       </Routes>
-    </Router>
+    </Router >
   );
 }
 

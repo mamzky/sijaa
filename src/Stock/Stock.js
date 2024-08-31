@@ -132,9 +132,6 @@ function Stock() {
           <Button disabled={reason === ''} variant="success" onClick={() => updateStock()}>Ya, Update</Button>
         </Modal.Footer>
       </Modal>
-      <SideNavBar />
-      <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
-        <TopNavBar />
         <div class="container-fluid py-4">
           <div style={{ display: 'flex', flexDirection: 'row' }}>
             <div className="col-lg-6 col-md-3 mb-md-0 mb-4">
@@ -236,7 +233,6 @@ function Stock() {
             </div>
           </div>
         </div>
-      </main>
     </div>
   )
 }

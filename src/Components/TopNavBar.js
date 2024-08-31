@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom'
 
 
 function TopNavBar(currentPage) {
-  const username = localStorage?.getItem(Constant.USERNAME)
-  const activeMenu = localStorage?.getItem(Constant.ACTIVE_MENU)
+  const username = localStorage?.getItem(Constant.USERNAME, '')
+  const activeMenu = localStorage?.getItem(Constant.ACTIVE_MENU, '')
   const navigate = useNavigate()
   return (
     <div>

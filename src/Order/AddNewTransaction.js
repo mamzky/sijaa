@@ -10,14 +10,14 @@ import { empty, isEmpty, isNil } from 'ramda'
 import { db } from '../Config/FirebaseConfig';
 import { collection, getDocs, addDoc, doc, updateDoc, query, where } from 'firebase/firestore'
 import moment from 'moment/moment'
-import { CUSTOMER_COLLECTION, EMPLOYEE_COLLECTION, LOG_COLLECTION, PRODUCT_COLLECTION, TRANSACTION_COLLECTION } from '../Utils/DataUtils'
+import { CUSTOMER_COLLECTION, EMPLOYEE_COLLECTION, LOG_COLLECTION, PRODUCT_COLLECTION, ORDER_COLLECTION } from '../Utils/DataUtils'
 import Constant from '../Utils/Constants'
 import { addLog, calculateTotal } from '../Utils/Utils'
 import Select from 'react-select'
 import AppColors from '../Utils/Colors'
 import DatePicker from "react-datepicker"
 
-function AddNewTransaction() {
+function AddNewOrder() {
 
     const navigate = useNavigate()
     const customerCollectionRef = collection(db, CUSTOMER_COLLECTION)
@@ -43,11 +43,11 @@ function AddNewTransaction() {
 
     //ORDER
     const [selectedCustomer, setSelectedCustomer] = useState()
-    const [transactionNotes, setTransactionNotes] = useState('')
+    const [orderNotes, setOrderNotes] = useState('')
     const [orderList, setOrderList] = useState([])
     const [orderNumber, setOrderNumber] = useState('')
     const [orderDate, setOrderDate] = useState(new Date());
-    const [transactionType, setTransactiontype] = useState('')
+    const [orderType, setOrdertype] = useState('')
     const [dp, setDp] = useState(0)
     const [isActive, setIsActive] = useState(true)
 
@@ -129,26 +129,25 @@ function AddNewTransaction() {
             order_list: orderHolder,
             order_number: orderNumber,
             order_date: orderDate,
-            notes: transactionNotes,
-            type: transactionType,
+            notes: orderNotes,
+            type: orderType,
             dp: dp ?? 0,
             pic: selectedPIC,
             total_bill: DigitFormatter(calculateTotal(orderList)),
-            status: isActive,
+            status: 'READY TO PACK',
             created_at: moment().locale('id').toISOString(),
             updated_at: moment().locale('id').toISOString(),
             created_by: localStorage.getItem(Constant.USERNAME)
         }
-        submitTransaction(body)
+        submitOrder(body)
     }
 
-    const submitTransaction = async (body) => {
-        console.log(body);
-        const transactionCollectionRef = collection(db, TRANSACTION_COLLECTION)
-        await addDoc(transactionCollectionRef, body).then(() => {
+    const submitOrder = async (body) => {
+        const orderCollectionRef = collection(db, ORDER_COLLECTION)
+        await addDoc(orderCollectionRef, body).then(() => {
             setIsLoading(false)
-            addLog(localStorage.getItem(Constant.USERNAME), `create transaction ${orderNumber}`)
-            navigate('/transaction')
+            addLog(localStorage.getItem(Constant.USERNAME), `create order ${orderNumber}`)
+            navigate('/order')
         })
     }
 
@@ -161,7 +160,7 @@ function AddNewTransaction() {
                 centered>
                 <Modal.Header>
                     <Modal.Title>
-                        {`Transaksi Baru (${orderNumber} - ${orderDate})`}
+                        {`Order Baru (${orderNumber} - ${orderDate})`}
                     </Modal.Title>
                     <CloseButton onClick={() => setShowModal(false)} />
                 </Modal.Header>
@@ -173,8 +172,8 @@ function AddNewTransaction() {
                             {summaryItem('Email', customerList.find((e) => e.id === selectedCustomer)?.value?.email ?? '-')}
                             {summaryItem('Alamat', address)}
                             {summaryItem('Contact person', contactPerson)}
-                            {summaryItem('Catatan', transactionNotes != '' ? transactionNotes : '-')}
-                            {summaryItem('Jenis Transaksi', transactionType)}
+                            {summaryItem('Catatan', orderNotes != '' ? orderNotes : '-')}
+                            {summaryItem('Jenis Order', orderType)}
                         </div>
                         <div className='col-lg-6'>
                             <span style={{ fontWeight: 'bold' }}>Order Item</span><br />
@@ -332,13 +331,10 @@ function AddNewTransaction() {
                         }}>{isEditItem ? 'Ubah Barang' : 'Ya, Tambah Barang'}</Button>
                 </Modal.Footer>
             </Modal>
-            <SideNavBar />
-            <main className="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
-                <TopNavBar />
                 <div className="container-fluid py-4">
                     <div style={{ display: 'flex', flexDirection: 'row' }}>
                         <div className="col-lg-6 col-md-3 mb-md-0 mb-4">
-                            <h2>Tambah Transaksi Baru</h2>
+                            <h2>Tambah Order Baru</h2>
                         </div>
                     </div>
                     <div className="row mt-4">
@@ -495,34 +491,34 @@ function AddNewTransaction() {
                                     <Form.Control
                                         as="textarea"
                                         name='cuctomerNotes'
-                                        value={transactionNotes}
+                                        value={orderNotes}
                                         onChange={(e) => {
-                                            setTransactionNotes(e.target.value)
+                                            setOrderNotes(e.target.value)
                                         }}
-                                        placeholder="Catatan transaksi"
+                                        placeholder="Catatan Order"
                                     />
                                     {/* {errNameExist && <p style={{ color: AppColors.Error1 }}>Nama customer telah didaftarkan</p>} */}
                                 </Form.Group>
 
-                                {/* TRANSACTION TYPE */}
+                                {/* ORDER TYPE */}
                                 <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='type'>
                                     <Row>
                                         <Col className='col-lg-4'>
-                                            <Form.Label>Jenis Transaksi</Form.Label>
+                                            <Form.Label>Jenis Order</Form.Label>
                                             <Dropdown className='col-lg-12'>
                                                 <Dropdown.Toggle className='col-lg-12' variant="success" id="dropdown-basic">
-                                                    {transactionType ?? 'Jenis Transaksi'}
+                                                    {orderType ?? 'Jenis Order'}
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu>
                                                     {['Tunai', 'Konsinyasi', 'Purchase Order'].map((label) => {
                                                         return (
-                                                            <Dropdown.Item onClick={() => setTransactiontype(label)}>{label}</Dropdown.Item>
+                                                            <Dropdown.Item onClick={() => setOrdertype(label)}>{label}</Dropdown.Item>
                                                         )
                                                     })}
                                                 </Dropdown.Menu>
                                             </Dropdown>
                                         </Col>
-                                        {transactionType?.toLowerCase() != 'tunai' &&
+                                        {orderType?.toLowerCase() != 'tunai' &&
                                             <Col>
                                                 <Form.Label>DP</Form.Label>
                                                 <Form.Control
@@ -544,7 +540,7 @@ function AddNewTransaction() {
 
                             <Row>
                                 {/* Status */}
-                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='contactPerson'>
+                                {/* <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='contactPerson'>
                                     <Form.Label>Status</Form.Label>
                                     <Form.Check // prettier-ignore
                                         checked={isActive}
@@ -552,7 +548,7 @@ function AddNewTransaction() {
                                         type="switch"
                                         label={isActive ? 'Aktif' : 'Non-Aktif'}
                                     />
-                                </Form.Group>
+                                </Form.Group> */}
                             </Row>
                             <Row>
                                 {/* EMPLOYEE */}
@@ -752,14 +748,13 @@ function AddNewTransaction() {
                                     onClick={() => {
                                         setShowModal(true)
                                     }}
-                                >Buat Transaksi</Button>
+                                >Buat Order</Button>
                             </div>
                         </Form>
                     </div>
                 </div>
-            </main>
         </div>
     )
 }
 
-export default AddNewTransaction
+export default AddNewOrder
