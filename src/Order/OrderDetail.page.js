@@ -250,12 +250,7 @@ function OrderDetail() {
                             {/* Status */}
                             <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='status'>
                                 <Form.Label>Status</Form.Label>
-                                <Form.Check // prettier-ignore
-                                    checked={isActive}
-                                    onChange={() => setUpdateModal(true)}
-                                    type="switch"
-                                    label={isActive ? 'Aktif' : 'Non-Aktif'}
-                                />
+                                <h4 style={{ marginTop: -10, marginBottom: -10 }}>{orderData?.status}</h4>
                             </Form.Group>
                             <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='pic'>
                                 <Form.Label>PIC</Form.Label>

@@ -245,7 +245,7 @@ function Order() {
                         <td>
                           <div className="ps-3 py-1">
                             <div className="d-flex flex-column">
-                              <h6 className="mb-0 text-sm">{moment(item?.created_at).format('DD MMM YYYY')}</h6>
+                              <h6 className="mb-0 text-sm">{moment(item?.created_at).format('DD MMM YYYY  HH:mm')}</h6>
                             </div>
                           </div>
                         </td>

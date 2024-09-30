@@ -52,7 +52,24 @@ function Delivery() {
 
   return (
     <div>
-      <ModalLoading isLoading={loading} onHide={() => setLoading(false)} />
+      <Modal show={loading} centered>
+        <Modal.Body backdrop={'false'} show={true} onHide={() => setLoading(false)}
+          size="md"
+          aria-labelledby="contained-modal-title-vcenter"
+          style={{
+            display: 'flex',
+            flex: 1,
+            flexDirection: 'row',
+            justifyContent: 'center'
+          }}
+        >
+          <div>
+            <Spinner animation="border" role="status" style={{ alignSelf: 'center' }}>
+            </Spinner>
+          </div>
+          <h3 style={{ marginLeft: 20 }}>Loading...</h3>
+        </Modal.Body>
+      </Modal>
 
       <div class="container-fluid py-4">
         <div style={{ display: 'flex', flexDirection: 'row' }}>
@@ -77,62 +94,69 @@ function Delivery() {
                   </tr>
                 </thead>
                 <tbody style={{ visibility: orderData.length > 0 }} >
-                  {orderData?.map((item, index) => {
-                    return (
-                      <tr className='border border-neutral-100 h-4'>
-                        <td>
-                          <div className="ps-3 py-1">
-                            <div className="d-flex flex-column justify-content-center">
-                              <h6 className="mb-0 text-sm">{index + 1}</h6>
+                  {orderData?.
+                    sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).
+                    sort((a, b) => b?.status - a?.status).
+                    map((item, index) => {
+                      return (
+                        <tr className='border border-neutral-100 h-4'>
+                          <td>
+                            <div className="ps-3 py-1">
+                              <div className="d-flex flex-column justify-content-center">
+                                <h6 className="mb-0 text-sm">{index + 1}</h6>
+                              </div>
                             </div>
-                          </div>
-                        </td>
-                        <td>
-                          <div className="ps-3 py-1">
-                            <div className="d-flex flex-column justify-content-center">
-                              <h6
-                                style={{ cursor: 'pointer', color: 'blue' }}
-                                className="mb-0 text-sm">{item?.order_number}</h6>
+                          </td>
+                          <td>
+                            <div className="ps-3 py-1">
+                              <div className="d-flex flex-column justify-content-center">
+                                <h6
+                                  style={{ cursor: 'pointer', color: 'blue' }}
+                                  className="mb-0 text-sm"
+                                  onClick={() => {
+                                    navigate(`/order/detail/${item?.order_number}`)
+                                  }}
+                                >{item?.order_number}</h6>
+                              </div>
                             </div>
-                          </div>
-                        </td>
-                        <td>
-                          <div className="ps-3 py-1">
-                            <div className="d-flex flex-column">
-                              <h6 className="mb-0 text-sm">{item?.customer?.name}</h6>
+                          </td>
+                          <td>
+                            <div className="ps-3 py-1">
+                              <div className="d-flex flex-column">
+                                <h6 className="mb-0 text-sm">{item?.customer?.name}</h6>
+                              </div>
                             </div>
-                          </div>
-                        </td>
-                        <td>
-                          <div className="ps-3 py-1">
-                            <div className="d-flex flex-column">
-                              <h6 className="mb-0 text-sm">{item?.status}</h6>
+                          </td>
+                          <td>
+                            <div className="ps-3 py-1">
+                              <div className="d-flex flex-column">
+                                <h6 className="mb-0 text-sm">{item?.status}</h6>
+                              </div>
                             </div>
-                          </div>
-                        </td>
-                        <td>
-                          <div className="ps-3 py-1">
-                            <div className="d-flex flex-column">
-                              <h6 className="mb-0 text-sm">{moment(item?.created_at).format('DD-MMM-YYYY HH:mm')}</h6>
+                          </td>
+                          <td>
+                            <div className="ps-3 py-1">
+                              <div className="d-flex flex-column">
+                                <h6 className="mb-0 text-sm">{moment(item?.created_at).format('DD-MMM-YYYY HH:mm')}</h6>
+                              </div>
                             </div>
-                          </div>
-                        </td>
-                        <td>
-                          <div className="ps-3 py-1">
-                            <div className="d-flex flex-column">
-                              <Button style={{ width: '100%'}} variant={item?.status === 'READY TO DELIVERY' ? 'primary' : 'success'} type="button"
-                                onClick={() => {
-                                  navigate(`/delivery/detail/${item?.order_number}`)
-                                }}
-                              >
-                                {item?.status === 'READY TO DELIVERY' ? 'Proses' : 'Detail'}
-                              </Button>
+                          </td>
+                          <td>
+                            <div className="ps-3 py-1">
+                              <div className="d-flex flex-column">
+                                <Button style={{ width: '100%' }} variant={item?.status === 'READY TO DELIVERY' ? 'primary' : 'success'} type="button"
+                                  onClick={() => {
+                                    navigate(`/delivery/detail/${item?.order_number}`)
+                                  }}
+                                >
+                                  {item?.status === 'READY TO DELIVERY' ? 'Proses' : 'Detail'}
+                                </Button>
+                              </div>
                             </div>
-                          </div>
-                        </td>
-                      </tr>
-                    )
-                  })}
+                          </td>
+                        </tr>
+                      )
+                    })}
                 </tbody>
               </table>
             </div>
