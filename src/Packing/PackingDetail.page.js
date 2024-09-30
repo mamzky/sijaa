@@ -46,7 +46,7 @@ const PackingDetailPage = () => {
         const newData = { ...orderData }
         newData.order_list = orderList
         newData.status = 'READY TO DELIVERY'
-        newData.updated_at = moment()
+        newData.updated_at = moment().toString()
         const oldData = doc(db, ORDER_COLLECTION, orderData?.id)
         updateDoc(oldData, newData)
             .then((val) => {

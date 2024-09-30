@@ -89,58 +89,68 @@ function Packing() {
                     <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"></th>
                   </tr>
                 </thead>
-                <tbody style={{ visibility: orderData.length > 0 }} >
-                  {orderData?.map((item, index) => {
-                    return (
-                      <tr className='border border-neutral-100 h-4'>
-                        <td>
-                          <div className="ps-3 py-1">
-                            <div className="d-flex flex-column justify-content-center">
-                              <h6 className="mb-0 text-sm">{index + 1}</h6>
-                            </div>
-                          </div>
-                        </td>
-                        <td>
-                          <div className="ps-3 py-1">
-                            <div className="d-flex flex-column justify-content-center">
-                              <h6
-                                style={{ cursor: 'pointer', color: 'blue' }}
-                                className="mb-0 text-sm">{item?.order_number}</h6>
-                            </div>
-                          </div>
-                        </td>
-                        <td>
-                          <div className="ps-3 py-1">
-                            <div className="d-flex flex-column">
-                              <h6 className="mb-0 text-sm">{item?.customer?.name}</h6>
-                            </div>
-                          </div>
-                        </td>
-                        <td>
-                          <div className="ps-3 py-1">
-                            <div className="d-flex flex-column">
-                              <h6 className="mb-0 text-sm">{moment(item?.created_at).format('DD-MMM-YYYY HH:mm')}</h6>
-                            </div>
-                          </div>
-                        </td>
-                        <td>
-                          <div className="ps-3 py-1">
-                            <div className="d-flex flex-column">
-                              <Button style={{ width: '100%' }} variant="info" type="button"
-                                onClick={() => {
-                                  navigate(`/packing/detail/${item?.order_number}`)
-                                }}
-                              >
-                                Proses
-                              </Button>
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
+                {orderData.length === 0 ? (
+                  <div style={{ width: '100%'}}>
+                    <span style={{ textAlign: 'center', }}>Tidak Ada Data</span>
+                  </div>
+                )
+                  :
+                  (
+                    <tbody style={{ visibility: orderData.length > 0 }} >
+                      {orderData?.map((item, index) => {
+                        return (
+                          <tr className='border border-neutral-100 h-4'>
+                            <td>
+                              <div className="ps-3 py-1">
+                                <div className="d-flex flex-column justify-content-center">
+                                  <h6 className="mb-0 text-sm">{index + 1}</h6>
+                                </div>
+                              </div>
+                            </td>
+                            <td>
+                              <div className="ps-3 py-1">
+                                <div className="d-flex flex-column justify-content-center">
+                                  <h6
+                                    style={{ cursor: 'pointer', color: 'blue' }}
+                                    className="mb-0 text-sm">{item?.order_number}</h6>
+                                </div>
+                              </div>
+                            </td>
+                            <td>
+                              <div className="ps-3 py-1">
+                                <div className="d-flex flex-column">
+                                  <h6 className="mb-0 text-sm">{item?.customer?.name}</h6>
+                                </div>
+                              </div>
+                            </td>
+                            <td>
+                              <div className="ps-3 py-1">
+                                <div className="d-flex flex-column">
+                                  <h6 className="mb-0 text-sm">{moment(item?.created_at).format('DD-MMM-YYYY HH:mm')}</h6>
+                                </div>
+                              </div>
+                            </td>
+                            <td>
+                              <div className="ps-3 py-1">
+                                <div className="d-flex flex-column">
+                                  <Button style={{ width: '100%' }} variant="info" type="button"
+                                    onClick={() => {
+                                      navigate(`/packing/detail/${item?.order_number}`)
+                                    }}
+                                  >
+                                    Proses
+                                  </Button>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  )}
               </table>
+
+
             </div>
           </div>
         </div>

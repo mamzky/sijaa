@@ -124,8 +124,8 @@ function AddNewOrder() {
             return _
         })
         const body = {
-            customer: customerList.find((e) => e.id === selectedCustomer).value,
-            customer_id: customerList.find((e) => e.id === selectedCustomer).value?.customer_code,
+            customer: customerList.find((e) => e.id === selectedCustomer)?.value ?? null,
+            customer_id: customerList.find((e) => e.id === selectedCustomer)?.value?.customer_code ?? null,
             order_list: orderHolder,
             order_number: orderNumber,
             order_date: orderDate,
@@ -160,14 +160,14 @@ function AddNewOrder() {
                 centered>
                 <Modal.Header>
                     <Modal.Title>
-                        {`Order Baru (${orderNumber} - ${orderDate})`}
+                        {`Order Baru (${orderNumber} - ${moment(orderDate).format('dddd, DD MMMM YYYY')})`}
                     </Modal.Title>
                     <CloseButton onClick={() => setShowModal(false)} />
                 </Modal.Header>
                 <Modal.Body>
                     <Row>
                         <div className='col-lg-6'>
-                            {summaryItem('Nama customer', `${customerList.find((e) => e.id === selectedCustomer)?.value?.name}(${customerList.find((e) => e.id === selectedCustomer)?.value?.contact_person})` ?? customerName)}
+                            {summaryItem('Nama customer', `${customerList.find((e) => e.id === selectedCustomer)?.value?.name ?? '-'}(${customerList.find((e) => e.id === selectedCustomer)?.value?.contact_person ?? '-'})` ?? customerName)}
                             {summaryItem('Nomor telepon', phone)}
                             {summaryItem('Email', customerList.find((e) => e.id === selectedCustomer)?.value?.email ?? '-')}
                             {summaryItem('Alamat', address)}
@@ -201,7 +201,7 @@ function AddNewOrder() {
                 <Modal.Footer>
                     <p style={{ width: '100%', textAlign: 'center' }}>Apakah data yang dimasukkan sudah benar?</p>
                     <Button variant="danger" onClick={() => setShowModal(false)}>Batal</Button>
-                    <Button variant="success" onClick={() => handleSubmit()}>Ya, Submit</Button>
+                    <Button disabled={orderList?.length === 0} variant="success" onClick={() => handleSubmit()}>Ya, Submit</Button>
                 </Modal.Footer>
             </Modal>
             {/* LOADING */}
@@ -510,7 +510,7 @@ function AddNewOrder() {
                                                     {orderType ?? 'Jenis Order'}
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu>
-                                                    {['Tunai', 'Konsinyasi', 'Purchase Order'].map((label) => {
+                                                    {['Tunai', 'Konsinyasi', 'Purchase Order', 'Sales Canvaser'].map((label) => {
                                                         return (
                                                             <Dropdown.Item onClick={() => setOrdertype(label)}>{label}</Dropdown.Item>
                                                         )
@@ -518,7 +518,7 @@ function AddNewOrder() {
                                                 </Dropdown.Menu>
                                             </Dropdown>
                                         </Col>
-                                        {orderType?.toLowerCase() != 'tunai' &&
+                                        {!['sales canvaser', 'tunai'].includes(orderType?.toLowerCase()) &&
                                             <Col>
                                                 <Form.Label>DP</Form.Label>
                                                 <Form.Control
