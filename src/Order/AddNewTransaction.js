@@ -46,6 +46,7 @@ function AddNewOrder() {
     const [orderNotes, setOrderNotes] = useState('')
     const [orderList, setOrderList] = useState([])
     const [orderNumber, setOrderNumber] = useState('')
+    const [poNumber, setPoNumber] = useState('')
     const [orderDate, setOrderDate] = useState(new Date());
     const [orderType, setOrdertype] = useState('')
     const [dp, setDp] = useState(0)
@@ -129,6 +130,7 @@ function AddNewOrder() {
             order_list: orderHolder,
             order_number: orderNumber,
             order_date: orderDate,
+            po_number: poNumber,
             notes: orderNotes,
             type: orderType,
             dp: dp ?? 0,
@@ -167,6 +169,7 @@ function AddNewOrder() {
                 <Modal.Body>
                     <Row>
                         <div className='col-lg-6'>
+                            {summaryItem('Nomor PO', poNumber)}
                             {summaryItem('Nama customer', `${customerList.find((e) => e.id === selectedCustomer)?.value?.name ?? '-'}(${customerList.find((e) => e.id === selectedCustomer)?.value?.contact_person ?? '-'})` ?? customerName)}
                             {summaryItem('Nomor telepon', phone)}
                             {summaryItem('Email', customerList.find((e) => e.id === selectedCustomer)?.value?.email ?? '-')}
@@ -331,58 +334,76 @@ function AddNewOrder() {
                         }}>{isEditItem ? 'Ubah Barang' : 'Ya, Tambah Barang'}</Button>
                 </Modal.Footer>
             </Modal>
-                <div className="container-fluid py-4">
-                    <div style={{ display: 'flex', flexDirection: 'row' }}>
-                        <div className="col-lg-6 col-md-3 mb-md-0 mb-4">
-                            <h2>Tambah Order Baru</h2>
-                        </div>
+            <div className="container-fluid py-4">
+                <div style={{ display: 'flex', flexDirection: 'row' }}>
+                    <div className="col-lg-6 col-md-3 mb-md-0 mb-4">
+                        <h2>Tambah Order Baru</h2>
                     </div>
-                    <div className="row mt-4">
-                        <Form>
-                            <Row>
-                                {/* NOMOR ORDER */}
-                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='phone'>
-                                    <Form.Label>Nomor Order</Form.Label>
-                                    <Row>
-                                        <Form.Control
-                                            type="input"
-                                            name='orderNumber'
-                                            style={{ width: '90%', height: 40, marginRight: 10 }}
-                                            value={orderNumber}
-                                            onChange={(e) => {
-                                                setOrderNumber(e.target.value)
-                                            }}
-                                            placeholder="Masukan nomor order"
-                                        />
-                                        <Button
-                                            style={{ width: '8%' }}
-                                            onClick={() => { setOrderNumber(`JAA${moment().format('DDMMYYYYhhmm')}`) }}
-                                        ><i className="material-icons opacity-10">cached</i></Button>
-                                    </Row>
-
-                                </Form.Group>
-
-                                {/* DATE */}
-                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='date'>
-                                    <Form.Label>Tanggal</Form.Label>
+                </div>
+                <div className="row mt-4">
+                    <Form>
+                        <Row>
+                            {/* NOMOR ORDER */}
+                            <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='phone'>
+                                <Form.Label>Nomor Order JAA</Form.Label>
+                                <Row>
                                     <Form.Control
-                                        type="date"
-                                        name='orderDate'
-                                        value={orderDate}
+                                        type="input"
+                                        name='orderNumber'
+                                        style={{ width: '90%', height: 40, marginRight: 10 }}
+                                        value={orderNumber}
                                         onChange={(e) => {
-                                            setOrderDate(e.target.value)
+                                            setOrderNumber(e.target.value)
                                         }}
-                                        placeholder="Tanggal order"
+                                        placeholder="Masukan nomor order"
                                     />
-                                </Form.Group>
-                            </Row>
+                                    <Button
+                                        style={{ width: '8%' }}
+                                        onClick={() => { setOrderNumber(`JAA${moment().format('DDMMYYYYhhmm')}`) }}
+                                    ><i className="material-icons opacity-10">cached</i></Button>
+                                </Row>
 
-                            {/* NAME */}
-                            <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20, paddingRight: 10 }} controlId='productName'>
-                                <Form.Label>Customer</Form.Label>
-                                <div className="col-lg-4 col-md-3" style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                            </Form.Group>
+
+                            {/* DATE */}
+                            <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='date'>
+                                <Form.Label>Tanggal</Form.Label>
+                                <Form.Control
+                                    type="date"
+                                    name='orderDate'
+                                    value={orderDate}
+                                    onChange={(e) => {
+                                        setOrderDate(e.target.value)
+                                    }}
+                                    placeholder="Tanggal order"
+                                />
+                            </Form.Group>
+                            <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='phone'>
+                                <Form.Label>Nomor Order Customer</Form.Label>
+                                <Row>
+                                    <Form.Control
+                                        type="input"
+                                        name='poNumber'
+                                        style={{ width: '90%', height: 40, marginRight: 10 }}
+                                        value={poNumber}
+                                        onChange={(e) => {
+                                            setPoNumber(e.target.value)
+                                        }}
+                                        placeholder="Masukan nomor order"
+                                    />
+                                </Row>
+
+                            </Form.Group>
+                        </Row>
+
+                        {/* NAME */}
+                        <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20, paddingRight: 10, display: 'flex', flex: 1, flexDirection: 'column' }} controlId='productName'>
+                            <Form.Label>Customer</Form.Label>
+                            <div style={{ width: '100%', display: 'flex', flex: 1, flexDirection: 'row-reverse', justifyContent: 'space-between' }}>
+
+                                <div style={{ width: '100%', display: 'flex', flex: 1, flexDirection: 'row' }}>
                                     <Form.Check
-                                        style={{ height: '100%', marginTop: 'auto' }}
+                                        style={{ height: '50%', width: '40%', marginTop: 'auto' }}
                                         type={'checkbox'}
                                         label={`Customer terdaftar`}
                                         color={'#FF0000'}
@@ -390,157 +411,158 @@ function AddNewOrder() {
                                             setExistingCustomer((e) => !e)
                                         }}
                                     />
-                                    <div className='col-lg-8 col-md-3'>
-                                        {
-                                            existingCustomer ?
-                                                <Select
-                                                    options={customerList}
-                                                    placeholder="Pilih customer"
-                                                    onChange={(e) => {
-                                                        setSelectedCustomer(e.id)
-                                                        setPhone(e.value.phone)
-                                                        setAddress(e.value.address)
-                                                        setContactPerson(e.value.contact_person)
-                                                        setEmail(e.value.email)
-                                                    }}
-                                                />
-                                                :
-                                                <Form.Control
-                                                    type="input"
-                                                    name='customerPhone'
-                                                    value={customerName}
-                                                    onChange={(e) => {
-                                                        setCustomerName(e.target.value)
-                                                    }}
-                                                    placeholder="Masukan nama customer"
-                                                />
-                                        }
-                                    </div>
+                                    {
+                                        existingCustomer ?
+                                            <Select
+                                                style={{ width: '100%' }}
+                                                options={customerList}
+                                                placeholder="Pilih customer"
+                                                onChange={(e) => {
+                                                    setSelectedCustomer(e.id)
+                                                    setPhone(e.value.phone)
+                                                    setAddress(e.value.address)
+                                                    setContactPerson(e.value.contact_person)
+                                                    setEmail(e.value.email)
+                                                }}
+                                            />
+                                            :
+                                            <Form.Control
+                                                style={{ width: '100%' }}
+                                                type="input"
+                                                name='customerName'
+                                                value={customerName}
+                                                onChange={(e) => {
+                                                    setCustomerName(e.target.value)
+                                                }}
+                                                placeholder="Masukan nama customer"
+                                            />
+                                    }
                                 </div>
+                            </div>
+                        </Form.Group>
+
+                        {/* PHONE */}
+                        <Row>
+                            <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='phone'>
+                                <Form.Label>Nomor Telepon Customer</Form.Label>
+                                <Form.Control
+                                    type="input"
+                                    name='customerPhone'
+                                    value={phone}
+                                    onChange={(e) => {
+                                        const onlyDigits = OnlyDigit(e.target.value)
+                                        setPhone(onlyDigits)
+                                    }}
+                                    placeholder="Masukan nomor telpon"
+                                />
                             </Form.Group>
 
-                            {/* PHONE */}
-                            <Row>
-                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='phone'>
-                                    <Form.Label>Nomor Telepon Customer</Form.Label>
-                                    <Form.Control
-                                        type="input"
-                                        name='customerPhone'
-                                        value={phone}
-                                        onChange={(e) => {
-                                            const onlyDigits = OnlyDigit(e.target.value)
-                                            setPhone(onlyDigits)
-                                        }}
-                                        placeholder="Masukan nomor telpon"
-                                    />
-                                </Form.Group>
-
-                                {/* EMAIL */}
-                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='address'>
-                                    <Form.Label>Email</Form.Label>
-                                    <Form.Control
-                                        // isInvalid={errorName}
-                                        type="input"
-                                        name='customerEmail'
-                                        value={email}
-                                        onChange={(e) => {
-                                            setEmail(e.target.value)
-                                        }}
-                                        placeholder="Masukan email"
-                                    />
-                                </Form.Group>
-                            </Row>
+                            {/* EMAIL */}
+                            <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='address'>
+                                <Form.Label>Email</Form.Label>
+                                <Form.Control
+                                    // isInvalid={errorName}
+                                    type="input"
+                                    name='customerEmail'
+                                    value={email}
+                                    onChange={(e) => {
+                                        setEmail(e.target.value)
+                                    }}
+                                    placeholder="Masukan email"
+                                />
+                            </Form.Group>
+                        </Row>
 
 
-                            <Row>
-                                {/* CONTACT PERSON */}
-                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='contactPerson'>
-                                    <Form.Label>Contact Person</Form.Label>
-                                    <Form.Control
-                                        // isInvalid={errorName}
-                                        type="input"
-                                        name='customerContactPerson'
-                                        value={contactPerson}
-                                        onChange={(e) => {
-                                            setContactPerson(e.target.value)
-                                        }}
-                                        placeholder="Masukan nama contact person"
-                                    />
-                                </Form.Group>
-                                {/* ADDRESS */}
-                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='address'>
-                                    <Form.Label>Alamat Pengiriman</Form.Label>
-                                    <Form.Control
-                                        // isInvalid={errorName}
-                                        type="input"
-                                        name='customerAddress'
-                                        value={address}
-                                        onChange={(e) => {
-                                            setAddress(e.target.value)
-                                        }}
-                                        placeholder="Masukan alamat"
-                                    />
-                                </Form.Group>
-                            </Row>
+                        <Row>
+                            {/* CONTACT PERSON */}
+                            <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='contactPerson'>
+                                <Form.Label>Contact Person</Form.Label>
+                                <Form.Control
+                                    // isInvalid={errorName}
+                                    type="input"
+                                    name='customerContactPerson'
+                                    value={contactPerson}
+                                    onChange={(e) => {
+                                        setContactPerson(e.target.value)
+                                    }}
+                                    placeholder="Masukan nama contact person"
+                                />
+                            </Form.Group>
+                            {/* ADDRESS */}
+                            <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='address'>
+                                <Form.Label>Alamat Pengiriman</Form.Label>
+                                <Form.Control
+                                    // isInvalid={errorName}
+                                    type="input"
+                                    name='customerAddress'
+                                    value={address}
+                                    onChange={(e) => {
+                                        setAddress(e.target.value)
+                                    }}
+                                    placeholder="Masukan alamat"
+                                />
+                            </Form.Group>
+                        </Row>
 
 
-                            <Row>
-                                {/* NOTES */}
-                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='notes'>
-                                    <Form.Label>Catatan</Form.Label>
-                                    <Form.Control
-                                        as="textarea"
-                                        name='cuctomerNotes'
-                                        value={orderNotes}
-                                        onChange={(e) => {
-                                            setOrderNotes(e.target.value)
-                                        }}
-                                        placeholder="Catatan Order"
-                                    />
-                                    {/* {errNameExist && <p style={{ color: AppColors.Error1 }}>Nama customer telah didaftarkan</p>} */}
-                                </Form.Group>
+                        <Row>
+                            {/* NOTES */}
+                            <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='notes'>
+                                <Form.Label>Catatan</Form.Label>
+                                <Form.Control
+                                    as="textarea"
+                                    name='cuctomerNotes'
+                                    value={orderNotes}
+                                    onChange={(e) => {
+                                        setOrderNotes(e.target.value)
+                                    }}
+                                    placeholder="Catatan Order"
+                                />
+                                {/* {errNameExist && <p style={{ color: AppColors.Error1 }}>Nama customer telah didaftarkan</p>} */}
+                            </Form.Group>
 
-                                {/* ORDER TYPE */}
-                                <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='type'>
-                                    <Row>
-                                        <Col className='col-lg-4'>
-                                            <Form.Label>Jenis Order</Form.Label>
-                                            <Dropdown className='col-lg-12'>
-                                                <Dropdown.Toggle className='col-lg-12' variant="success" id="dropdown-basic">
-                                                    {orderType ?? 'Jenis Order'}
-                                                </Dropdown.Toggle>
-                                                <Dropdown.Menu>
-                                                    {['Tunai', 'Konsinyasi', 'Purchase Order', 'Sales Canvaser'].map((label) => {
-                                                        return (
-                                                            <Dropdown.Item onClick={() => setOrdertype(label)}>{label}</Dropdown.Item>
-                                                        )
-                                                    })}
-                                                </Dropdown.Menu>
-                                            </Dropdown>
+                            {/* ORDER TYPE */}
+                            <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='type'>
+                                <Row>
+                                    <Col className='col-lg-4'>
+                                        <Form.Label>Jenis Order</Form.Label>
+                                        <Dropdown className='col-lg-12'>
+                                            <Dropdown.Toggle className='col-lg-12' variant="success" id="dropdown-basic">
+                                                {orderType ?? 'Jenis Order'}
+                                            </Dropdown.Toggle>
+                                            <Dropdown.Menu>
+                                                {['Tunai', 'Konsinyasi', 'Purchase Order', 'Sales Canvaser'].map((label) => {
+                                                    return (
+                                                        <Dropdown.Item onClick={() => setOrdertype(label)}>{label}</Dropdown.Item>
+                                                    )
+                                                })}
+                                            </Dropdown.Menu>
+                                        </Dropdown>
+                                    </Col>
+                                    {!['sales canvaser', 'tunai'].includes(orderType?.toLowerCase()) &&
+                                        <Col>
+                                            <Form.Label>DP</Form.Label>
+                                            <Form.Control
+                                                className='col-lg-6'
+                                                type="input"
+                                                name='dp'
+                                                value={DigitFormatter(dp)}
+                                                onChange={(e) => {
+                                                    setDp(e.target.value)
+                                                }}
+                                                placeholder="Jumlah DP"
+                                            />
                                         </Col>
-                                        {!['sales canvaser', 'tunai'].includes(orderType?.toLowerCase()) &&
-                                            <Col>
-                                                <Form.Label>DP</Form.Label>
-                                                <Form.Control
-                                                    className='col-lg-6'
-                                                    type="input"
-                                                    name='dp'
-                                                    value={DigitFormatter(dp)}
-                                                    onChange={(e) => {
-                                                        setDp(e.target.value)
-                                                    }}
-                                                    placeholder="Jumlah DP"
-                                                />
-                                            </Col>
-                                        }
+                                    }
 
-                                    </Row>
-                                </Form.Group>
-                            </Row>
+                                </Row>
+                            </Form.Group>
+                        </Row>
 
-                            <Row>
-                                {/* Status */}
-                                {/* <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='contactPerson'>
+                        <Row>
+                            {/* Status */}
+                            {/* <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='contactPerson'>
                                     <Form.Label>Status</Form.Label>
                                     <Form.Check // prettier-ignore
                                         checked={isActive}
@@ -549,210 +571,210 @@ function AddNewOrder() {
                                         label={isActive ? 'Aktif' : 'Non-Aktif'}
                                     />
                                 </Form.Group> */}
-                            </Row>
-                            <Row>
-                                {/* EMPLOYEE */}
-                                <Select
+                        </Row>
+                        <Row>
+                            {/* EMPLOYEE */}
+                            <Select
                                 className='col-lg-6'
-                                    options={employeeData.map((e) => {
-                                        return { label: e?.employeeName ?? '', value: e?.employeeName ?? '' }
-                                    })}
-                                    placeholder="Pilih PIC"
-                                    onChange={(e) => {
-                                        setSelectedPIC(e.value)
-                                    }}
-                                />
-                            </Row>
+                                options={employeeData.map((e) => {
+                                    return { label: e?.employeeName ?? '', value: e?.employeeName ?? '' }
+                                })}
+                                placeholder="Pilih PIC"
+                                onChange={(e) => {
+                                    setSelectedPIC(e.value)
+                                }}
+                            />
+                        </Row>
 
-                            <div class="row mt-4">
-                                <div className="card-body px-0 pb-2">
-                                    <div className="table-responsive">
-                                        <table className="table align-items-center mb-0">
-                                            <thead>
-                                                <tr>
-                                                    <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">No.</th>
-                                                    <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nama Barang</th>
-                                                    <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Jumlah</th>
-                                                    <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Harga</th>
-                                                    <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Diskon</th>
-                                                    <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Total</th>
-                                                    <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 col-lg-2"></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {orderList?.map((item, index) => {
-                                                    const price = parseInt(OnlyDigit(item?.price));
-                                                    const discount = parseInt(item?.disc);
-                                                    const totalPrice = price * parseInt(item?.qty) * (1 - discount / 100);
-                                                    return (
-                                                        <tr>
-                                                            <td>
-                                                                <div className="ps-3 py-1">
-                                                                    <div className="d-flex flex-column justify-content-center">
-                                                                        <h6 className="mb-0 text-sm">{index + 1}</h6>
-                                                                    </div>
+                        <div class="row mt-4">
+                            <div className="card-body px-0 pb-2">
+                                <div className="table-responsive">
+                                    <table className="table align-items-center mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">No.</th>
+                                                <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nama Barang</th>
+                                                <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Jumlah</th>
+                                                <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Harga</th>
+                                                <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Diskon</th>
+                                                <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Total</th>
+                                                <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 col-lg-2"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {orderList?.map((item, index) => {
+                                                const price = parseInt(OnlyDigit(item?.price));
+                                                const discount = parseInt(item?.disc);
+                                                const totalPrice = price * parseInt(item?.qty) * (1 - discount / 100);
+                                                return (
+                                                    <tr>
+                                                        <td>
+                                                            <div className="ps-3 py-1">
+                                                                <div className="d-flex flex-column justify-content-center">
+                                                                    <h6 className="mb-0 text-sm">{index + 1}</h6>
                                                                 </div>
-                                                            </td>
-                                                            <td
-                                                                style={{ cursor: 'pointer' }} // Optional: Change cursor on hover
-                                                                onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#F5F5F5')}
-                                                                onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '')}
-                                                                onClick={() => {
-                                                                    console.log('ITEM', item);
-                                                                    setIsEditItem(true)
-                                                                    setSeletedProduct(item.item)
-                                                                    setQtySelectedItem(item.qty)
-                                                                    setPriceSelectedItem(DigitFormatter(item.price))
-                                                                    setDiscountSelectedItem(item.disc ?? 0)
-                                                                    setModalItem(true)
-                                                                }}
-                                                            >
-                                                                <div className="ps-3 py-1">
-                                                                    <div className="d-flex flex-column justify-content-center">
-                                                                        <h6 className="mb-0 text-sm">{item?.name}</h6>
-                                                                    </div>
-                                                                </div>
-                                                            </td>
-                                                            <td>
-                                                                <div className="ps-3 py-1">
-                                                                    <div className="d-flex flex-column">
-                                                                        <h6 className="mb-0 text-sm">{item?.qty}</h6>
-                                                                    </div>
-                                                                </div>
-                                                            </td>
-                                                            <td>
-                                                                <div className="ps-3 py-1">
-                                                                    <div className="d-flex flex-column">
-                                                                        <h6 className="mb-0 text-sm">{DigitFormatter(item?.price)}</h6>
-                                                                    </div>
-                                                                </div>
-                                                            </td>
-                                                            <td className='col-lg-2'>
-                                                                <div className="ps-2 py-1">
-                                                                    <div className="d-flex flex-column">
-                                                                        <h6 className="mb-0 text-sm">{item?.disc}%</h6>
-                                                                    </div>
-                                                                </div>
-                                                            </td>
-                                                            <td>
-                                                                <div className="ps-3 py-1">
-                                                                    <div className="d-flex flex-column">
-                                                                        <h6 className="mb-0 text-sm">{DigitFormatter(totalPrice)}</h6>
-                                                                    </div>
-                                                                </div>
-                                                            </td>
-                                                            <td>
-                                                                <div className="col-lg-6 ps-1 py-1">
-                                                                    <div className="d-flex flex-column">
-                                                                        <Button variant='danger'
-                                                                            onClick={() => {
-                                                                                const tempArr = orderList
-                                                                                setOrderList(tempArr.filter((e) => e.id != item.id))
-                                                                            }}
-                                                                        >Hapus</Button>
-                                                                    </div>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    )
-                                                })}
-                                                {orderList.length > 0 &&
-                                                    <>
-                                                        <tr
-                                                            style={{ backgroundColor: AppColors.MainBrand9 }} // Optional: Change cursor on hover
+                                                            </div>
+                                                        </td>
+                                                        <td
+                                                            style={{ cursor: 'pointer' }} // Optional: Change cursor on hover
+                                                            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#F5F5F5')}
+                                                            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '')}
+                                                            onClick={() => {
+                                                                console.log('ITEM', item);
+                                                                setIsEditItem(true)
+                                                                setSeletedProduct(item.item)
+                                                                setQtySelectedItem(item.qty)
+                                                                setPriceSelectedItem(DigitFormatter(item.price))
+                                                                setDiscountSelectedItem(item.disc ?? 0)
+                                                                setModalItem(true)
+                                                            }}
                                                         >
-                                                            <td />
-                                                            <td />
-                                                            <td />
-                                                            <td />
-                                                            <td>
-                                                                <div className="ps-3 py-1">
-                                                                    <div className="d-flex flex-column justify-content-center">
-                                                                        <h6 className="mb-0 text-sm">{'SUBTOTAL'}</h6>
-                                                                    </div>
+                                                            <div className="ps-3 py-1">
+                                                                <div className="d-flex flex-column justify-content-center">
+                                                                    <h6 className="mb-0 text-sm">{item?.name}</h6>
                                                                 </div>
-                                                            </td>
-                                                            <td>
-                                                                <div className="ps-3 py-1">
-                                                                    <div className="d-flex flex-column justify-content-center">
-                                                                        <h6 className="mb-0 text-sm">{DigitFormatter(calculateTotal(orderList))}</h6>
-                                                                    </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div className="ps-3 py-1">
+                                                                <div className="d-flex flex-column">
+                                                                    <h6 className="mb-0 text-sm">{item?.qty}</h6>
                                                                 </div>
-                                                            </td>
-                                                        </tr>
-                                                        <tr
-                                                            style={{ backgroundColor: AppColors.MainBrand9 }} // Optional: Change cursor on hover
-                                                        >
-                                                            <td />
-                                                            <td />
-                                                            <td />
-                                                            <td />
-                                                            <td>
-                                                                <div className="ps-3 py-1">
-                                                                    <div className="d-flex flex-column justify-content-center">
-                                                                        <h6 className="mb-0 text-sm">{'Tax'}</h6>
-                                                                    </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div className="ps-3 py-1">
+                                                                <div className="d-flex flex-column">
+                                                                    <h6 className="mb-0 text-sm">{DigitFormatter(item?.price)}</h6>
                                                                 </div>
-                                                            </td>
-                                                            <td>
-                                                                <div className="ps-3 py-1">
-                                                                    <div className="d-flex flex-column justify-content-center">
-                                                                        <h6 className="mb-0 text-sm">{DigitFormatter(calculateTotal(orderList) * 0.11)}</h6>
-                                                                    </div>
+                                                            </div>
+                                                        </td>
+                                                        <td className='col-lg-2'>
+                                                            <div className="ps-2 py-1">
+                                                                <div className="d-flex flex-column">
+                                                                    <h6 className="mb-0 text-sm">{item?.disc}%</h6>
                                                                 </div>
-                                                            </td>
-                                                        </tr>
-                                                        <tr
-                                                            style={{ backgroundColor: AppColors.MainBrand9 }} // Optional: Change cursor on hover
-                                                        >
-                                                            <td />
-                                                            <td />
-                                                            <td />
-                                                            <td />
-                                                            <td>
-                                                                <div className="ps-3 py-1">
-                                                                    <div className="d-flex flex-column justify-content-center">
-                                                                        <h6 className="mb-0 text-sm">{'TOTAL'}</h6>
-                                                                    </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div className="ps-3 py-1">
+                                                                <div className="d-flex flex-column">
+                                                                    <h6 className="mb-0 text-sm">{DigitFormatter(totalPrice)}</h6>
                                                                 </div>
-                                                            </td>
-                                                            <td>
-                                                                <div className="ps-3 py-1">
-                                                                    <div className="d-flex flex-column justify-content-center">
-                                                                        <h6 className="mb-0 text-sm">{DigitFormatter(calculateTotal(orderList) + calculateTotal(orderList) * 0.11)}</h6>
-                                                                    </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div className="col-lg-6 ps-1 py-1">
+                                                                <div className="d-flex flex-column">
+                                                                    <Button variant='danger'
+                                                                        onClick={() => {
+                                                                            const tempArr = orderList
+                                                                            setOrderList(tempArr.filter((e) => e.id != item.id))
+                                                                        }}
+                                                                    >Hapus</Button>
                                                                 </div>
-                                                            </td>
-                                                        </tr>
-                                                    </>
-                                                }
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                )
+                                            })}
+                                            {orderList.length > 0 &&
+                                                <>
+                                                    <tr
+                                                        style={{ backgroundColor: AppColors.MainBrand9 }} // Optional: Change cursor on hover
+                                                    >
+                                                        <td />
+                                                        <td />
+                                                        <td />
+                                                        <td />
+                                                        <td>
+                                                            <div className="ps-3 py-1">
+                                                                <div className="d-flex flex-column justify-content-center">
+                                                                    <h6 className="mb-0 text-sm">{'SUBTOTAL'}</h6>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div className="ps-3 py-1">
+                                                                <div className="d-flex flex-column justify-content-center">
+                                                                    <h6 className="mb-0 text-sm">{DigitFormatter(calculateTotal(orderList))}</h6>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr
+                                                        style={{ backgroundColor: AppColors.MainBrand9 }} // Optional: Change cursor on hover
+                                                    >
+                                                        <td />
+                                                        <td />
+                                                        <td />
+                                                        <td />
+                                                        <td>
+                                                            <div className="ps-3 py-1">
+                                                                <div className="d-flex flex-column justify-content-center">
+                                                                    <h6 className="mb-0 text-sm">{'Tax'}</h6>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div className="ps-3 py-1">
+                                                                <div className="d-flex flex-column justify-content-center">
+                                                                    <h6 className="mb-0 text-sm">{DigitFormatter(calculateTotal(orderList) * 0.11)}</h6>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr
+                                                        style={{ backgroundColor: AppColors.MainBrand9 }} // Optional: Change cursor on hover
+                                                    >
+                                                        <td />
+                                                        <td />
+                                                        <td />
+                                                        <td />
+                                                        <td>
+                                                            <div className="ps-3 py-1">
+                                                                <div className="d-flex flex-column justify-content-center">
+                                                                    <h6 className="mb-0 text-sm">{'TOTAL'}</h6>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div className="ps-3 py-1">
+                                                                <div className="d-flex flex-column justify-content-center">
+                                                                    <h6 className="mb-0 text-sm">{DigitFormatter(calculateTotal(orderList) + calculateTotal(orderList) * 0.11)}</h6>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </>
+                                            }
 
-                                            </tbody>
-                                        </table>
-                                        <div style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'center', paddingTop: 20 }}>
-                                            <Button onClick={() => {
-                                                setModalItem(true)
-                                                setIsEditItem(false)
-                                            }} variant="primary">+Tambah Barang</Button>
-                                        </div>
+                                        </tbody>
+                                    </table>
+                                    <div style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'center', paddingTop: 20 }}>
+                                        <Button onClick={() => {
+                                            setModalItem(true)
+                                            setIsEditItem(false)
+                                        }} variant="primary">+Tambah Barang</Button>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
 
-                            <div className='my-4'>
-                                <Button
-                                    type='button'
-                                    variant='success'
-                                    style={{ width: '25%', alignSelf: 'flex-end' }}
-                                    onClick={() => {
-                                        setShowModal(true)
-                                    }}
-                                >Buat Order</Button>
-                            </div>
-                        </Form>
-                    </div>
+                        <div className='my-4'>
+                            <Button
+                                type='button'
+                                variant='success'
+                                style={{ width: '25%', alignSelf: 'flex-end' }}
+                                onClick={() => {
+                                    setShowModal(true)
+                                }}
+                            >Buat Order</Button>
+                        </div>
+                    </Form>
                 </div>
+            </div>
         </div>
     )
 }

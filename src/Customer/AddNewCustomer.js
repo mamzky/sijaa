@@ -77,11 +77,11 @@ function AddNewCustomer() {
                     <CloseButton onClick={() => setShowModal(false)} />
                 </Modal.Header>
                 <Modal.Body>
-                    {summaryItem('Nama customer', customerName)}
+                    {summaryItem('Nama instansi', customerName)}
                     {summaryItem('Nomor telepon', phone)}
                     {summaryItem('Email', email)}
                     {summaryItem('Alamat', address)}
-                    {summaryItem('Contact person', contactPerson)}
+                    {summaryItem('Nama Contact person', contactPerson)}
                     {summaryItem('Catatan', notes)}
                 </Modal.Body>
                 <Modal.Footer>
@@ -119,7 +119,7 @@ function AddNewCustomer() {
                         <Form>
                             {/* NAME */}
                             <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='productName'>
-                                <Form.Label>Nama Customer</Form.Label>
+                                <Form.Label>Nama Instansi</Form.Label>
                                 <Form.Control
                                     type="input"
                                     name='customerName'
@@ -133,7 +133,7 @@ function AddNewCustomer() {
 
                             {/* PHONE */}
                             <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='phone'>
-                                <Form.Label>Nomor Telepon Customer</Form.Label>
+                                <Form.Label>Nomor Telepon</Form.Label>
                                 <Form.Control
                                     type="input"
                                     name='customerPhone'
@@ -148,7 +148,7 @@ function AddNewCustomer() {
 
                             {/* EMAIL */}
                             <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='email'>
-                                <Form.Label>Email Customer</Form.Label>
+                                <Form.Label>Email</Form.Label>
                                 <Form.Control
                                     type="input"
                                     name='customerEmail'
@@ -162,9 +162,8 @@ function AddNewCustomer() {
 
                             {/* ADDRESS */}
                             <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='address'>
-                                <Form.Label>Alamat Customer</Form.Label>
+                                <Form.Label>Alamat</Form.Label>
                                 <Form.Control
-                                    // isInvalid={errorName}
                                     type="input"
                                     as="textarea" rows={3}
                                     name='customerAddress'
@@ -178,7 +177,7 @@ function AddNewCustomer() {
 
                             {/* CONTACT PERSON */}
                             <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='contactPerson'>
-                                <Form.Label>Contact Person</Form.Label>
+                                <Form.Label>Nama Customer</Form.Label>
                                 <Form.Control
                                     // isInvalid={errorName}
                                     type="input"

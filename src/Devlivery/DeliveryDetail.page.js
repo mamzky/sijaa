@@ -12,6 +12,7 @@ import moment from "moment";
 import PdfDocument from "./PdfDocument";
 import { Document, Page, pdfjs } from "react-pdf";
 import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
+import IMGJAA from '../assets/img/jaa.png'
 
 const DeliveryDetail = () => {
 
@@ -28,7 +29,8 @@ const DeliveryDetail = () => {
   const [modalDelivered, setModalDelivered] = useState(false)
   const [deliveryNote, setDeliveryNotes] = useState()
   const [customerList, setCustomerList] = useState([])
-  const [showPDF, setShowPDF] = useState(false)
+  const [showInvoice, setShowInvoice] = useState(false)
+  const [showDeliveryNote, setShowDeliveryNote] = useState(false)
 
   useEffect(() => {
     getOrderData(order_number)
@@ -44,7 +46,6 @@ const DeliveryDetail = () => {
     if (!querySnapshot.empty) {
       setLoading(false)
       const order = result[0]
-      // setOrderData(result[0])
       const list = result?.[0]?.order_list?.map((order) => {
         return {
           ...order,
@@ -110,6 +111,7 @@ const DeliveryDetail = () => {
       }
     })
   }
+
 
   return (
     <div>
@@ -203,7 +205,14 @@ const DeliveryDetail = () => {
               <Button type='button'
                 variant={'primary'}
                 style={{ width: '20%', visibility: orderData?.status === 'READY TO DELIVERY' ? 'visible' : 'hidden' }}
-                onClick={() => setShowPDF(true)}
+                onClick={() => setShowInvoice(true)}
+              >
+                <i className="material-icons opacity-10">print</i>
+                Cetak Invoice</Button>
+              <Button type='button'
+                variant={'primary'}
+                style={{ width: '20%', visibility: orderData?.status === 'READY TO DELIVERY' ? 'visible' : 'hidden' }}
+                onClick={() => setShowDeliveryNote(true)}
               >
                 <i className="material-icons opacity-10">print</i>
                 Cetak Surat Jalan</Button>
@@ -262,27 +271,57 @@ const DeliveryDetail = () => {
                         <td style={{ width: '50%' }}>
                           <div className="ps-3 py-1">
                             <div className="d-flex flex-column justify-content-center">
-                              {item?.sold?.map((soldItem) => {
+                              {item?.sold?.map((soldItem, idx) => {
                                 return (
                                   <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                                     <Form.Select size="sm"
-                                      value={soldItem?.customer}
                                       style={{ width: '70%' }}
                                       defaultValue={null}
                                       defaultChecked={null}
+                                      onChange={(e) => {
+                                        const customerName = e.currentTarget?.value
+                                        const selectedCustomer = customerList?.find(e => e.label === customerName)?.value
+
+                                        const newSold = item?.sold?.map((v, i) => {
+                                          return i === idx ? { ...v, customer: selectedCustomer } : v
+                                        })
+                                        const updatedArr = { ...orderData?.order_list[index], sold: newSold }
+                                        const updatedOrderList = orderDataHolder?.order_list?.map((orderList) => {
+                                          return orderList?.id === updatedArr?.id ? updatedArr : orderList
+                                        })
+                                        setOrderDataHolder(e => { return { ...e, order_list: updatedOrderList } })
+                                      }}
                                     >
                                       <option value={null}>Pilih Customer</option>
                                       {customerList?.map((cust) => {
                                         return (
-                                          <option defaultChecked={null} defaultValue={null} value={cust?.value}>{cust?.label}</option>
+                                          <option defaultChecked={null} defaultValue={null} value={cust?.value?.id}>{cust?.label}</option>
                                         )
                                       })}
                                     </Form.Select>
                                     <Form.Select size="sm"
                                       defaultValue={null}
                                       defaultChecked={null}
-                                      value={item.qty}
-                                      style={{ width: '30%' }}>
+                                      style={{ width: '30%' }}
+                                      onChange={(e) => {
+                                        const remainItem = item?.qty - item?.sold?.reduce((accumulator, currentValue) => {
+                                          return accumulator + currentValue.qty;
+                                        }, 0)
+                                        if (e.currentTarget?.value > remainItem) {
+                                          return alert('ITEM MELEBIHI QTY')
+                                        } else {
+                                          const newSold = item?.sold?.map((v, i) => {
+                                            return i === idx ? { ...v, qty: e.currentTarget?.value } : v
+                                          })
+                                          const updatedArr = { ...orderData?.order_list[index], sold: newSold }
+                                          const updatedOrderList = orderDataHolder?.order_list?.map((orderList) => {
+                                            return orderList?.id === updatedArr?.id ? updatedArr : orderList
+                                          })
+                                          setOrderDataHolder(e => { return { ...e, order_list: updatedOrderList } })
+                                        }
+
+                                      }}
+                                    >
                                       <option value={null}>Pilih Qty</option>
                                       {Array.from({ length: Number(item?.qty) + 1 }, (_, i) => i).map((soldQty) => {
                                         return (
@@ -290,6 +329,9 @@ const DeliveryDetail = () => {
                                         )
                                       })}
                                     </Form.Select>
+                                    <span>{item?.qty - item?.sold.reduce((accumulator, currentValue) => {
+                                      return accumulator + currentValue.qty;
+                                    }, 0)}</span>
                                   </div>
                                 )
                               })}
@@ -385,19 +427,37 @@ const DeliveryDetail = () => {
         </Modal.Footer>
       </Modal>
       <Modal
-        show={showPDF}
-        onHide={() => setShowPDF(false)}
+        show={showInvoice}
+        onHide={() => setShowInvoice(false)}
+        size="lg"
+      >
+        <Modal.Header>
+          <Modal.Title>
+            Invoice
+          </Modal.Title>
+          <CloseButton onClick={() => setShowInvoice(false)} />
+        </Modal.Header>
+        <Modal.Body style={{ height: '70vh' }}>
+          <PDFViewer style={{ display: 'flex', flex: 1, height: '100%', width: '100%' }}>
+            <PdfDocument order={orderData} type={'INVOICE'} />
+          </PDFViewer>
+        </Modal.Body>
+      </Modal>
+
+      <Modal
+        show={showDeliveryNote}
+        onHide={() => setShowDeliveryNote(false)}
         size="lg"
       >
         <Modal.Header>
           <Modal.Title>
             Dokumen Perjalanan
           </Modal.Title>
-          <CloseButton onClick={() => setShowPDF(false)} />
+          <CloseButton onClick={() => setShowDeliveryNote(false)} />
         </Modal.Header>
         <Modal.Body style={{ height: '70vh' }}>
           <PDFViewer style={{ display: 'flex', flex: 1, height: '100%', width: '100%' }}>
-            <PdfDocument order={orderData} />
+            <PdfDocument order={orderData} type={'DELIVERY_NOTES'} />
           </PDFViewer>
         </Modal.Body>
       </Modal>

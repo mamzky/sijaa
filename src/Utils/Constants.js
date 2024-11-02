@@ -18,7 +18,7 @@ URL_DATABASE:'https://console.firebase.google.com/u/2/project/sijaa-ca714/databa
 // AUTH
 TOKEN: 'TOKEN',
 USERNAME: 'USERNAME',
-ROLE: 'ROLE'
+ROLE: 'ROLE',
 }
 
 export default Constant
