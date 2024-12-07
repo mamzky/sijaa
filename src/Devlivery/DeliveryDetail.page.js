@@ -4,7 +4,7 @@ import ModalLoading from "../Components/ModalLoading"
 import { db } from '../Config/FirebaseConfig';
 import { collection, getDocs, addDoc, doc, updateDoc, query, where } from 'firebase/firestore'
 import { CUSTOMER_COLLECTION, ORDER_COLLECTION } from "../Utils/DataUtils";
-import { Button, CloseButton, Form, Modal, Spinner, ToggleButton, ToggleButtonGroup } from "react-bootstrap";
+import { Button, CloseButton, Form, Modal, ModalBody, Spinner } from "react-bootstrap";
 import { addLog } from "../Utils/Utils";
 
 import Constant from "../Utils/Constants";
@@ -13,24 +13,25 @@ import PdfDocument from "./PdfDocument";
 import { Document, Page, pdfjs } from "react-pdf";
 import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
 import IMGJAA from '../assets/img/jaa.png'
+import AppColors from "../Utils/Colors";
 
 const DeliveryDetail = () => {
 
   const navigate = useNavigate()
-  const defaultSold = { customer: null, qty: 0 }
   const customerCollectionRef = collection(db, CUSTOMER_COLLECTION)
   const { order_number } = useParams()
   const [loading, setLoading] = useState(false)
-  const [orderList, setOrderList] = useState([])
   const [orderData, setOrderData] = useState()
   const [orderDataHolder, setOrderDataHolder] = useState()
   const [modalResult, setModalResult] = useState(false)
-  const [salesStatus, setSalesStatus] = useState('SALES')
   const [modalDelivered, setModalDelivered] = useState(false)
   const [deliveryNote, setDeliveryNotes] = useState()
   const [customerList, setCustomerList] = useState([])
   const [showInvoice, setShowInvoice] = useState(false)
   const [showDeliveryNote, setShowDeliveryNote] = useState(false)
+  const [soldItem, setSoldItem] = useState([])
+  const [overQty, setOverQty] = useState([])
+  const [showModalCloseSales, setShowModalCloseSales] = useState(false)
 
   useEffect(() => {
     getOrderData(order_number)
@@ -46,15 +47,7 @@ const DeliveryDetail = () => {
     if (!querySnapshot.empty) {
       setLoading(false)
       const order = result[0]
-      const list = result?.[0]?.order_list?.map((order) => {
-        return {
-          ...order,
-          sold: [defaultSold]
-        }
-      })
-      order.order_list = list
       setOrderData(order)
-      setOrderList(list)
     } else {
       setLoading(false)
     }
@@ -75,11 +68,12 @@ const DeliveryDetail = () => {
       })
   }
 
-  const handleCloseDelivery = () => {
-    const newData = { ...orderData }
+  const handleCloseDelivery = (data) => {
+    const newData = data
     newData.status = 'DELIVERED'
     newData.updated_at = moment().toString()
-    newData.delivery_note = deliveryNote
+    newData.delivery_note = deliveryNote ?? 'Sales Canvaser'
+
     const oldData = doc(db, ORDER_COLLECTION, orderData?.id)
     updateDoc(oldData, newData)
       .then((val) => {
@@ -96,22 +90,37 @@ const DeliveryDetail = () => {
   }
 
   const addSoldItem = (item) => {
-    const newItem = {
-      ...item,
-      sold: [...item?.sold, ...[defaultSold]]
-    }
-    const newOrderList = []
-    orderDataHolder?.order_list?.map((order) => {
-      newOrderList.push(order?.id === newItem?.id ? newItem : order)
-    })
-    setOrderDataHolder((val) => {
-      return {
-        ...val,
-        order_list: newOrderList
-      }
-    })
+    setSoldItem((e) => [...e, { customer: null, qty: 0, id: item?.id, unique_id: Math.floor(Math.random() * 9999) }])
   }
 
+  const validateResult = () => {
+    const validateQty = orderData?.order_list?.map((order_list, idx) => {
+      const totalQty = soldItem?.filter((item) => item.id === order_list?.id)?.reduce((acc, item) => acc + item.qty, 0)
+      return Boolean(totalQty > order_list.qty)
+    })
+    setOverQty(validateQty)
+  }
+
+  const saveOrderSales = () => {
+    validateResult()
+    const newOrderList = orderData?.order_list?.map((item) => ({ ...item, sold: soldItem?.filter((e) => e.id === item?.id) }))
+    const hasNullCustomer = newOrderList?.some(item =>
+      item.sold?.some(sale => sale.customer === null || sale.qty === 0)
+    );
+    if (hasNullCustomer) {
+      alert('Data penjualan belum valid, terdapat transaksi dengan jumlah (qty) yang belum terisi atau pelanggan (customer) belum ditentukan.')
+    } else {
+      const updatedOrderData = { ...orderData, order_list: newOrderList }
+      setOrderData(updatedOrderData)
+      // handleCloseDelivery(updatedOrderData)
+      setShowModalCloseSales(true)
+    }
+  }
+
+  useEffect(() => {
+    validateResult()
+
+  }, [soldItem])
 
   return (
     <div>
@@ -154,10 +163,10 @@ const DeliveryDetail = () => {
                     <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Jumlah</th>
                   </tr>
                 </thead>
-                <tbody style={{ visibility: orderList.length > 0 }} >
-                  {orderList?.map((item, index) => {
+                <tbody style={{ visibility: orderData?.order_list.length > 0 }} >
+                  {orderData?.order_list?.map((item, index) => {
                     return (
-                      <tr className='border border-neutral-100 h-4' style={{ background: '#6FC276' }}>
+                      <tr className='border border-neutral-100 h-4'>
                         <td>
                           <div className="ps-3 py-1">
                             <div className="d-flex flex-column justify-content-center">
@@ -246,7 +255,7 @@ const DeliveryDetail = () => {
                 <tbody style={{ visibility: orderDataHolder?.order_list?.length > 0 }} >
                   {orderDataHolder?.order_list?.map((item, index) => {
                     return (
-                      <tr className='border border-neutral-100 h-4' style={{ background: '#6FC276' }}>
+                      <tr className={`border border-neutral-100 table ${Boolean(overQty && overQty[index]) ? 'table-danger' : ''}`}>
                         <td>
                           <div className="ps-3 py-1">
                             <div className="d-flex flex-column justify-content-center">
@@ -271,25 +280,23 @@ const DeliveryDetail = () => {
                         <td style={{ width: '50%' }}>
                           <div className="ps-3 py-1">
                             <div className="d-flex flex-column justify-content-center">
-                              {item?.sold?.map((soldItem, idx) => {
+                              {soldItem?.filter((e) => e.id === item?.id).map((val, idx) => {
                                 return (
                                   <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                                     <Form.Select size="sm"
-                                      style={{ width: '70%' }}
+                                      style={{ width: '70%', height: 32 }}
                                       defaultValue={null}
                                       defaultChecked={null}
-                                      onChange={(e) => {
-                                        const customerName = e.currentTarget?.value
-                                        const selectedCustomer = customerList?.find(e => e.label === customerName)?.value
-
-                                        const newSold = item?.sold?.map((v, i) => {
-                                          return i === idx ? { ...v, customer: selectedCustomer } : v
-                                        })
-                                        const updatedArr = { ...orderData?.order_list[index], sold: newSold }
-                                        const updatedOrderList = orderDataHolder?.order_list?.map((orderList) => {
-                                          return orderList?.id === updatedArr?.id ? updatedArr : orderList
-                                        })
-                                        setOrderDataHolder(e => { return { ...e, order_list: updatedOrderList } })
+                                      onChange={(inputCustomer) => {
+                                        const customer = customerList.find((e) => e.label === inputCustomer?.target.value)?.value
+                                        const isExist = soldItem?.findIndex((e) => e?.id === item?.id && e?.customer?.customer_code === customer?.customer_code)
+                                        if (isExist === -1) {
+                                          setSoldItem((e) =>
+                                            e.map((items) => items?.unique_id === val?.unique_id ? { ...val, customer } : items))
+                                        } else {
+                                          alert('Customer sudah terpilih dengan item yang sama')
+                                          setSoldItem((e) => e.filter((item) => item?.unique_id !== val.unique_id))
+                                        }
                                       }}
                                     >
                                       <option value={null}>Pilih Customer</option>
@@ -300,38 +307,30 @@ const DeliveryDetail = () => {
                                       })}
                                     </Form.Select>
                                     <Form.Select size="sm"
-                                      defaultValue={null}
-                                      defaultChecked={null}
-                                      style={{ width: '30%' }}
-                                      onChange={(e) => {
-                                        const remainItem = item?.qty - item?.sold?.reduce((accumulator, currentValue) => {
-                                          return accumulator + currentValue.qty;
-                                        }, 0)
-                                        if (e.currentTarget?.value > remainItem) {
-                                          return alert('ITEM MELEBIHI QTY')
-                                        } else {
-                                          const newSold = item?.sold?.map((v, i) => {
-                                            return i === idx ? { ...v, qty: e.currentTarget?.value } : v
-                                          })
-                                          const updatedArr = { ...orderData?.order_list[index], sold: newSold }
-                                          const updatedOrderList = orderDataHolder?.order_list?.map((orderList) => {
-                                            return orderList?.id === updatedArr?.id ? updatedArr : orderList
-                                          })
-                                          setOrderDataHolder(e => { return { ...e, order_list: updatedOrderList } })
-                                        }
-
+                                      defaultValue={0}
+                                      defaultChecked={0}
+                                      style={{ width: '30%', height: 32 }}
+                                      onChange={(inputQty) => {
+                                        setSoldItem((e) =>
+                                          e.map((items) => items?.unique_id === val?.unique_id ? { ...val, qty: Number(inputQty.target?.value) } : items))
                                       }}
                                     >
-                                      <option value={null}>Pilih Qty</option>
+                                      <option value={null}>0</option>
                                       {Array.from({ length: Number(item?.qty) + 1 }, (_, i) => i).map((soldQty) => {
-                                        return (
-                                          <option defaultChecked={null} defaultValue={null} value={soldQty}>{soldQty}</option>
-                                        )
+                                        if (soldQty > 0) {
+                                          return (
+                                            <option defaultChecked={null} defaultValue={null} value={soldQty}>{soldQty}</option>
+                                          )
+                                        }
                                       })}
                                     </Form.Select>
-                                    <span>{item?.qty - item?.sold.reduce((accumulator, currentValue) => {
-                                      return accumulator + currentValue.qty;
-                                    }, 0)}</span>
+                                    <Button variant="danger" style={{ height: 32, marginLeft: 4 }}
+                                      onClick={() => {
+                                        setSoldItem((e) => e.filter((item) => item?.unique_id !== val.unique_id))
+                                      }}
+                                    >
+                                      x
+                                    </Button>
                                   </div>
                                 )
                               })}
@@ -353,7 +352,43 @@ const DeliveryDetail = () => {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="danger" onClick={() => setModalResult(false)}>Batal</Button>
-          <Button variant="success" onClick={() => { }}>Selesai</Button>
+          <Button variant="success" disabled={overQty?.some(e => e)} onClick={saveOrderSales}>Selesai</Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal
+        show={showModalCloseSales}
+        onHide={() => setModalDelivered(false)}
+        centered
+      >
+        <ModalBody>
+          <div>
+            <h4>Item Terjual</h4>
+            {orderData?.order_list?.map((order) => (
+              <div style={{ paddingLeft: '5%' }}>
+                <h5>{order?.name}</h5>
+                {order?.sold?.length > 0 ?
+                  (
+                    order?.sold?.map((sold) => (
+                      <div style={{ width: '70%', marginLeft: '7%', display: 'flex', flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
+                        <span>{`${sold?.customer?.name} (${sold?.customer?.contact_person})`}</span>
+                        <span>{`${sold?.qty} (pcs)`}</span>
+                      </div>
+                    ))
+                  )
+                  : (
+                    <div><span>*Tidak Ada Data*</span></div>
+                  )}
+              </div>
+            ))}
+          </div>
+        </ModalBody>
+        <Modal.Footer>
+          <Button variant="danger" onClick={() => setShowModalCloseSales(false)}>Batal</Button>
+          <Button variant="success" onClick={() => {
+            console.log('orderData', orderData);
+            handleCloseDelivery(orderData)
+          }}>Selesai</Button>
         </Modal.Footer>
       </Modal>
 
@@ -423,7 +458,7 @@ const DeliveryDetail = () => {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="danger" onClick={() => setModalDelivered(false)}>Batal</Button>
-          <Button variant="success" onClick={handleCloseDelivery}>Selesai</Button>
+          <Button variant="success" onClick={() => handleCloseDelivery(orderData)}>Selesai</Button>
         </Modal.Footer>
       </Modal>
       <Modal
