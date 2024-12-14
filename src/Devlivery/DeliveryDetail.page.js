@@ -47,6 +47,8 @@ const DeliveryDetail = () => {
     if (!querySnapshot.empty) {
       setLoading(false)
       const order = result[0]
+      console.log('ORDER', order);
+      
       setOrderData(order)
     } else {
       setLoading(false)

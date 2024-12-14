@@ -35,8 +35,7 @@ function Stock() {
     const productHolder = { ...selectedProduct }
     productHolder.qty = newStock
     productHolder.latest_update = reason
-    productHolder.updated_at = moment().format('DD/MMM/YYYY hh:mm')
-    console.log(productHolder)
+    productHolder.updated_at = moment().format('DD/MMM/YYYY HH:mm')
 
     const producDoc = doc(db, PRODUCT_COLLECTION, selectedProduct.id)
     await updateDoc(producDoc, productHolder).then((res) => {
@@ -139,12 +138,6 @@ function Stock() {
               <h6>Daftar Stok JAA Alkesum</h6>
             </div>
           </div>
-          {/* <div class="row mt-4">
-            <SmallImageCard />
-            <SmallImageCard />
-            <SmallImageCard />
-            <SmallImageCard />
-          </div> */}
 
           <div>
             <Form.Group className="col-lg-6 col-md-3" controlId='productName'>
@@ -156,8 +149,6 @@ function Stock() {
                   setTimeout(() => {
                     searchProduct(e.target.value)
                   }, 500);
-                  // setProductName(e.target.value)
-                  // setErrorName(isEmpty(e.target.value))
                 }}
                 placeholder="Cari produk"
               />
@@ -182,6 +173,7 @@ function Stock() {
                           <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">No.</th>
                           <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Produk</th>
                           <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7" style={{ textAlign: 'center' }}>Jumlah Stock</th>
+                          <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7" style={{ textAlign: 'center' }}>Update Terakhir</th>
                           <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"></th>
                         </tr>
                       </thead>
@@ -211,11 +203,18 @@ function Stock() {
                                 </div>
                               </td>
                               <td>
+                                <div className="ps-3 py-1">
+                                  <div className="d-flex flex-column">
+                                    <h6 className="mb-0 text-sm" style={{ textAlign: 'center' }}>{item?.latest_update}</h6>
+                                    <span style={{alignSelf: 'center', fontSize: 11}}>{`Last Update ${item?.updated_at} (${item?.updated_by ?? '-'})`}</span>
+                                  </div>
+                                </div>
+                              </td>
+                              <td>
                                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
                                   <Button
                                     style={{ width: '60%', marginTop: 10 }}
                                     onClick={() => {
-                                      // navigate('/product/add-new-product')
                                       setSelectedProduct(item)
                                       setModalUpdateStock(true)
                                     }}

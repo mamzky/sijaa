@@ -95,7 +95,6 @@ function AddNewOrder() {
             .then((res) => {
                 const listData = res.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
                 setEmployeeData(listData)
-                console.log('EMPLOYEE', listData)
             })
             .catch((err) => {
                 console.log(err)
@@ -182,8 +181,8 @@ function AddNewOrder() {
                             <span style={{ fontWeight: 'bold' }}>Order Item</span><br />
                             {orderList.map((item) => {
                                 const price = parseInt(OnlyDigit(item.price));
-                                const discount = parseInt(item.disc);
-                                const totalPrice = price * item.qty * (1 - discount / 100);
+                                const discount = parseInt(item.discount);
+                                const totalPrice = (price * item.qty) - discount;
 
                                 return (
                                     <Row>
@@ -250,6 +249,7 @@ function AddNewOrder() {
                                     if (orderList.findIndex((val) => val.id === e.id) < 0) {
                                         setProductIsExist(false)
                                         setSeletedProduct(e)
+                                        
                                         setPriceSelectedItem(e.value.base_price)
                                     } else {
                                         setSeletedProduct()
@@ -292,7 +292,7 @@ function AddNewOrder() {
                                 </Form.Group>
                             </div>
                             <Form.Group style={{ marginTop: 12 }}>
-                                <Form.Label>Diskon(%)</Form.Label>
+                                <Form.Label>Diskon(Rp)</Form.Label>
                                 <Form.Control
                                     style={{ width: '50%' }}
                                     type="input"
@@ -302,7 +302,7 @@ function AddNewOrder() {
                                         const onlyDigits = OnlyDigit(e.target.value)
                                         setDiscountSelectedItem(onlyDigits)
                                     }}
-                                    placeholder="Diskon (%)"
+                                    placeholder="Diskon (Rp)"
                                 />
                             </Form.Group>
                         </div>
@@ -312,7 +312,7 @@ function AddNewOrder() {
                     <p style={{ width: '100%', textAlign: 'center' }}>Apakah data yang dimasukkan sudah benar?</p>
                     <Button variant="danger" onClick={() => setModalItem(false)}>Batal</Button>
                     <Button variant="success"
-                        disabled={productIsExist || parseInt(qtySelectedItem) < 1 || isEmpty(qtySelectedItem) || isNil(selectedProduct?.id) || discountSelectedItem > 100}
+                        disabled={productIsExist || parseInt(qtySelectedItem) < 1 || isEmpty(qtySelectedItem) || isNil(selectedProduct?.id)}
                         onClick={() => {
                             if (isEditItem) {
                                 updateItem(selectedProduct.id, qtySelectedItem, OnlyDigit(priceSelectedItem))
@@ -322,7 +322,8 @@ function AddNewOrder() {
                                     id: selectedProduct.id,
                                     name: selectedProduct.value.product_name,
                                     qty: qtySelectedItem,
-                                    disc: discountSelectedItem === '' ? 0 : discountSelectedItem,
+                                    discount: discountSelectedItem === '' ? 0 : discountSelectedItem,
+                                    uom: selectedProduct?.value?.uom ?? '-',
                                     price: OnlyDigit(priceSelectedItem)
                                 }
                                 addItem(item)
@@ -604,8 +605,8 @@ function AddNewOrder() {
                                         <tbody>
                                             {orderList?.map((item, index) => {
                                                 const price = parseInt(OnlyDigit(item?.price));
-                                                const discount = parseInt(item?.disc);
-                                                const totalPrice = price * parseInt(item?.qty) * (1 - discount / 100);
+                                                const discount = parseInt(item?.discount);
+                                                const totalPrice = (price * parseInt(item?.qty)) - discount
                                                 return (
                                                     <tr>
                                                         <td>
@@ -625,7 +626,7 @@ function AddNewOrder() {
                                                                 setSeletedProduct(item.item)
                                                                 setQtySelectedItem(item.qty)
                                                                 setPriceSelectedItem(DigitFormatter(item.price))
-                                                                setDiscountSelectedItem(item.disc ?? 0)
+                                                                setDiscountSelectedItem(item.discount ?? 0)
                                                                 setModalItem(true)
                                                             }}
                                                         >
@@ -652,7 +653,7 @@ function AddNewOrder() {
                                                         <td className='col-lg-2'>
                                                             <div className="ps-2 py-1">
                                                                 <div className="d-flex flex-column">
-                                                                    <h6 className="mb-0 text-sm">{item?.disc}%</h6>
+                                                                    <h6 className="mb-0 text-sm">{DigitFormatter(item?.discount)}</h6>
                                                                 </div>
                                                             </div>
                                                         </td>

@@ -90,9 +90,8 @@ const ContactDetail = () => {
             phone: contactPhone,
             email: contactEmail,
             address: contactAddress,
-            updated_at: moment(new Date).toISOString(),
             contactId: contactData?.contactId,
-            updated_at: moment().format('DD/MMM/YYYY hh:mm')
+            updated_at: moment().format('DD/MMM/YYYY HH:mm')
         }
         const oldContactDoc = doc(db, CONTACT_COLLECTION, contactData?.id)
         updateDoc(oldContactDoc, newContactData)

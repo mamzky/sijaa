@@ -36,10 +36,6 @@ const SalesDetail = () => {
     const [formData, setFormData] = useState({})
     const getContactDetail = async (contact_id) => {
         setIsLoading(true)
-        console.log('contactId', contact_id)
-
-   
-
         const q = query(collection(db, CONTACT_COLLECTION)
             , where('contactId', '==', contact_id))
         await getDocs(q)
@@ -100,7 +96,7 @@ const SalesDetail = () => {
             address: contactAddress,
             updated_at: moment(new Date).toISOString(),
             contactId: contactData?.contactId,
-            updated_at: moment().format('DD/MMM/YYYY hh:mm')
+            updated_at: moment().format('DD/MMM/YYYY HH:mm')
         }
         const oldContactDoc = doc(db, CONTACT_COLLECTION, contactData?.id)
         updateDoc(oldContactDoc, newContactData)
