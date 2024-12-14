@@ -81,9 +81,8 @@ const EmployeeDetail = () => {
             role: employeeRole,
             status: employeeStatus,
             contact: employeeContact,
-            updated_at: moment(new Date).toISOString(),
             employeeId: employeeData?.employeeId,
-            updated_at: moment().format('DD/MMM/YYYY hh:mm')
+            updated_at: moment().format('DD/MMM/YYYY HH:mm')
         }
         const oldContactDoc = doc(db, EMPLOYEE_COLLECTION, employeeData.employeeId)
         updateDoc(oldContactDoc, newEmployeeData)

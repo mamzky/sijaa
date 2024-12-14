@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react"
 import { Form, useNavigate, useParams } from "react-router-dom"
 import ModalLoading from "../Components/ModalLoading"
 import { db } from '../Config/FirebaseConfig';
-import { collection, getDocs, addDoc, doc, updateDoc, query, where } from 'firebase/firestore'
-import { ORDER_COLLECTION } from "../Utils/DataUtils";
+import { collection, getDocs, addDoc, doc, updateDoc, query, where, increment } from 'firebase/firestore'
+import { ORDER_COLLECTION, PRODUCT_COLLECTION } from "../Utils/DataUtils";
 import { Button, FormCheck } from "react-bootstrap";
-import { addLog } from "../Utils/Utils";
+import { addLog, getDocument } from "../Utils/Utils";
 import Constant from "../Utils/Constants";
 import moment from "moment";
 
@@ -43,17 +43,37 @@ const PackingDetailPage = () => {
     }
 
     const proceedOrder = () => {
+        
         const newData = { ...orderData }
         newData.order_list = orderList
         newData.status = 'READY TO DELIVERY'
         newData.updated_at = moment().toString()
+        
         const oldData = doc(db, ORDER_COLLECTION, orderData?.id)
         updateDoc(oldData, newData)
             .then((val) => {
+                orderList?.map((val) => {
+                    updateStock(val?.id, Number(val?.qty), orderData?.order_number)
+                })
                 setLoading(false)
                 addLog('UPDATE STATUS ORDER', `${localStorage.getItem(Constant.USERNAME)} update selesai cek data`)
                 navigate(-1)
             })
+    }
+
+    const updateStock = async (id, qty, orderNumber) => {
+        try {
+            const docRef = doc(db, PRODUCT_COLLECTION, id); // Referensi dokumen
+            await updateDoc(docRef, {
+                qty: increment(-Math.abs(qty)),
+                updated_at: moment().format('DD/MMM/YYYY HH:mm'),
+                updated_by: localStorage.getItem(Constant.USERNAME) ?? '-',
+                latest_update: `order number ${orderNumber}, ${qty} pcs`
+            });
+            console.log("Document updated successfully!");
+        } catch (error) {
+            console.error("Error updating document:", error);
+        }
     }
 
     return (
@@ -83,57 +103,57 @@ const PackingDetailPage = () => {
                                     {orderList?.map((item, index) => {
                                         return (
                                             <tr className='border border-neutral-100 h-4' style={{ background: '#6FC276' }}>
-                                                    <td>
-                                                        <div className="ps-3 py-1">
-                                                            <div className="d-flex flex-column justify-content-center">
-                                                                <h6 className="mb-0 text-sm">{index + 1}</h6>
-                                                            </div>
+                                                <td>
+                                                    <div className="ps-3 py-1">
+                                                        <div className="d-flex flex-column justify-content-center">
+                                                            <h6 className="mb-0 text-sm">{index + 1}</h6>
                                                         </div>
-                                                    </td>
-                                                    <td>
-                                                        <div className="ps-3 py-1">
-                                                            <div className="d-flex flex-column justify-content-center">
-                                                                <h6 className="mb-0 text-sm">{item?.name}</h6>
-                                                            </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div className="ps-3 py-1">
+                                                        <div className="d-flex flex-column justify-content-center">
+                                                            <h6 className="mb-0 text-sm">{item?.name}</h6>
                                                         </div>
-                                                    </td>
-                                                    <td>
-                                                        <div className="ps-3 py-1">
-                                                            <div className="d-flex flex-column justify-content-center">
-                                                                <h6 className="mb-0 text-sm">{item?.qty}</h6>
-                                                            </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div className="ps-3 py-1">
+                                                        <div className="d-flex flex-column justify-content-center">
+                                                            <h6 className="mb-0 text-sm">{item?.qty}</h6>
                                                         </div>
-                                                    </td>
-                                                    <td>
-                                                        <div className="ps-3 py-1">
-                                                            <div className="d-flex flex-column justify-content-center">
-                                                                <div className="form-check flex cursor-pointer"
-                                                                    onClick={() => {
-                                                                        setOrderList((e) => e.map((val) => {
-                                                                            if (item?.id === val?.id) {
-                                                                                return {
-                                                                                    ...val,
-                                                                                    checked: !Boolean(val.checked)
-                                                                                }
-                                                                            } else {
-                                                                                return val
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div className="ps-3 py-1">
+                                                        <div className="d-flex flex-column justify-content-center">
+                                                            <div className="form-check flex cursor-pointer"
+                                                                onClick={() => {
+                                                                    setOrderList((e) => e.map((val) => {
+                                                                        if (item?.id === val?.id) {
+                                                                            return {
+                                                                                ...val,
+                                                                                checked: !Boolean(val.checked)
                                                                             }
-                                                                        }))
-                                                                    }}
-                                                                >
-                                                                    {item?.checked ? (
-                                                                        <i className="material-icons" style={{ fontSize: 30, fontWeight: 'bold', color: 'green' }}>check</i>
-                                                                    ) :
-                                                                        (
-                                                                            <Button
-                                                                                className="w-full flex"
-                                                                                variant="secondary"
-                                                                            >OK</Button>
-                                                                        )}
-                                                                </div>
+                                                                        } else {
+                                                                            return val
+                                                                        }
+                                                                    }))
+                                                                }}
+                                                            >
+                                                                {item?.checked ? (
+                                                                    <i className="material-icons" style={{ fontSize: 30, fontWeight: 'bold', color: 'green' }}>check</i>
+                                                                ) :
+                                                                    (
+                                                                        <Button
+                                                                            className="w-full flex"
+                                                                            variant="secondary"
+                                                                        >OK</Button>
+                                                                    )}
                                                             </div>
                                                         </div>
-                                                    </td>
+                                                    </div>
+                                                </td>
                                             </tr>
 
                                         )
@@ -148,7 +168,9 @@ const PackingDetailPage = () => {
                                 variant='success'
                                 style={{ width: '20%' }}
                                 disabled={orderList?.some(item => item?.checked === false)}
-                                onClick={proceedOrder}
+                                onClick={() => {
+                                    proceedOrder()
+                                }}
                             >Proses Order</Button>
                         </div>
                     </div>

@@ -309,14 +309,14 @@ function OrderDetail() {
                                                 <td>
                                                     <div className="ps-3 py-1">
                                                         <div className="d-flex flex-column">
-                                                            <h6 className="mb-0 text-sm">{item?.discount}</h6>
+                                                            <h6 className="mb-0 text-sm">{`Rp${DigitFormatter(item?.discount)}`}</h6>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td>
                                                     <div className="ps-3 py-1">
                                                         <div className="d-flex flex-column">
-                                                            <h6 className="mb-0 text-sm">{`Rp${DigitFormatter(item?.qty * item.price)}`}</h6>
+                                                            <h6 className="mb-0 text-sm">{`Rp${DigitFormatter(item?.qty * item.price - item?.discount)}`}</h6>
                                                         </div>
                                                     </div>
                                                 </td>

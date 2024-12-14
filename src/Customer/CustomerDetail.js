@@ -120,7 +120,7 @@ function CustomerDetail() {
             total_bill: DigitFormatter(calculateTotal(orderList)),
             updated_at: moment(new Date).toISOString(),
             customer_code: customerData?.customer_code,
-            updated_at: moment().format('DD/MMM/YYYY hh:mm')
+            updated_at: moment().format('DD/MMM/YYYY HH:mm')
         }
         const oldProductDoc = doc(db, CUSTOMER_COLLECTION, customerData?.id)
         updateDoc(oldProductDoc, newCustomerData)

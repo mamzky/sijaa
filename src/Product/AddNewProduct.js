@@ -29,6 +29,7 @@ function AddNewProduct() {
     const [discount, setDiscount] = useState('')
     const [discountType, setDiscountType] = useState('')
     const [supplier, setSupplier] = useState('')
+    const [uom, setUom] = useState('pcs')
     const [qty, setQty] = useState('')
     const [showModal, setShowModal] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
@@ -80,10 +81,7 @@ function AddNewProduct() {
                         console.log(productName);
                         setErrorName(true)
                         window.scrollTo(0, 0)
-                    } else if (isEmpty(productSize) && isEmpty(productSizeExtra)) {
-                        setErrorSize(true)
-                        window.scrollTo(0, 0)
-                    } else if (isEmpty(productBasePrice)) {
+                    }  else if (isEmpty(productBasePrice)) {
                         setErrorBasePrice(true)
                     } else if (isEmpty(supplier)) {
                         setErrorSupplier(true)
@@ -103,24 +101,28 @@ function AddNewProduct() {
     }
 
     const submitNewProduct = async () => {
-        setShowModal(false)
         const productCollectionRef = collection(db, PRODUCT_COLLECTION)
         await addDoc(productCollectionRef, {
             product_name: productName,
-            product_size: productSize,
+            uom: uom,
             base_price: productBasePrice,
             sell_price: productSellPrice,
-            discount: discount,
-            discount_type: discountType,
+            // discount: discount,
+            // discount_type: discountType,
             qty: qty,
             supplier: supplier,
             product_code: `JAA${moment().format('DDMMYYhhmm')}`,
-            created_at: moment().locale('id').toISOString()
+            created_at: moment().locale('id').toISOString(),
+            created_by: localStorage.getItem(Constant.USERNAME) ?? '-'
         }).then((res) => {
             console.log(res);
             addLog(localStorage.getItem(Constant.USERNAME), `add product ${productName}`)
             navigate('/product')
         })
+        .catch((error) => {
+            console.log('ERROR', error);
+        })
+        .finally(() => setShowModal(false))
     }
 
     useEffect(() => {
@@ -141,13 +143,13 @@ function AddNewProduct() {
                 </Modal.Header>
                 <Modal.Body>
                     {summaryItem('Nama produk', productName)}
-                    {productSize === 'Lainnya...' ?
+                    {/* {productSize === 'Lainnya...' ?
                         summaryItem('Ukuran', productSizeExtra)
                         :
-                        summaryItem('Ukuran', productSize)}
+                        summaryItem('Ukuran', productSize)} */}
                     {summaryItem('Harga dasar', `Rp${DigitFormatter(productBasePrice)}`)}
                     {summaryItem('Harga jual', isEmpty(productSellPrice) ? '-' : `Rp${DigitFormatter(productSellPrice)}`)}
-                    {summaryItem('Diskon', isEmpty(discount) ? '0' : `${DigitFormatter(discount)}(${discountType} Rupiah)`)}
+                    {/* {summaryItem('Diskon', isEmpty(discount) ? '0' : `${DigitFormatter(discount)}(${discountType} Rupiah)`)} */}
                     {summaryItem('Supplier', supplier)}
                     {summaryItem('Jumlah', qty)}
                 </Modal.Body>
@@ -203,7 +205,7 @@ function AddNewProduct() {
                             </Form.Group>
 
                             {/* SIZE */}
-                            <div
+                            {/* <div
                                 className="col-lg-6 col-md-3 mt-4"
                                 style={{
                                     border: 'solid',
@@ -255,10 +257,22 @@ function AddNewProduct() {
                                         placeholder="Masukan ukuran produk"
                                     />
                                 }
+                            </div> */}
+                            <div className="col-lg-6 col-md-3 mt-4">
+                                <Form.Label>Unit of Measurement(UoM)</Form.Label>
+                                <Form.Control
+                                    type="input"
+                                    name='uom'
+                                    value={uom}
+                                    onChange={(e) => {
+                                        setUom(e.target.value)
+                                    }}
+                                    placeholder="Masukan UoM"
+                                />
                             </div>
 
                             {/* PRICE */}
-                            <Row className='mt-4'>
+                            <Row className='mt-4 px-2'>
                                 {/* BASE PRICE */}
                                 <Col className="col-lg-6 col-md-3">
                                     <Form.Label>Harga dasar</Form.Label>
@@ -294,7 +308,7 @@ function AddNewProduct() {
                             </Row>
 
                             {/* DISCOUNT */}
-                            <div className="col-lg-6 col-md-3 mt-4">
+                            {/* <div className="col-lg-6 col-md-3 mt-4">
                                 <Form.Label>Diskon</Form.Label>
                                 <Row>
                                     {discType.map((disc) => {
@@ -329,7 +343,7 @@ function AddNewProduct() {
                                     }}
                                     placeholder="Masukan diskon"
                                 />
-                            </div>
+                            </div> */}
 
                             {/* SUPPLIER */}
                             <div className="col-lg-6 col-md-3 mt-4">

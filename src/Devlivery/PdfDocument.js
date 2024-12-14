@@ -110,7 +110,6 @@ moment.locale('id')
 
 const PdfDocument = ({ order, type }) => {
     moment.locale('id')
-
     const itemPerPage = 5
     const [data, setData] = useState(null)
     const [jaaImg, setJaaImg] = useState('')
@@ -264,16 +263,16 @@ const PdfDocument = ({ order, type }) => {
                             <Text style={{ fontSize: 8, textAlign: 'center' }}>{item?.qty}</Text>
                         </View>
                         <View style={[styles.tableColHeader, { width: '15%' }]}>
-                            <Text style={{ fontSize: 8, textAlign: 'center' }}>{'-'}</Text>
+                            <Text style={{ fontSize: 8, textAlign: 'center' }}>{item?.uom ?? '-'}</Text>
                         </View>
                         <View style={[styles.tableColHeader, { width: '20%' }]}>
-                            <Text style={{ fontSize: 8, textAlign: 'center' }}>{DigitFormatter(Number(item?.price / item?.qty))}</Text>
+                            <Text style={{ fontSize: 8, textAlign: 'center' }}>{DigitFormatter(item?.price)}</Text>
                         </View>
                         <View style={[styles.tableColHeader, { width: '10%' }]}>
                             <Text style={{ fontSize: 8, textAlign: 'center' }}>{item?.disc}</Text>
                         </View>
                         <View style={[styles.tableColHeader, { width: '23%' }]}>
-                            <Text style={{ fontSize: 8, textAlign: 'right' }}>{DigitFormatter(item?.price)}</Text>
+                            <Text style={{ fontSize: 8, textAlign: 'right' }}>{DigitFormatter(Number(item?.price * item?.qty - item?.disc))}</Text>
                         </View>
                     </View>
                 ))}

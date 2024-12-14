@@ -109,7 +109,6 @@ function ProductDetail() {
     }
 
     useEffect(() => {
-        console.log('ID', product_code);
         getProduct(product_code)
     }, [])
 
