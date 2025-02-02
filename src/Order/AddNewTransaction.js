@@ -75,6 +75,7 @@ function AddNewOrder() {
         getCustomer()
         getProduct()
         getListEmployee()
+        setOrdertype('Tunai')
     }, [])
 
     const getCustomer = async () => {
@@ -136,10 +137,12 @@ function AddNewOrder() {
             pic: selectedPIC,
             total_bill: DigitFormatter(calculateTotal(orderList)),
             status: 'READY TO PACK',
-            created_at: moment().locale('id').toISOString(),
-            updated_at: moment().locale('id').toISOString(),
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
             created_by: localStorage.getItem(Constant.USERNAME)
         }
+        console.log('BODY SUBMIT ORDER', body);
+        
         submitOrder(body)
     }
 
@@ -150,6 +153,13 @@ function AddNewOrder() {
             addLog(localStorage.getItem(Constant.USERNAME), `create order ${orderNumber}`)
             navigate('/order')
         })
+    }
+
+    const resetModalItem = () => {
+        setSeletedProduct(undefined)
+        setQtySelectedItem(0)
+        setPriceSelectedItem(0)
+        setModalItem(false)
     }
 
     return (
@@ -249,7 +259,7 @@ function AddNewOrder() {
                                     if (orderList.findIndex((val) => val.id === e.id) < 0) {
                                         setProductIsExist(false)
                                         setSeletedProduct(e)
-                                        
+
                                         setPriceSelectedItem(e.value.base_price)
                                     } else {
                                         setSeletedProduct()
@@ -260,7 +270,8 @@ function AddNewOrder() {
                             />
                         </div>
                         {productIsExist && <p style={{ color: AppColors.Error1 }}>Produk sudah ada dalam list</p>}
-                        <div style={{ width: '100%', marginTop: productIsExist ? -10 : 20, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                        {selectedProduct && <p>{`stok saat ini: ${selectedProduct?.value?.qty}`}</p>}
+                        <div style={{ width: '100%', marginTop: (productIsExist || selectedProduct) ? -10 : 20, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                             <div style={{ display: 'flex', flexDirection: 'row', gap: 12 }}>
                                 <Form.Group style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
                                     <Form.Label>Jumlah</Form.Label>
@@ -310,12 +321,17 @@ function AddNewOrder() {
                 </Modal.Body>
                 <Modal.Footer>
                     <p style={{ width: '100%', textAlign: 'center' }}>Apakah data yang dimasukkan sudah benar?</p>
-                    <Button variant="danger" onClick={() => setModalItem(false)}>Batal</Button>
+                    <Button variant="danger" onClick={() => {
+                        resetModalItem()
+                    }}>Batal</Button>
                     <Button variant="success"
                         disabled={productIsExist || parseInt(qtySelectedItem) < 1 || isEmpty(qtySelectedItem) || isNil(selectedProduct?.id)}
                         onClick={() => {
                             if (isEditItem) {
                                 updateItem(selectedProduct.id, qtySelectedItem, OnlyDigit(priceSelectedItem))
+                            } else if (Number(qtySelectedItem) > selectedProduct?.value?.qty) {
+                                alert('Qty pesanan melebihi stok!')
+                                setQtySelectedItem(0)
                             } else {
                                 const item = {
                                     item: selectedProduct,
@@ -327,11 +343,9 @@ function AddNewOrder() {
                                     price: OnlyDigit(priceSelectedItem)
                                 }
                                 addItem(item)
+                                resetModalItem()
                             }
-                            setSeletedProduct()
-                            setQtySelectedItem('')
-                            setPriceSelectedItem('')
-                            setModalItem(false)
+
                         }}>{isEditItem ? 'Ubah Barang' : 'Ya, Tambah Barang'}</Button>
                 </Modal.Footer>
             </Modal>
@@ -526,7 +540,7 @@ function AddNewOrder() {
                             {/* ORDER TYPE */}
                             <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='type'>
                                 <Row>
-                                    <Col className='col-lg-4'>
+                                    <Col className='col-lg-6'>
                                         <Form.Label>Jenis Order</Form.Label>
                                         <Dropdown className='col-lg-12'>
                                             <Dropdown.Toggle className='col-lg-12' variant="success" id="dropdown-basic">

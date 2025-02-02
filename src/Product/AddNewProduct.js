@@ -112,7 +112,7 @@ function AddNewProduct() {
             qty: qty,
             supplier: supplier,
             product_code: `JAA${moment().format('DDMMYYhhmm')}`,
-            created_at: moment().locale('id').toISOString(),
+            created_at: new Date().toISOString(),
             created_by: localStorage.getItem(Constant.USERNAME) ?? '-'
         }).then((res) => {
             console.log(res);
