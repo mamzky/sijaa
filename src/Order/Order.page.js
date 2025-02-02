@@ -11,6 +11,7 @@ import { calculateTotal } from '../Utils/Utils'
 import { DigitFormatter, PaymentTypeList, StatusTypeList, filterByList } from '../Utils/General'
 import { isEmpty } from 'ramda'
 import Select from 'react-select'
+import Constant from '../Utils/Constants'
 
 function Order() {
 
@@ -21,6 +22,9 @@ function Order() {
   const [orderData, setOrderData] = useState([])
   const [customerList, setCustomerList] = useState([])
   const [loading, setLoading] = useState(false)
+  const [modalDelete, setModalDelete] = useState(false)
+  const [cancelReason, setCancelReason] = useState('')
+  const [selectedOrder, setSelectedOrder] = useState(null)
 
   // FILTER
   const [filterField, setFilterField] = useState('')
@@ -36,7 +40,7 @@ function Order() {
     setLoading(true)
     getCustomer()
     getDocs(orderCollectionRef).then((res) => {
-      const rawData = res?.docs?.map((doc) => ({ ...doc?.data(), id: doc?.id }))
+      const rawData = res?.docs?.map((doc) => ({ ...doc?.data(), id: doc?.id })).filter((e) => e.status !== 'DELETED')
       setOrderData(rawData?.sort((a, b) => new Date(b?.created_at) - new Date(a?.created_at)))
     })
       .catch((err) => {
@@ -126,6 +130,23 @@ function Order() {
     }
   }
 
+  const cancelOrder = async () => {
+    setModalDelete(false)
+    setLoading(true)
+    const holderOrder = { ...selectedOrder, cancel_reason: cancelReason, status: 'DELETED', deleted_at: new Date().toISOString() , deleted_by: localStorage.getItem(Constant.USERNAME)}
+    const oldOrderDoc = doc(db, ORDER_COLLECTION, selectedOrder?.id)
+    updateDoc(oldOrderDoc, holderOrder)
+      .then(() => {
+        console.log('DONE');
+      })
+      .catch((err) => {
+        console.log('ERR', err);
+      })
+    setLoading(false)
+  }
+
+
+
   return (
     <div>
       <Modal show={loading} centered>
@@ -196,6 +217,7 @@ function Order() {
                     <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
                     <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tanggal</th>
                     <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Total</th>
+                    <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"></th>
                   </tr>
                 </thead>
                 <tbody style={{ visibility: orderData.length > 0 }}>
@@ -256,6 +278,18 @@ function Order() {
                             </div>
                           </div>
                         </td>
+                        <td>
+                          {['READY TO DELIVERY', 'READY TO PACK'].includes(item?.status) &&
+                            <div className="ps-3 py-1">
+                              <div className="d-flex flex-column">
+                                <Button variant="danger" onClick={() => {
+                                  setSelectedOrder(item)
+                                  setModalDelete(true)
+                                }}>X</Button>
+                              </div>
+                            </div>
+                          }
+                        </td>
                       </tr>
                     )
                   })}
@@ -264,8 +298,35 @@ function Order() {
             </div>
           </div>
         </div>
-
       </div>
+      <Modal show={modalDelete}>
+        <Modal.Header>Batalkan Pesanan</Modal.Header>
+        <Modal.Body>
+          <Form.Group style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
+            <Form.Label>Alasan</Form.Label>
+            <Form.Control
+              style={{ width: '100%' }}
+              type="input"
+              name='cancelReason'
+              value={cancelReason}
+              onChange={(e) => {
+                setCancelReason(e.target.value)
+              }}
+              placeholder="Alasan Pembatalan"
+            />
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="outline-dark" onClick={() => {
+            setModalDelete(false)
+            setCancelReason('')
+          }}>Cancel</Button>
+          <Button variant="danger" onClick={() => {
+            setModalDelete(false)
+            cancelOrder()
+          }}>Ya, Batalkan</Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   )
 }

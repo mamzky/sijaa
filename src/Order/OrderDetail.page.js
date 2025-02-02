@@ -30,6 +30,8 @@ function OrderDetail() {
     const [showModal, setShowModal] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
     const [updateModal, setUpdateModal] = useState(false)
+    const [closeOrderModal, setCloseOrderModal] = useState(false)
+    const [closeOrderNote, setCloseOrderNote] = useState('')
 
     // validationFlag
     const { order_number } = useParams()
@@ -85,6 +87,20 @@ function OrderDetail() {
                 addLog('UPDATE STATUS ORDER', `${localStorage.getItem(Constant.USERNAME)} update status order menjadi ${newData?.status}`)
                 window.location.reload(false)
             })
+    }
+
+    const closeOrder = () => {
+        const holderOrder = { ...orderData, notes: closeOrderNote, status: 'DONE', updated_at: new Date().toISOString(), updated_by: localStorage.getItem(Constant.USERNAME) }
+        const oldOrderDoc = doc(db, ORDER_COLLECTION, orderData?.id)
+        updateDoc(oldOrderDoc, holderOrder)
+            .then(() => {
+                console.log('DONE');
+                window.location.reload()
+            })
+            .catch((err) => {
+                console.log('ERR', err);
+            })
+
     }
 
     return (
@@ -174,6 +190,34 @@ function OrderDetail() {
                     </div>
                 </Modal.Footer>
             </Modal>
+            <Modal show={closeOrderModal} onHide={() => setCloseOrderModal(false)}>
+                <Modal.Header>Selesaikan Order</Modal.Header>
+                <Modal.Body>
+                    <Form.Group style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
+                        <Form.Label>Close Order Note</Form.Label>
+                        <Form.Control
+                            style={{ width: '100%' }}
+                            type="input"
+                            name='closeOrderNote'
+                            value={closeOrderNote}
+                            onChange={(e) => {
+                                setCloseOrderNote(e.target.value)
+                            }}
+                            placeholder="Keterangan Close Order"
+                        />
+                    </Form.Group>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="outline-dark" onClick={() => {
+                        setCloseOrderModal(false)
+                        setCloseOrderNote('')
+                    }}>Cancel</Button>
+                    <Button variant="danger" onClick={() => {
+                        setCloseOrderModal(false)
+                        closeOrder()
+                    }}>Ya, Selesaikan</Button>
+                </Modal.Footer>
+            </Modal>
             <div className="container-fluid py-4">
                 <div style={{ display: 'flex', flexDirection: 'row' }}>
                     <div className="col-lg-6 col-md-3 mb-md-0 mb-4">
@@ -231,6 +275,12 @@ function OrderDetail() {
                             <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='notes'>
                                 <Form.Label>Catatan</Form.Label>
                                 <h4 style={{ marginTop: -10, marginBottom: -10 }}>{isEmpty(orderData?.notes) ? '-' : orderData?.notes}</h4>
+                                {orderData?.status === 'DONE' && (
+                                    <>
+                                        <Form.Label style={{ marginTop: 10 }}>Catatan Pengiriman</Form.Label>
+                                        <h4 style={{ marginTop: -10, marginBottom: -10 }}>{isEmpty(orderData?.delivery_note) ? '-' : orderData?.delivery_note}</h4>
+                                    </>
+                                )}
                             </Form.Group>
                         </Row>
                         <Row>
@@ -327,10 +377,18 @@ function OrderDetail() {
 
                                 </tbody>
                             </table>
+                            {['DELIVERED'].includes(orderData?.status) &&
+                                <Button variant="success" style={{ height: 32, marginLeft: 4 }}
+                                    onClick={() => {
+                                        setCloseOrderModal(true)
+                                    }}
+                                >
+                                    Close Order
+                                </Button>
+                            }
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     )

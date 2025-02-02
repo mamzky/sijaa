@@ -6,7 +6,6 @@ import SmallImageCard from '../Components/SmallImageCard'
 import CustomTable from '../Components/CustomTable'
 import { useNavigate, useParams } from 'react-router-dom'
 import { DigitFormatter, OnlyDigit } from '../Utils/General'
-import { empty, isEmpty } from 'ramda'
 import { db } from '../Config/FirebaseConfig';
 import { collection, getDocs, addDoc, doc, updateDoc, query, where, deleteDoc } from 'firebase/firestore'
 import moment from 'moment/moment'
@@ -440,7 +439,7 @@ function CustomerDetail() {
                                                     <td>
                                                         <div className="ps-3 py-1">
                                                             <div className="d-flex flex-column">
-                                                                <h6 className="mb-0 text-sm">{item?.status ? 'Aktif' : 'Non-Aktif'}</h6>
+                                                                <h6 className="mb-0 text-sm">{item?.status}</h6>
                                                             </div>
                                                         </div>
                                                     </td>

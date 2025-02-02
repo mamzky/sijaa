@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import ModalLoading from "../Components/ModalLoading"
 import { db } from '../Config/FirebaseConfig';
 import { collection, getDocs, addDoc, doc, updateDoc, query, where } from 'firebase/firestore'
-import { CUSTOMER_COLLECTION, ORDER_COLLECTION } from "../Utils/DataUtils";
+import { calculateRemainingQty, CUSTOMER_COLLECTION, extractCustomerCodes, ORDER_COLLECTION, summarizeOrdersByCustomer, updateStock } from "../Utils/DataUtils";
 import { Button, CloseButton, Form, Modal, ModalBody, Spinner } from "react-bootstrap";
 import { addLog } from "../Utils/Utils";
 
@@ -14,6 +14,7 @@ import { Document, Page, pdfjs } from "react-pdf";
 import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
 import IMGJAA from '../assets/img/jaa.png'
 import AppColors from "../Utils/Colors";
+import { toast } from "react-toastify";
 
 const DeliveryDetail = () => {
 
@@ -48,17 +49,17 @@ const DeliveryDetail = () => {
       setLoading(false)
       const order = result[0]
       console.log('ORDER', order);
-      
+
       setOrderData(order)
     } else {
       setLoading(false)
     }
   }
 
-  const proceedOrder = () => {
+  const proceedOrder = (status) => {
     setLoading(true)
     const newData = { ...orderData }
-    newData.status = 'ON DELIVERY'
+    newData.status = status
     newData.updated_at = moment().toString()
     const oldData = doc(db, ORDER_COLLECTION, orderData?.id)
     updateDoc(oldData, newData)
@@ -72,7 +73,7 @@ const DeliveryDetail = () => {
 
   const handleCloseDelivery = (data) => {
     const newData = data
-    newData.status = 'DELIVERED'
+    newData.status = 'DONE'
     newData.updated_at = moment().toString()
     newData.delivery_note = deliveryNote ?? 'Sales Canvaser'
 
@@ -103,19 +104,53 @@ const DeliveryDetail = () => {
     setOverQty(validateQty)
   }
 
+  const submitAllOrders = async (arrayPayload, newOrderList, orderData) => {
+    setLoading(true)
+    const orderCollectionRef = collection(db, ORDER_COLLECTION);
+
+    try {
+      await Promise.all(
+        arrayPayload.map(async (body) => {
+          const docRef = await addDoc(orderCollectionRef, body);
+          await addLog(localStorage.getItem(Constant.USERNAME), `create order ${body.orderNumber}`);
+          console.log(`✅ Order ${body.orderNumber} berhasil disubmit dengan ID: ${docRef.id}`);
+        })
+      );
+      setTimeout(() => {
+        const sumSoldQty = newOrderList?.map(item => ({
+          id: item.id,
+          name: item?.name,
+          sold: item.sold?.reduce((total, sale) => total + (sale.qty || 0), 0) || 0
+        }))
+        const itemRemaining = calculateRemainingQty(orderData?.order_list, sumSoldQty)
+        Promise.all(
+          itemRemaining?.map((val) => {
+            updateStock(val?.id, Number(val?.remaining_qty), orderData?.order_number, 'ADD')
+          })
+        )
+        proceedOrder('DISTRIBUTED')
+      }, 2000);
+      setLoading(false)
+      toast.success('Semua order berhasil disubmit!')
+      navigate('/order');
+    } catch (error) {
+      console.error("❌ Gagal submit order:", error);
+    }
+  };
+
   const saveOrderSales = () => {
     validateResult()
     const newOrderList = orderData?.order_list?.map((item) => ({ ...item, sold: soldItem?.filter((e) => e.id === item?.id) }))
     const hasNullCustomer = newOrderList?.some(item =>
       item.sold?.some(sale => sale.customer === null || sale.qty === 0)
     );
+
     if (hasNullCustomer) {
       alert('Data penjualan belum valid, terdapat transaksi dengan jumlah (qty) yang belum terisi atau pelanggan (customer) belum ditentukan.')
     } else {
-      const updatedOrderData = { ...orderData, order_list: newOrderList }
-      setOrderData(updatedOrderData)
-      // handleCloseDelivery(updatedOrderData)
-      setShowModalCloseSales(true)
+      summarizeOrdersByCustomer(orderData, newOrderList, db).then((res) => {
+        submitAllOrders(res, newOrderList, orderData)
+      })
     }
   }
 
@@ -204,7 +239,7 @@ const DeliveryDetail = () => {
                 style={{ width: '20%' }}
                 onClick={() => {
                   if (orderData?.status === 'READY TO DELIVERY') {
-                    proceedOrder()
+                    proceedOrder('ON DELIVERY')
                   } else if (orderData?.type.toUpperCase() === 'SALES CANVASER') {
                     setOrderDataHolder(orderData)
                     setModalResult(true)
@@ -372,7 +407,7 @@ const DeliveryDetail = () => {
                 {order?.sold?.length > 0 ?
                   (
                     order?.sold?.map((sold) => (
-                      <div style={{ width: '70%', marginLeft: '7%', display: 'flex', flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
+                      <div style={{ width: '70%', marginLeft: '7%', display: 'flex', flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
                         <span>{`${sold?.customer?.name} (${sold?.customer?.contact_person})`}</span>
                         <span>{`${sold?.qty} (pcs)`}</span>
                       </div>

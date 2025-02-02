@@ -43,17 +43,17 @@ const PackingDetailPage = () => {
     }
 
     const proceedOrder = () => {
-        
+
         const newData = { ...orderData }
         newData.order_list = orderList
         newData.status = 'READY TO DELIVERY'
         newData.updated_at = moment().toString()
-        
+
         const oldData = doc(db, ORDER_COLLECTION, orderData?.id)
         updateDoc(oldData, newData)
-            .then((val) => {
+            .then((res) => {
                 orderList?.map((val) => {
-                    updateStock(val?.id, Number(val?.qty), orderData?.order_number)
+                    updateStock(val?.id, Number(val?.qty), orderData?.order_number, 'SUB')
                 })
                 setLoading(false)
                 addLog('UPDATE STATUS ORDER', `${localStorage.getItem(Constant.USERNAME)} update selesai cek data`)
@@ -63,14 +63,24 @@ const PackingDetailPage = () => {
 
     const updateStock = async (id, qty, orderNumber) => {
         try {
-            const docRef = doc(db, PRODUCT_COLLECTION, id); // Referensi dokumen
-            await updateDoc(docRef, {
-                qty: increment(-Math.abs(qty)),
+            const q = query(collection(db, PRODUCT_COLLECTION)
+                , where('id', '==', id))
+            const querySnapshot = await getDocs(q)
+            const result = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data()}))[0]
+            const holder = {...result, 
+                qty: result?.qty - qty,
                 updated_at: moment().format('DD/MMM/YYYY HH:mm'),
                 updated_by: localStorage.getItem(Constant.USERNAME) ?? '-',
                 latest_update: `order number ${orderNumber}, ${qty} pcs`
-            });
-            console.log("Document updated successfully!");
+            }
+            const oldProductDoc = doc(db, PRODUCT_COLLECTION, id)
+            updateDoc(oldProductDoc, holder)
+                  .then(() => {
+                    console.log('DONE');
+                  })
+                  .catch((err) => {
+                    console.log('ERR', err);
+                  })
         } catch (error) {
             console.error("Error updating document:", error);
         }

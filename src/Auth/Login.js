@@ -48,7 +48,7 @@ function Login() {
         localStorage.setItem(Constant.USERNAME, user?.username)
         localStorage.setItem(Constant.ROLE, user?.roleId)
         setFailLogin(false)
-        addLog('LOGIN', `${user?.username} telah login pada jam ${moment().locale('id').format('DD/MM/YYYY hh:mm:s')}`)
+        addLog('LOGIN', `${user?.username} telah login pada jam ${new Date().toISOString()}`)
         navigate('/')
         toast.success(`Berhasil login! Selamat datang ${user?.username}`)
       } else {

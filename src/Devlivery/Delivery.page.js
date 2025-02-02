@@ -89,6 +89,7 @@ function Delivery() {
                     <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nomor Order</th>
                     <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Customer</th>
                     <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
+                    <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tipe</th>
                     <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tanggal</th>
                     <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"></th>
                   </tr>
@@ -131,6 +132,13 @@ function Delivery() {
                             <div className="ps-3 py-1">
                               <div className="d-flex flex-column">
                                 <h6 className="mb-0 text-sm">{item?.status}</h6>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div className="ps-3 py-1">
+                              <div className="d-flex flex-column">
+                                <h6 className="mb-0 text-sm">{item?.type}</h6>
                               </div>
                             </div>
                           </td>
