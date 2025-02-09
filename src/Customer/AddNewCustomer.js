@@ -54,7 +54,7 @@ function AddNewCustomer() {
             address: address,
             contact_person: contactPerson,
             notes,
-            customer_code: `JAACST${moment().format('DDMMYYhhmm')}`,
+            customer_code: `KNGCST${moment().format('DDMMYYhhmmss')}`,
             created_at: new Date().toISOString(),
             created_by: localStorage.getItem(Constant.USERNAME) ?? '-'
         }).then((res) => {

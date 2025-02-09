@@ -15,7 +15,6 @@ import Constant from '../Utils/Constants'
 import { addLog, calculateTotal } from '../Utils/Utils'
 import Select from 'react-select'
 import AppColors from '../Utils/Colors'
-import DatePicker from "react-datepicker"
 
 function AddNewOrder() {
 
@@ -60,7 +59,9 @@ function AddNewOrder() {
     const [productIsExist, setProductIsExist] = useState(false)
     const [isEditItem, setIsEditItem] = useState(false)
 
-
+    const [withTax, setWithTax] = useState(true)
+    const [modalDiscount, setModalDiscount] = useState(false)
+    const [discountBill, setDiscountBill] = useState('')
 
     const summaryItem = (title, value) => {
         return (
@@ -76,6 +77,8 @@ function AddNewOrder() {
         getProduct()
         getListEmployee()
         setOrdertype('Tunai')
+        setOrderNumber(`KNG${moment().format('DDMMYYYYhhmmss')}`)
+        setWithTax(true)
     }, [])
 
     const getCustomer = async () => {
@@ -141,8 +144,6 @@ function AddNewOrder() {
             updated_at: new Date().toISOString(),
             created_by: localStorage.getItem(Constant.USERNAME)
         }
-        console.log('BODY SUBMIT ORDER', body);
-        
         submitOrder(body)
     }
 
@@ -201,10 +202,16 @@ function AddNewOrder() {
                                     </Row>
                                 )
                             })}
+                            {withTax &&
+                                <Row>
+                                    <p className='col-lg-6'>{`Tax`}</p>
+                                    <p className='col-lg-6' style={{ textAlign: 'right', fontWeight: 'bolder' }}>{`Rp${DigitFormatter(calculateTotal(orderList) * 0.11)}`}</p>
+                                </Row>
+                            }
                             <div style={{ height: 1, backgroundColor: 'GrayText' }} />
                             <Row>
                                 <p className='col-lg-6'>{`Total`}</p>
-                                <p className='col-lg-6' style={{ textAlign: 'right', fontWeight: 'bolder' }}>{`Rp${DigitFormatter(calculateTotal(orderList))}`}</p>
+                                <p className='col-lg-6' style={{ textAlign: 'right', fontWeight: 'bolder' }}>{`Rp${DigitFormatter(calculateTotal(orderList) + (calculateTotal(orderList) * (withTax ? 0.11 : 0)))}`}</p>
                             </Row>
                         </div>
                     </Row>
@@ -360,7 +367,7 @@ function AddNewOrder() {
                         <Row>
                             {/* NOMOR ORDER */}
                             <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='phone'>
-                                <Form.Label>Nomor Order JAA</Form.Label>
+                                <Form.Label>Nomor Order KNG</Form.Label>
                                 <Row>
                                     <Form.Control
                                         type="input"
@@ -374,7 +381,7 @@ function AddNewOrder() {
                                     />
                                     <Button
                                         style={{ width: '8%' }}
-                                        onClick={() => { setOrderNumber(`JAA${moment().format('DDMMYYYYhhmm')}`) }}
+                                        onClick={() => { setOrderNumber(`KNG${moment().format('DDMMYYYYhhmmss')}`) }}
                                     ><i className="material-icons opacity-10">cached</i></Button>
                                 </Row>
 
@@ -574,19 +581,6 @@ function AddNewOrder() {
                                 </Row>
                             </Form.Group>
                         </Row>
-
-                        <Row>
-                            {/* Status */}
-                            {/* <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='contactPerson'>
-                                    <Form.Label>Status</Form.Label>
-                                    <Form.Check // prettier-ignore
-                                        checked={isActive}
-                                        onChange={() => setIsActive((e) => !e)}
-                                        type="switch"
-                                        label={isActive ? 'Aktif' : 'Non-Aktif'}
-                                    />
-                                </Form.Group> */}
-                        </Row>
                         <Row>
                             {/* EMPLOYEE */}
                             <Select
@@ -604,6 +598,13 @@ function AddNewOrder() {
                         <div class="row mt-4">
                             <div className="card-body px-0 pb-2">
                                 <div className="table-responsive">
+                                    <input
+                                        type="checkbox"
+                                        checked={withTax}
+                                        onChange={() => setWithTax(!withTax)}
+                                        className="w-5 h-5"
+                                    />
+                                    <span>Pajak</span>
                                     <table className="table align-items-center mb-0">
                                         <thead>
                                             <tr>
@@ -717,28 +718,30 @@ function AddNewOrder() {
                                                             </div>
                                                         </td>
                                                     </tr>
-                                                    <tr
-                                                        style={{ backgroundColor: AppColors.MainBrand9 }} // Optional: Change cursor on hover
-                                                    >
-                                                        <td />
-                                                        <td />
-                                                        <td />
-                                                        <td />
-                                                        <td>
-                                                            <div className="ps-3 py-1">
-                                                                <div className="d-flex flex-column justify-content-center">
-                                                                    <h6 className="mb-0 text-sm">{'Tax'}</h6>
+                                                    {withTax &&
+                                                        <tr
+                                                            style={{ backgroundColor: AppColors.MainBrand9 }} // Optional: Change cursor on hover
+                                                        >
+                                                            <td />
+                                                            <td />
+                                                            <td />
+                                                            <td />
+                                                            <td >
+                                                                <div className="ps-3 py-1">
+                                                                    <div className="d-flex flex-column justify-content-center">
+                                                                        <h6 className="mb-0 text-sm">{'Tax'}</h6>
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            <div className="ps-3 py-1">
-                                                                <div className="d-flex flex-column justify-content-center">
-                                                                    <h6 className="mb-0 text-sm">{DigitFormatter(calculateTotal(orderList) * 0.11)}</h6>
+                                                            </td>
+                                                            <td>
+                                                                <div className="ps-3 py-1">
+                                                                    <div className="d-flex flex-column justify-content-center">
+                                                                        <h6 className="mb-0 text-sm">{DigitFormatter(calculateTotal(orderList) * 0.11)}</h6>
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
+                                                            </td>
+                                                        </tr>
+                                                    }
                                                     <tr
                                                         style={{ backgroundColor: AppColors.MainBrand9 }} // Optional: Change cursor on hover
                                                     >
@@ -756,21 +759,23 @@ function AddNewOrder() {
                                                         <td>
                                                             <div className="ps-3 py-1">
                                                                 <div className="d-flex flex-column justify-content-center">
-                                                                    <h6 className="mb-0 text-sm">{DigitFormatter(calculateTotal(orderList) + calculateTotal(orderList) * 0.11)}</h6>
+                                                                    <h6 className="mb-0 text-sm">{DigitFormatter(calculateTotal(orderList) + calculateTotal(orderList) * (withTax ? 0.11 : 0))}</h6>
                                                                 </div>
                                                             </div>
                                                         </td>
                                                     </tr>
                                                 </>
                                             }
-
                                         </tbody>
                                     </table>
-                                    <div style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'center', paddingTop: 20 }}>
+                                    <div style={{ width: '100%', display: 'flex', gap: 8, flexDirection: 'row', justifyContent: 'center', paddingTop: 20 }}>
                                         <Button onClick={() => {
                                             setModalItem(true)
                                             setIsEditItem(false)
                                         }} variant="primary">+Tambah Barang</Button>
+                                        {/* <Button onClick={() => {
+                                            setModalDiscount(true)
+                                        }} variant="primary">+Tambah Diskon Order</Button> */}
                                     </div>
                                 </div>
                             </div>
@@ -790,6 +795,33 @@ function AddNewOrder() {
                     </Form>
                 </div>
             </div>
+            <Modal show={modalDiscount}>
+                <Modal.Header>Tambah Diskon Order</Modal.Header>
+                <Modal.Body>
+                    <Form.Group style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
+                        <Form.Label>Total Diskon</Form.Label>
+                        <Form.Control
+                            style={{ width: '100%' }}
+                            type="input"
+                            name='discountBill'
+                            value={discountBill}
+                            onChange={(e) => {
+                                const onlyDigits = OnlyDigit(e.target.value)
+                                setDiscountBill(onlyDigits)
+                            }}
+                            placeholder="Discount Bill"
+                        />
+                    </Form.Group>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="danger" onClick={() => {
+                        setDiscountBill(0)
+                    }}>Hapus Diskon</Button>
+                    <Button variant="success" onClick={() => {
+                        setModalDiscount(false)
+                    }}>Tutup</Button>
+                </Modal.Footer>
+            </Modal>
         </div>
     )
 }

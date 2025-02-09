@@ -83,7 +83,7 @@ function Login() {
                         display: 'flex',
                         flex: 1,
                         justifyContent: 'center'
-                      }}>Login menggunakan akun JAA</Form.Label>
+                      }}>Login menggunakan akun KNG</Form.Label>
                   </div>
                 </div>
                 <div className="card-body">

@@ -72,7 +72,7 @@ function Packing() {
         <div style={{ display: 'flex', flexDirection: 'row' }}>
           <div className="col-lg-6 col-md-3 mb-md-0 mb-4">
             <h2>Packing</h2>
-            <h6>Data Packing JAA Alkesum</h6>
+            <h6>Data Packing KNG</h6>
           </div>
         </div>
 
