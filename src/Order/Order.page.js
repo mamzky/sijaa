@@ -171,7 +171,7 @@ function Order() {
         <div style={{ display: 'flex', flexDirection: 'row' }}>
           <div className="col-lg-6 col-md-3 mb-md-0 mb-4">
             <h2>Order</h2>
-            <h6>Data order JAA Alkesum</h6>
+            <h6>Data order KNG</h6>
           </div>
           <div className="col-lg-8 col-md-3" style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
             <Button

@@ -81,7 +81,7 @@ function ProductDetail() {
             discout_type: discType,
             qty: productData?.qty,
             supplier: supplier,
-            product_code: `JAA${moment().format('DDMMYYhhmm')}`,
+            product_code: `KNG${moment().format('DDMMYYhhmm')}`,
             created_at: moment(new Date).toISOString()
         }
         const oldProductDoc = doc(db, PRODUCT_COLLECTION, productData?.id)

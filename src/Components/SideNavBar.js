@@ -20,12 +20,6 @@ function SideNavBar() {
     setRole(localStorage.getItem(Constant.ROLE))
   }
 
-  // useEffect(() => {
-  //   checkLogin()
-  //   getActiveMenu()
-  //   getRole()
-  // }, [])
-
   const performLogout = () => {
     localStorage.clear()
     navigate('/login')
@@ -72,11 +66,15 @@ function SideNavBar() {
         navigate('/order')
         break;
 
-
       default:
         break;
     }
   }, [activeMenu])
+
+  useEffect(() => {
+    getRole()
+    checkLogin()
+  }, [])
 
   return (
     <aside className="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3   bg-gradient-dark" id="sidenav-main">
@@ -85,25 +83,12 @@ function SideNavBar() {
         <a className="navbar-brand m-0" target="_blank">
           {/* <img src="../assets/img/logo-ct.png" className="navbar-brand-img h-100" alt="main_logo" /> */}
           <h1 className="ms-1 font-weight-bold text-white">{Constant.APP_NAME}</h1>
-          <span className='text-white'>Sistem Informasi JAA</span>
+          <span className='text-white'>Sistem Informasi KNG</span>
         </a>
       </div>
       <div className="horizontal light mt-5 mb-2">
         <div className="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
           <ul className="navbar-nav">
-            {/* <li className="nav-item">
-              <a className={`nav-link text-white bg-gradient-primary ${activeMenu === Constant.MENU_DASHBOARD ? 'active' : ''}`}
-                onClick={() => {
-                  setActiveMenu(Constant.MENU_DASHBOARD)
-                  // localStorage.setItem(Constant.ACTIVE_MENU, Constant.MENU_DASHBOARD)
-                }}
-              >
-                <div className="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                  <i className="material-icons opacity-10">dashboard</i>
-                </div>
-                <span className="nav-link-text ms-1">Dashboard</span>
-              </a>
-            </li> */}
             <li className="nav-item">
               <a className={`nav-link text-white bg-gradient-primary ${activeMenu === Constant.MENU_CUSTOMER ? 'active' : ''}`}
                 // href="/customer"

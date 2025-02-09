@@ -111,7 +111,7 @@ function AddNewProduct() {
             // discount_type: discountType,
             qty: qty,
             supplier: supplier,
-            product_code: `JAA${moment().format('DDMMYYhhmm')}`,
+            product_code: `KNG${moment().format('DDMMYYhhmm')}`,
             created_at: new Date().toISOString(),
             created_by: localStorage.getItem(Constant.USERNAME) ?? '-'
         }).then((res) => {

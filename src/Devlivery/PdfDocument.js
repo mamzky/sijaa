@@ -4,7 +4,6 @@ import moment from 'moment';
 import 'moment/locale/id'
 import { DigitFormatter } from '../Utils/General';
 import IMGJAA from '../Utils/imageJaaBase64'
-import Constant from '../Utils/Constants';
 
 
 
@@ -159,11 +158,11 @@ const PdfDocument = ({ order, type }) => {
             <View style={styles.signature}>
                 <View style={styles.signatureBox}>
                     <Text style={{ width: '100%' }}>Received by,</Text>
-                    <Text style={{ borderBottom: 1, borderBottomColor: 'black', marginTop: 32 }}>{``}</Text>
+                    <Text style={{ borderBottom: 1, borderBottomColor: 'black', marginTop: 48 }}>{``}</Text>
                 </View>
                 <View style={styles.signatureBox}>
-                    <Text style={{ width: '100%' }}>CV. JAA Alkesum</Text>
-                    <Text style={{ borderBottom: 1, borderBottomColor: 'black', marginTop: 32 }}>{``}</Text>
+                    <Text style={{ width: '100%' }}>PT. Kreasi Nurwidhi Grup</Text>
+                    <Text style={{ borderBottom: 1, borderBottomColor: 'black', marginTop: 48 }}>{``}</Text>
                 </View>
             </View>
         )
@@ -177,7 +176,7 @@ const PdfDocument = ({ order, type }) => {
                     <Image style={{ height: 50, width: 50 }} src={{ uri: IMGJAA, method: "GET", headers: { "Cache-Control": "no-cache" }, body: "" }} />
                 </div>
                 <div style={{ width: '70%', display: 'flex', flexDirection: 'column' }}>
-                    <Text style={{ fontSize: 14, width: '100%', textAlign: 'left' }}>{`CV. JAA ALKESUM`}</Text>
+                    <Text style={{ fontSize: 14, width: '100%', textAlign: 'left' }}>{`PT. Kreasi Nurwidhi Grup`}</Text>
                     <Text style={{ fontSize: 12, width: '100%', textAlign: 'left' }}>{`Rehabilitation & General Hospital Equipment`}</Text>
                     <Text style={{ fontSize: 12, width: '100%', textAlign: 'left' }}>{`Bantar Jati, Setu, Cipayung, Jakarta Timur`}</Text>
                 </div>
@@ -322,7 +321,7 @@ const PdfDocument = ({ order, type }) => {
                     <Image style={{ height: 50, width: 50 }} src={{ uri: IMGJAA, method: "GET", headers: { "Cache-Control": "no-cache" }, body: "" }} />
                 </div>
                 <div style={{ width: '70%', display: 'flex', flexDirection: 'column' }}>
-                    <Text style={{ fontSize: 14, width: '100%', textAlign: 'left' }}>{`CV. JAA ALKESUM`}</Text>
+                    <Text style={{ fontSize: 14, width: '100%', textAlign: 'left' }}>{`PT. Kreasi Nurwidhi Grup`}</Text>
                     <Text style={{ fontSize: 12, width: '100%', textAlign: 'left' }}>{`Rehabilitation & General Hospital Equipment`}</Text>
                     <Text style={{ fontSize: 12, width: '100%', textAlign: 'left' }}>{`Bantar Jati, Setu, Cipayung, Jakarta Timur`}</Text>
                 </div>
@@ -335,7 +334,7 @@ const PdfDocument = ({ order, type }) => {
             <div style={{ width: '100%', borderBottomWidth: 2, borderBottomColor: 'black', marginTop: 8, marginBottom: 8 }}></div>
             <View style={styles.section}>
                 <div style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                    <div style={{ width: '50%', display: 'flex', flexDirection: 'col' }}>
+                    <div style={{ width: '60%', display: 'flex', flexDirection: 'col' }}>
                         <div style={{ display: 'flex', flexDirection: 'row' }}>
                             <Text style={{ width: '40%' }}>Nomor</Text>
                             <Text style={{ width: '50%' }}>: {order?.order_number}</Text>
@@ -346,10 +345,10 @@ const PdfDocument = ({ order, type }) => {
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'row' }}>
                             <Text style={{ width: '40%' }}>Reff PO</Text>
-                            <Text style={{ width: '50%' }}>: {order?.po_number}</Text>
+                            <Text style={{ width: '50%', overflow: 'clip' }}>: {order?.po_number}</Text>
                         </div>
                     </div>
-                    <div style={{ width: '50%', display: 'flex', flexDirection: 'col' }}>
+                    <div style={{ width: '40%', display: 'flex', flexDirection: 'col' }}>
                         <div style={{ display: 'flex', flexDirection: 'row' }}>
                             <Text style={{ width: '40%', textAlign: 'right' }}>To</Text>
                             <Text style={{ width: '50%' }}>: {order?.customer?.name}</Text>
@@ -360,7 +359,7 @@ const PdfDocument = ({ order, type }) => {
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'row' }}>
                             <Text style={{ width: '40%' }}></Text>
-                            <Text style={{ width: '50%' }}>{` UP: ${order?.customer?.contact_person}`}</Text>
+                            <Text style={{ width: '50%' }}>{` UP: ${order?.customer?.contact_person ?? ''}`}</Text>
                         </div>
                     </div>
                 </div>

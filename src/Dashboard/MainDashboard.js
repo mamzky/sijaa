@@ -33,8 +33,8 @@ function MainDashboard() {
     <div>
         <div class="py-4 flex-row justify-center h-[100vh]">
           <>
-            <h1 className='text-center'>Welcome to SIJAA</h1>
-            <h3 className='text-center'>Sistem Informasi JAA Alkesum</h3>
+            <h1 className='text-center'>Welcome to SIKNG</h1>
+            <h3 className='text-center'>Sistem Informasi SIKNG</h3>
           </>
           {/* <div class="row">
             <SmallImageCard/>

@@ -270,7 +270,7 @@ function Stock() {
         <div style={{ display: 'flex', flexDirection: 'row' }}>
           <div className="flex col-lg-12 col-md-6 mb-md-0 mb-4">
             <h2>Stok</h2>
-            <h6>Daftar Stok JAA Alkesum</h6>
+            <h6>Daftar Stok KNG</h6>
           </div>
         </div>
         <div className="d-flex flex-column justify-content-center">

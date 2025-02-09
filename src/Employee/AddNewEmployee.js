@@ -255,7 +255,7 @@ function AddNewEmployee() {
                                     onChange={handleInputChange}
                                     placeholder="Catatan"
                                 />
-                            </Form.Group> */} 
+                            </Form.Group> */}
 
 
                             <div className='my-4'>
@@ -267,7 +267,7 @@ function AddNewEmployee() {
                                         tampilpopup()
                                         console.log(formData)
                                     }}
-                                >Tambah Sales Baru</Button>
+                                >Tambah Karyawan Baru</Button>
                             </div>
                         </Form>
                     </div>

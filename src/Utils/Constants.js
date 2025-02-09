@@ -1,5 +1,5 @@
 const Constant = {
- APP_NAME: 'SIJAA',
+ APP_NAME: 'SIKNG',
  ACTIVE_MENU: 'ACTIVE_MENU'  ,
  
 //  MENU

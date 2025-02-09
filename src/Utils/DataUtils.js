@@ -72,7 +72,7 @@ export const summarizeOrdersByCustomer = async (orderData, data, db) => {
                             customer: null,
                             customer_id: customerCode,
                             order_list: [],
-                            order_number: `JAA${moment().format('DDMMYYYYhhmm')}${index}`,
+                            order_number: `KNG${moment().format('DDMMYYYYhhmm')}${index}`,
                             order_date: new Date().toISOString(),
                             po_number: '-',
                             notes: `SALES CANVASER ${moment().format('DD MMM YYYY')} oleh ${orderData?.pic}`,
