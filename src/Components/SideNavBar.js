@@ -91,7 +91,7 @@ function SideNavBar() {
       <div className="horizontal light mt-5 mb-2">
         <div className="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
           <ul className="navbar-nav">
-            <li className="nav-item">
+            {/* <li className="nav-item">
               <a className={`nav-link text-white bg-gradient-primary ${activeMenu === Constant.MENU_DASHBOARD ? 'active' : ''}`}
                 onClick={() => {
                   setActiveMenu(Constant.MENU_DASHBOARD)
@@ -103,7 +103,7 @@ function SideNavBar() {
                 </div>
                 <span className="nav-link-text ms-1">Dashboard</span>
               </a>
-            </li>
+            </li> */}
             <li className="nav-item">
               <a className={`nav-link text-white bg-gradient-primary ${activeMenu === Constant.MENU_CUSTOMER ? 'active' : ''}`}
                 // href="/customer"

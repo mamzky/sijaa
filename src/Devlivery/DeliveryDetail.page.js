@@ -438,7 +438,7 @@ const DeliveryDetail = () => {
           <Modal.Title>
             Selesaikan Pesanan
           </Modal.Title>
-          <CloseButton onClick={() => setModalResult(false)} />
+          <CloseButton onClick={() => setModalDelivered(false)} />
         </Modal.Header>
         <Modal.Body>
           <div className="table-responsive">

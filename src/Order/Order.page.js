@@ -274,7 +274,7 @@ function Order() {
                         <td>
                           <div className="ps-3 py-1">
                             <div className="d-flex flex-column">
-                              <h6 className="mb-0 text-sm">{`Rp${DigitFormatter(calculateTotal(item?.order_list))}`}</h6>
+                              <h6 className="mb-0 text-sm">{isNaN(calculateTotal(item?.order_list)) ? `-` : `Rp${DigitFormatter(calculateTotal(item?.order_list))}`}</h6>
                             </div>
                           </div>
                         </td>

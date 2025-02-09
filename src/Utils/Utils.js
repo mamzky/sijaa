@@ -11,7 +11,8 @@ export const addLog = async (title, msg) => {
 
 export function calculateTotal(items) {
     return items?.reduce((total, item) => {
-        const itemPrice = parseFloat(item?.price?.replace(',', '.')); // assuming price is a string
+        console.log('---',item?.price);
+        const itemPrice = parseFloat((item?.price ?? '')?.replace(',', '.')); // assuming price is a string
         const itemQty = parseInt(item?.qty, 10);
         const itemDiscount = parseFloat(item?.discount);
         const totalPriceBeforeDiscount = itemPrice * itemQty ;

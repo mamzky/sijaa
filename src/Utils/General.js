@@ -1,12 +1,14 @@
 export const DigitFormatter = (number) => {
+    console.log('NUMBER', number);
+
     if (isNaN(number)) {
         return "Invalid number";
-      }
-      const numStr = number.toString();
-      const parts = numStr.split(".");
-      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-      const formattedNumber = parts.join(".");
-      return formattedNumber;
+    }
+    const numStr = number.toString();
+    const parts = numStr.split(".");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    const formattedNumber = parts.join(".");
+    return formattedNumber;
 }
 
 export const OnlyDigit = (value) => {
@@ -14,14 +16,14 @@ export const OnlyDigit = (value) => {
 }
 
 export const PaymentTypeList = [
-    {label: 'Tunai', value: 'Tunai'},
-    {label: 'Konsinyasi', value: 'Konsinyasi'},
-    {label: 'Purchase Order', value: 'Purchase Order'},
+    { label: 'Tunai', value: 'Tunai' },
+    { label: 'Konsinyasi', value: 'Konsinyasi' },
+    { label: 'Purchase Order', value: 'Purchase Order' },
 ]
 
 export const StatusTypeList = [
-    {label: 'Aktif', value: true},
-    {label: 'NonAktif', value: false},
+    { label: 'Aktif', value: true },
+    { label: 'NonAktif', value: false },
 ]
 
 export const filterByList = [
@@ -31,4 +33,4 @@ export const filterByList = [
     { label: 'Tanggal', value: 'order_date' },
     { label: 'Status', value: 'status' },
     { label: 'Hapus Filter', value: null }
-  ]
+]
