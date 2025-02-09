@@ -122,6 +122,8 @@ const PdfDocument = ({ order, type }) => {
 
 
     useEffect(() => {
+        console.log('ORDER');
+        
         setData(order)
         setDocType(type)
         if (order?.order_list) {
@@ -172,8 +174,8 @@ const PdfDocument = ({ order, type }) => {
         <Page size="A5" orientation='landscape' style={styles.page}>
             {/* Company Information */}
             <View style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                <div style={{ width: '10%', marginRight: 20 }}>
-                    <Image style={{ height: 50, width: 50 }} src={{ uri: IMGJAA, method: "GET", headers: { "Cache-Control": "no-cache" }, body: "" }} />
+                <div style={{ width: '25%', marginRight: 20 }}>
+                    <Image style={{ height: 50, width: 100 }} src={IMGJAA} />
                 </div>
                 <div style={{ width: '70%', display: 'flex', flexDirection: 'column' }}>
                     <Text style={{ fontSize: 14, width: '100%', textAlign: 'left' }}>{`PT. Kreasi Nurwidhi Grup`}</Text>
@@ -271,7 +273,7 @@ const PdfDocument = ({ order, type }) => {
                             <Text style={{ fontSize: 8, textAlign: 'center' }}>{item?.disc}</Text>
                         </View>
                         <View style={[styles.tableColHeader, { width: '23%' }]}>
-                            <Text style={{ fontSize: 8, textAlign: 'right' }}>{DigitFormatter(Number(item?.price * item?.qty - item?.disc))}</Text>
+                            <Text style={{ fontSize: 8, textAlign: 'right' }}>{DigitFormatter(Number(item?.price * item?.qty - (item?.disc ?? 0)))}</Text>
                         </View>
                     </View>
                 ))}
@@ -295,7 +297,7 @@ const PdfDocument = ({ order, type }) => {
                         <Text style={{ fontSize: 8, textAlign: 'center' }}>Tax</Text>
                     </View>
                     <View style={[styles.tableColHeader, { width: '23%' }]}>
-                        <Text style={{ fontSize: 8, textAlign: 'right' }}>{DigitFormatter(Number(order?.total_bill.replaceAll('.', '') * 0.11).toFixed(0))}</Text>
+                        <Text style={{ fontSize: 8, textAlign: 'right' }}>{order?.tax ? DigitFormatter(Number(order?.total_bill.replaceAll('.', '') * 0.11).toFixed(0)) : '0'}</Text>
                     </View>
                 </View>
                 <View style={styles.tableRow}>
@@ -317,8 +319,8 @@ const PdfDocument = ({ order, type }) => {
     const DeliveryNote = <Document>
         <Page size="A5" orientation='landscape' style={styles.page}>
             <View style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                <div style={{ width: '10%', marginRight: 20 }}>
-                    <Image style={{ height: 50, width: 50 }} src={{ uri: IMGJAA, method: "GET", headers: { "Cache-Control": "no-cache" }, body: "" }} />
+                <div style={{ width: '25%', marginRight: 20 }}>
+                    <Image style={{ height: 50, width: 100 }} src={IMGJAA} />
                 </div>
                 <div style={{ width: '70%', display: 'flex', flexDirection: 'column' }}>
                     <Text style={{ fontSize: 14, width: '100%', textAlign: 'left' }}>{`PT. Kreasi Nurwidhi Grup`}</Text>
