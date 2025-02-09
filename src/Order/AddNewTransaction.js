@@ -142,7 +142,8 @@ function AddNewOrder() {
             status: 'READY TO PACK',
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
-            created_by: localStorage.getItem(Constant.USERNAME)
+            created_by: localStorage.getItem(Constant.USERNAME),
+            tax: withTax
         }
         submitOrder(body)
     }
@@ -225,7 +226,6 @@ function AddNewOrder() {
             </Modal>
             {/* LOADING */}
             <Modal show={isLoading} centered>
-
                 <Modal.Body backdrop={'false'} show={true} onHide={() => setShowModal(false)}
                     size="md"
                     aria-labelledby="contained-modal-title-vcenter"
