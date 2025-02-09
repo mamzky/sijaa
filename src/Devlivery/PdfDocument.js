@@ -291,7 +291,7 @@ const PdfDocument = ({ order, type }) => {
                 </View>
                 <View style={styles.tableRow}>
                     <View style={[styles.tableColHeaderCenter, { width: '52%' }]}>
-                        <Text style={{ fontSize: 8 }}>BCA: 685 022 0041 A/N. Uyet Nurhidayat</Text>
+                        <Text style={{ fontSize: 8 }}>Mandiri: 103 00000 89777 A/N. Kreasi Nurwidhi Grup</Text>
                     </View>
                     <View style={[styles.tableColHeader, { width: '30%' }]}>
                         <Text style={{ fontSize: 8, textAlign: 'center' }}>Tax</Text>
@@ -302,7 +302,7 @@ const PdfDocument = ({ order, type }) => {
                 </View>
                 <View style={styles.tableRow}>
                     <View style={[styles.tableColHeaderBottom, { width: '52%' }]}>
-                        <Text style={{ fontSize: 8 }}>Mandiri: 123 000 4354 017 A/N. Uyet Nurhidayat</Text>
+                        <Text style={{ fontSize: 8 }}> </Text>
                     </View>
                     <View style={[styles.tableColHeader, { width: '30%' }]}>
                         <Text style={{ fontSize: 8, textAlign: 'center' }}>Grand Total</Text>

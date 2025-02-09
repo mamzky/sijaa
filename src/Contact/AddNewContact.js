@@ -203,7 +203,7 @@ function AddNewContact() {
                                         tampilpopup()
                                         console.log(formData)
                                     }}
-                                >Tambah Customer Baru</Button>
+                                >Tambah Kontak Baru</Button>
                             </div>
                         </Form>
                     </div>
