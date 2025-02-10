@@ -123,7 +123,7 @@ const PdfDocument = ({ order, type }) => {
 
     useEffect(() => {
         console.log('ORDER');
-        
+
         setData(order)
         setDocType(type)
         if (order?.order_list) {
@@ -160,11 +160,11 @@ const PdfDocument = ({ order, type }) => {
             <View style={styles.signature}>
                 <View style={styles.signatureBox}>
                     <Text style={{ width: '100%' }}>Received by,</Text>
-                    <Text style={{ borderBottom: 1, borderBottomColor: 'black', marginTop: 48 }}>{``}</Text>
+                    <Text style={{ borderBottom: 1, borderBottomColor: 'black', marginTop: 64 }}>{``}</Text>
                 </View>
                 <View style={styles.signatureBox}>
                     <Text style={{ width: '100%' }}>PT. Kreasi Nurwidhi Grup</Text>
-                    <Text style={{ borderBottom: 1, borderBottomColor: 'black', marginTop: 48 }}>{``}</Text>
+                    <Text style={{ borderBottom: 1, borderBottomColor: 'black', marginTop: 64 }}>{``}</Text>
                 </View>
             </View>
         )
@@ -191,36 +191,39 @@ const PdfDocument = ({ order, type }) => {
             <div style={{ width: '100%', borderBottomWidth: 2, borderBottomColor: 'black', marginTop: 8, marginBottom: 8 }}></div>
             <View style={styles.section}>
                 <div style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
-                    <div style={{ width: '50%', display: 'flex', flexDirection: 'col' }}>
+                    <div style={{ width: '45%', display: 'flex', flexDirection: 'col' }}>
                         <div style={{ display: 'flex', flexDirection: 'row' }}>
-                            <Text style={{ width: '40%' }}>Invoice Date</Text>
-                            <Text style={{ width: '50%' }}>: {moment(order?.created_at).format('DD/MM/YYYY')}</Text>
+                            <Text style={{ width: '30%' }}>Invoice Date</Text>
+                            <Text style={{ width: '60%' }}>: {moment(order?.created_at).format('DD/MM/YYYY')}</Text>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'row' }}>
-                            <Text style={{ width: '40%' }}>Invoice No.</Text>
-                            <Text style={{ width: '50%' }}>: {order?.order_number}</Text>
+                            <Text style={{ width: '30%', fontSize: 11 }}>Invoice No.</Text>
+                            <Text style={{ width: '60%', fontSize: 11 }}>: {order?.order_number}</Text>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'row' }}>
-                            <Text style={{ width: '40%' }}>PO No.</Text>
-                            <Text style={{ width: '50%' }}>: {order?.po_number}</Text>
+                            <Text style={{ width: '30%', fontSize: 11 }}>PO No.</Text>
+                            <Text style={{ width: '60%', fontSize: 11 }}>: {order?.po_number}</Text>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'row' }}>
-                            <Text style={{ width: '40%' }}>Due Date</Text>
-                            <Text style={{ width: '50%' }}>: {moment(order?.created_at).add('days', 30).format('DD/MM/YYYY')}</Text>
+                            <Text style={{ width: '30%', fontSize: 11 }}>Due Date</Text>
+                            <Text style={{ width: '60%', fontSize: 12 }}>: {moment(order?.created_at).add('days', 30).format('DD/MM/YYYY')}</Text>
                         </div>
                     </div>
-                    <div style={{ width: '50%', display: 'flex', flexDirection: 'col' }}>
+                    <div style={{ width: '55%', display: 'flex', flexDirection: 'col' }}>
                         <div style={{ display: 'flex', flexDirection: 'row' }}>
-                            <Text style={{ width: '40%' }}>Customer</Text>
-                            <Text style={{ width: '50%' }}>: {order?.customer?.name}</Text>
+                            <Text style={{ width: '30%', fontSize: 11 }}>Customer</Text>
+                            <Text>{': '}</Text>
+                            <Text style={{ width: '80%', fontSize: 11 }}>{order?.customer?.name}</Text>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'row' }}>
-                            <Text style={{ width: '40%' }}>Address</Text>
-                            <Text style={{ width: '50%' }}>: {order?.customer?.address}</Text>
+                            <Text style={{ width: '30%', fontSize: 11 }}>Address</Text>
+                            <Text>{': '}</Text>
+                            <Text style={{ width: '60%', fontSize: 11 }}>: {order?.customer?.address}</Text>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'row' }}>
-                            <Text style={{ width: '40%' }}>Contact Person</Text>
-                            <Text style={{ width: '50%' }}>: {order?.customer?.contact_person}</Text>
+                            <Text style={{ width: '30%', fontSize: 11 }}>Contact Person</Text>
+                            <Text>{': '}</Text>
+                            <Text style={{ width: '80%', fontSize: 11 }}>{order?.customer?.contact_person}</Text>
                         </div>
                     </div>
                 </div>
@@ -230,25 +233,25 @@ const PdfDocument = ({ order, type }) => {
             <View style={styles.table}>
                 <View style={styles.tableRow}>
                     <View style={styles.tableColHeaderNumber}>
-                        <Text style={{ fontSize: 8, textAlign: 'center', paddingVertical:4 }}>No</Text>
+                        <Text style={{ fontSize: 8, textAlign: 'center', paddingVertical: 4 }}>No</Text>
                     </View>
                     <View style={[styles.tableColHeader, { width: '25%' }]}>
-                        <Text style={{ fontSize: 10, textAlign: 'center', paddingVertical:4, fontWeight: 'extrabold' }}>Description</Text>
+                        <Text style={{ fontSize: 10, textAlign: 'center', paddingVertical: 4, fontWeight: 'extrabold' }}>Description</Text>
                     </View>
                     <View style={[styles.tableColHeader, { width: '7%' }]}>
-                        <Text style={{ fontSize: 10, textAlign: 'center', paddingVertical:4, fontWeight: 'extrabold' }}>Qty</Text>
+                        <Text style={{ fontSize: 10, textAlign: 'center', paddingVertical: 4, fontWeight: 'extrabold' }}>Qty</Text>
                     </View>
                     <View style={[styles.tableColHeader, { width: '15%' }]}>
-                        <Text style={{ fontSize: 10, textAlign: 'center', paddingVertical:4, fontWeight: 'extrabold' }}>UoM</Text>
+                        <Text style={{ fontSize: 10, textAlign: 'center', paddingVertical: 4, fontWeight: 'extrabold' }}>UoM</Text>
                     </View>
                     <View style={[styles.tableColHeader, { width: '20%' }]}>
-                        <Text style={{ fontSize: 10, textAlign: 'center', paddingVertical:4, fontWeight: 'extrabold' }}>Unit Price</Text>
+                        <Text style={{ fontSize: 10, textAlign: 'center', paddingVertical: 4, fontWeight: 'extrabold' }}>Unit Price</Text>
                     </View>
                     <View style={[styles.tableColHeader, { width: '10%' }]}>
-                        <Text style={{ fontSize: 10, textAlign: 'center', paddingVertical:4, fontWeight: 'extrabold' }}>Disc</Text>
+                        <Text style={{ fontSize: 10, textAlign: 'center', paddingVertical: 4, fontWeight: 'extrabold' }}>Disc</Text>
                     </View>
                     <View style={[styles.tableColHeader, { width: '23%' }]}>
-                        <Text style={{ fontSize: 10, textAlign: 'center', paddingVertical:4, fontWeight: 'extrabold' }}>Amount(IDR)</Text>
+                        <Text style={{ fontSize: 10, textAlign: 'center', paddingVertical: 4, fontWeight: 'extrabold' }}>Amount(IDR)</Text>
                     </View>
                 </View>
 
@@ -308,7 +311,7 @@ const PdfDocument = ({ order, type }) => {
                         <Text style={{ fontSize: 8, textAlign: 'center' }}>Grand Total</Text>
                     </View>
                     <View style={[styles.tableColHeader, { width: '23%' }]}>
-                        <Text style={{ fontSize: 8, textAlign: 'right' }}>{DigitFormatter(Number(order?.total_bill.replaceAll('.', '') * 1.11).toFixed(0))}</Text>
+                        <Text style={{ fontSize: 8, textAlign: 'right' }}>{DigitFormatter(Number(order?.total_bill.replaceAll('.', '') * (order?.tax ? 1.11 : 1)).toFixed(0))}</Text>
                     </View>
                 </View>
             </View>
@@ -338,30 +341,33 @@ const PdfDocument = ({ order, type }) => {
                 <div style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
                     <div style={{ width: '60%', display: 'flex', flexDirection: 'col' }}>
                         <div style={{ display: 'flex', flexDirection: 'row' }}>
-                            <Text style={{ width: '40%' }}>Nomor</Text>
-                            <Text style={{ width: '50%' }}>: {order?.order_number}</Text>
+                            <Text style={{ width: '20%', fontSize: 11 }}>Nomor</Text>
+                            <Text>{': '}</Text>
+                            <Text style={{ width: '70%' }}>{order?.order_number}</Text>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'row' }}>
-                            <Text style={{ width: '40%' }}>Date</Text>
-                            <Text style={{ width: '50%' }}>: {moment().format('DD/MM/YYYY')}</Text>
+                            <Text style={{ width: '20%', fontSize: 11 }}>Date</Text>
+                            <Text style={{ width: '70%', fontSize: 11 }}>: {moment().format('DD/MM/YYYY')}</Text>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'row' }}>
-                            <Text style={{ width: '40%' }}>Reff PO</Text>
-                            <Text style={{ width: '50%', overflow: 'clip' }}>: {order?.po_number}</Text>
+                            <Text style={{ width: '20%', fontSize: 11 }}>Reff PO</Text>
+                            <Text style={{ width: '70%', fontSize: 11 }}>: {order?.po_number}</Text>
                         </div>
                     </div>
-                    <div style={{ width: '40%', display: 'flex', flexDirection: 'col' }}>
+                    <div style={{ width: '60%', display: 'flex', flexDirection: 'col' }}>
                         <div style={{ display: 'flex', flexDirection: 'row' }}>
-                            <Text style={{ width: '40%', textAlign: 'right' }}>To</Text>
-                            <Text style={{ width: '50%' }}>: {order?.customer?.name}</Text>
+                            <Text style={{ width: '20%', fontSize: 11 }}>To</Text>
+                            <Text>{': '}</Text>
+                            <Text style={{ width: '70%', fontSize: 11 }}>{order?.customer?.name}</Text>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'row' }}>
-                            <Text style={{ width: '40%' }}></Text>
-                            <Text style={{ width: '50%' }}> {order?.customer?.address}</Text>
+                            <Text style={{ width: '20%', fontSize: 11 }}></Text>
+                            <Text style={{ width: '70%', fontSize: 11 }}> {order?.customer?.address}</Text>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'row' }}>
-                            <Text style={{ width: '40%' }}></Text>
-                            <Text style={{ width: '50%' }}>{` UP: ${order?.customer?.contact_person ?? ''}`}</Text>
+                            <Text style={{ width: '20%', fontSize: 11 }}>UP</Text>
+                            <Text>{': '}</Text>
+                            <Text style={{ width: '70%', fontSize: 11 }}>{`${order?.customer?.contact_person ?? ''}`}</Text>
                         </div>
                     </div>
                 </div>
@@ -418,7 +424,7 @@ const PdfDocument = ({ order, type }) => {
                         <Text style={{ fontSize: 8 }}>Total</Text>
                     </View>
                     <View style={[styles.tableColHeader, { width: '7%' }]}>
-                        <Text style={{ fontSize: 8, textAlign:'center' }}>{totalQty ?? '-'}</Text>
+                        <Text style={{ fontSize: 8, textAlign: 'center' }}>{totalQty ?? '-'}</Text>
                     </View>
                     <View style={[styles.tableColHeader, { width: '23%' }]}>
                         <Text></Text>
