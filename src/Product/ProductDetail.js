@@ -58,9 +58,6 @@ function ProductDetail() {
             console.log(productName);
             setErrorName(true)
             window.scrollTo(0, 0)
-        } else if (isEmpty(productSize) && isEmpty(productSizeExtra)) {
-            setErrorSize(true)
-            window.scrollTo(0, 0)
         } else if (isEmpty(productBasePrice)) {
             setErrorBasePrice(true)
         } else if (isEmpty(supplier)) {
@@ -74,15 +71,11 @@ function ProductDetail() {
         setShowModal(false)
         const newProductData = {
             product_name: productName,
-            product_size: productSize,
             base_price: productBasePrice,
-            sell_price: productSellPrice,
-            discount: discount,
-            discout_type: discType,
             qty: productData?.qty,
             supplier: supplier,
             product_code: `KNG${moment().format('DDMMYYhhmm')}`,
-            created_at: moment(new Date).toISOString()
+            updated_at: moment(new Date).toISOString()
         }
         const oldProductDoc = doc(db, PRODUCT_COLLECTION, productData?.id)
         updateDoc(oldProductDoc, newProductData)
@@ -114,13 +107,8 @@ function ProductDetail() {
 
     const loadDataToForm = () => {
         setProductName(productData?.product_name)
-        setProductSize(productData?.product_size)
         setProductBasePrice(productData?.base_price)
-        setProductSellPrice(productData?.sell_price)
-        setDiscountType(productData?.discount_type)
-        setDiscount(productData?.discount)
         setSupplier(productData?.supplier)
-        console.log(productData)
     }
 
     return (
@@ -137,13 +125,7 @@ function ProductDetail() {
                 </Modal.Header>
                 <Modal.Body>
                     {summaryItem('Nama produk', productName)}
-                    {productSize === 'Lainnya...' ?
-                        summaryItem('Ukuran', productSizeExtra)
-                        :
-                        summaryItem('Ukuran', productSize)}
                     {summaryItem('Harga dasar', `Rp${DigitFormatter(productBasePrice)}`)}
-                    {summaryItem('Harga jual', isEmpty(productSellPrice) ? '-' : `Rp${DigitFormatter(productSellPrice)}`)}
-                    {summaryItem('Diskon', isEmpty(discount) ? '0' : `${DigitFormatter(discount)}(${discountType})`)}
                     {summaryItem('Supplier', supplier)}
                 </Modal.Body>
                 <Modal.Footer>
@@ -187,24 +169,12 @@ function ProductDetail() {
                             <h4 style={{ marginTop: -20 }}>{productData?.product_code}</h4>
                         </div>
                         <div>
-                            <p>Ukuran</p>
-                            <h4 style={{ marginTop: -20 }}>{productData?.product_size}</h4>
-                        </div>
-                        <div>
                             <p>Stok saat ini</p>
                             <h4 style={{ marginTop: -20 }}>{productData?.qty}</h4>
                         </div>
                         <div>
                             <p>Harga Pokok</p>
                             <h4 style={{ marginTop: -20 }}>{DigitFormatter(productData?.base_price)}</h4>
-                        </div>
-                        <div>
-                            <p>Harga Jual</p>
-                            <h4 style={{ marginTop: -20 }}>{isEmpty(productData?.sell_price) ? '-' : DigitFormatter(productData?.sell_price)}</h4>
-                        </div>
-                        <div>
-                            <p>Diskon</p>
-                            <h4 style={{ marginTop: -20 }}>{isEmpty(productData?.discount) ? '-' : `${DigitFormatter(productData?.discount)}(${productData?.discount_type})`}</h4>
                         </div>
                         <div>
                             <p>Supplier</p>
@@ -263,134 +233,23 @@ function ProductDetail() {
                                 />
                             </Form.Group>
 
-                            {/* SIZE */}
-                            <div
-                                className="col-lg-6 col-md-3 mt-4"
-                                style={{
-                                    border: 'solid',
-                                    borderWidth: '1px',
-                                    borderColor: errorSize ? 'red' : 'transparent',
-                                    borderRadius: 5
-                                }}>
-                                <Form.Label>Ukuran</Form.Label>
-                                <Row className='p2'>
-                                    {size.map((size) => {
-                                        return (
-                                            <Col
-                                                key={size}
-                                                sm={8}
-                                                md={6}
-                                                lg={4}
-                                            >
-                                                <Form.Check
-                                                    type="radio"
-                                                    name='productSize'
-                                                    value={size}
-                                                    checked={size === productSize}
-                                                    label={size}
-                                                    placeholder="Ukuran produk"
-                                                    onChange={(e) => {
-                                                        if (e.target.value === 'Lainnya...') {
-                                                            setProductSize('')
-                                                        } else {
-                                                            setProductSize(e.target.value)
-                                                            setProductSizeExtra('')
-                                                        }
-                                                        setErrorSize(isEmpty(productSizeExtra) && isEmpty(productSize))
-                                                    }}
-                                                />
-                                            </Col>
-                                        )
-                                    })}
-                                </Row>
-                                {(productSize === 'Lainnya...') &&
-                                    <Form.Control
-                                        style={{ marginLeft: 20, marginBottom: 10, width: '50%', alignSelf: 'center', visibility: productSize === 'Lainnya...' ? 'visible' : 'hidden' }}
-                                        type="input"
-                                        name='productSizeExtra'
-                                        value={productSizeExtra}
-                                        onChange={(e) => {
-                                            setProductSizeExtra(e.target.value)
-                                            setErrorSize(isEmpty(productSizeExtra) && isEmpty(productSize))
-                                        }}
-                                        placeholder="Masukan ukuran produk"
-                                    />
-                                }
-                            </div>
 
                             {/* PRICE */}
-                            <Row className='mt-4'>
-                                {/* BASE PRICE */}
-                                <Col className="col-lg-6 col-md-3">
-                                    <Form.Label>Harga dasar</Form.Label>
-                                    <Form.Control
-                                        type="input"
-                                        isInvalid={errorBasePrice}
-                                        name='productBasePrice'
-                                        value={`Rp${DigitFormatter(productBasePrice)}`}
-                                        onChange={(e) => {
-                                            const onlyDigits = OnlyDigit(e.target.value)
-                                            setProductBasePrice(onlyDigits)
-                                            setErrorBasePrice(isEmpty(onlyDigits))
-                                        }}
-                                        placeholder="Masukan harga dasar"
-                                    />
-                                </Col>
-
-                                {/* SELL PRICE */}
-                                <Col className="col-lg-6 col-md-3">
-                                    <Form.Label>Harga jual</Form.Label>
-                                    <Form.Control
-                                        type="input"
-                                        name='productSellPrice'
-                                        isInvalid={errorSellPrice}
-                                        value={`Rp${DigitFormatter(productSellPrice)}`}
-                                        onChange={(e) => {
-                                            const onlyDigits = OnlyDigit(e.target.value)
-                                            setProductSellPrice(onlyDigits)
-                                        }}
-                                        placeholder="Masukan harga jual"
-                                    />
-                                </Col>
-                            </Row>
-
-                            {/* DISCOUNT */}
-                            <div className="col-lg-6 col-md-3 mt-4">
-                                <Form.Label>Diskon</Form.Label>
-                                <Row>
-                                    {discType.map((disc) => {
-                                        return (
-                                            <Col
-                                                key={disc}
-                                                sm={8}
-                                                md={6}
-                                                lg={4}
-                                            >
-                                                <Form.Check
-                                                    type="radio"
-                                                    name='discountType'
-                                                    value={disc}
-                                                    checked={disc === discountType}
-                                                    label={disc}
-                                                    onChange={(e) => {
-                                                        setDiscountType(e.target.value)
-                                                    }}
-                                                />
-                                            </Col>
-                                        )
-                                    })}
-                                </Row>
+                            <Form.Group className="col-lg-6 col-md-3" controlId='productName'>
+                                <Form.Label>Harga dasar</Form.Label>
                                 <Form.Control
                                     type="input"
-                                    name='discount'
-                                    value={DigitFormatter(discount)}
+                                    isInvalid={errorBasePrice}
+                                    name='productBasePrice'
+                                    value={`Rp${DigitFormatter(productBasePrice)}`}
                                     onChange={(e) => {
                                         const onlyDigits = OnlyDigit(e.target.value)
-                                        setDiscount(onlyDigits)
+                                        setProductBasePrice(onlyDigits)
+                                        setErrorBasePrice(isEmpty(onlyDigits))
                                     }}
-                                    placeholder="Masukan diskon"
+                                    placeholder="Masukan harga dasar"
                                 />
-                            </div>
+                            </Form.Group>
 
                             {/* SUPPLIER */}
                             <div className="col-lg-6 col-md-3 mt-4">
