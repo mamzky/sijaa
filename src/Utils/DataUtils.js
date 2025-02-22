@@ -22,7 +22,7 @@ export const updateStock = async (id, qty, orderNumber, opr) => {
         const result = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))[0]
         const holder = {
             ...result,
-            qty: opr === 'ADD' ? result?.qty + qty : result?.qty - qty,
+            qty: opr === 'ADD' ? Number(result?.qty) + qty : Number(result?.qty) - qty,
             updated_at: moment().format('DD/MMM/YYYY HH:mm'),
             updated_by: localStorage.getItem(Constant.USERNAME) ?? '-',
             latest_update: `order number ${orderNumber}, ${qty} pcs`

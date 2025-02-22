@@ -109,51 +109,22 @@ moment.locale('id')
 
 const PdfDocument = ({ order, type }) => {
     moment.locale('id')
-    const itemPerPage = 5
     const [data, setData] = useState(null)
-    const [jaaImg, setJaaImg] = useState('')
     const [docType, setDocType] = useState('')
     const [totalQty, setTotalQty] = useState(0)
-    const [totalPage, setTotalPage] = useState(1)
-    const [paginatedOrder, setPaginatedOrder] = useState([])
-    const [grandTotal, setGrandTotal] = useState(0)
-    const taxRate = 0.11;
-
-
 
     useEffect(() => {
-        console.log('ORDER');
-
         setData(order)
         setDocType(type)
-        if (order?.order_list) {
-            const tempTotal = order?.order_list.reduce((sum, item) => sum + parseInt(item.qty), 0);
-            setTotalQty(tempTotal)
-            setTotalPage(Math.ceil(order?.order_list?.length / itemPerPage))
-
-            const itemsOnFirstPage = 5;
-            const itemsPerPage = 7;
-            const itemsOnLastPageMax = 5;
-
-            const paginatedOrderList = [];
-
-            paginatedOrderList.push(order.order_list.slice(0, itemsOnFirstPage));
-
-            let start = itemsOnFirstPage;
-            while (start < order.order_list.length - itemsOnLastPageMax) {
-                paginatedOrderList.push(order.order_list.slice(start, start + itemsPerPage));
-                start += itemsPerPage;
-            }
-            paginatedOrderList.push(order.order_list.slice(start, order.order_list.length));
-            setPaginatedOrder(paginatedOrderList);
-            const totalBill = parseInt(order.total_bill.replace(/\./g, ""), 10);
-            setGrandTotal(totalBill + (totalBill * taxRate))
-            console.log('ORDER', order);
-
-            console.log('PAGINATED', paginatedOrderList); //DIBUAT PAGINATION PER PAGE
-
-        }
     }, [order, type])
+
+    const chunkArray = (arr, size) => {
+        return arr.reduce((acc, _, i) =>
+            (i % size === 0 ? [...acc, arr.slice(i, i + size)] : acc), []
+        );
+    };
+    const itemsPerPage = 4;
+    const groupedOrders = chunkArray(order?.order_list || [], itemsPerPage);
 
     const footer = () => {
         return (
@@ -170,9 +141,8 @@ const PdfDocument = ({ order, type }) => {
         )
     }
 
-    const Invoice = <Document>
-        <Page size="A5" orientation='landscape' style={styles.page}>
-            {/* Company Information */}
+    const invoicePageHeader = () => {
+        return (
             <View style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
                 <div style={{ width: '25%', marginRight: 20 }}>
                     <Image style={{ height: 50, width: 100 }} src={IMGJAA} />
@@ -188,7 +158,37 @@ const PdfDocument = ({ order, type }) => {
                     </Text>
                 </div>
             </View>
-            <div style={{ width: '100%', borderBottomWidth: 2, borderBottomColor: 'black', marginTop: 8, marginBottom: 8 }}></div>
+        )
+    }
+    const invoiceTableHeader = () => {
+        return (
+            <View style={styles.tableRow}>
+                <View style={styles.tableColHeaderNumber}>
+                    <Text style={{ fontSize: 8, textAlign: 'center', paddingVertical: 4 }}>No</Text>
+                </View>
+                <View style={[styles.tableColHeader, { width: '25%' }]}>
+                    <Text style={{ fontSize: 10, textAlign: 'center', paddingVertical: 4, fontWeight: 'extrabold' }}>Description</Text>
+                </View>
+                <View style={[styles.tableColHeader, { width: '7%' }]}>
+                    <Text style={{ fontSize: 10, textAlign: 'center', paddingVertical: 4, fontWeight: 'extrabold' }}>Qty</Text>
+                </View>
+                <View style={[styles.tableColHeader, { width: '15%' }]}>
+                    <Text style={{ fontSize: 10, textAlign: 'center', paddingVertical: 4, fontWeight: 'extrabold' }}>UoM</Text>
+                </View>
+                <View style={[styles.tableColHeader, { width: '20%' }]}>
+                    <Text style={{ fontSize: 10, textAlign: 'center', paddingVertical: 4, fontWeight: 'extrabold' }}>Unit Price</Text>
+                </View>
+                <View style={[styles.tableColHeader, { width: '10%' }]}>
+                    <Text style={{ fontSize: 10, textAlign: 'center', paddingVertical: 4, fontWeight: 'extrabold' }}>Disc</Text>
+                </View>
+                <View style={[styles.tableColHeader, { width: '23%' }]}>
+                    <Text style={{ fontSize: 10, textAlign: 'center', paddingVertical: 4, fontWeight: 'extrabold' }}>Amount(IDR)</Text>
+                </View>
+            </View>
+        )
+    }
+    const invoiceOrderInformation = () => {
+        return (
             <View style={styles.section}>
                 <div style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
                     <div style={{ width: '45%', display: 'flex', flexDirection: 'col' }}>
@@ -228,99 +228,11 @@ const PdfDocument = ({ order, type }) => {
                     </div>
                 </div>
             </View>
+        )
+    }
 
-            {/* Table Header */}
-            <View style={styles.table}>
-                <View style={styles.tableRow}>
-                    <View style={styles.tableColHeaderNumber}>
-                        <Text style={{ fontSize: 8, textAlign: 'center', paddingVertical: 4 }}>No</Text>
-                    </View>
-                    <View style={[styles.tableColHeader, { width: '25%' }]}>
-                        <Text style={{ fontSize: 10, textAlign: 'center', paddingVertical: 4, fontWeight: 'extrabold' }}>Description</Text>
-                    </View>
-                    <View style={[styles.tableColHeader, { width: '7%' }]}>
-                        <Text style={{ fontSize: 10, textAlign: 'center', paddingVertical: 4, fontWeight: 'extrabold' }}>Qty</Text>
-                    </View>
-                    <View style={[styles.tableColHeader, { width: '15%' }]}>
-                        <Text style={{ fontSize: 10, textAlign: 'center', paddingVertical: 4, fontWeight: 'extrabold' }}>UoM</Text>
-                    </View>
-                    <View style={[styles.tableColHeader, { width: '20%' }]}>
-                        <Text style={{ fontSize: 10, textAlign: 'center', paddingVertical: 4, fontWeight: 'extrabold' }}>Unit Price</Text>
-                    </View>
-                    <View style={[styles.tableColHeader, { width: '10%' }]}>
-                        <Text style={{ fontSize: 10, textAlign: 'center', paddingVertical: 4, fontWeight: 'extrabold' }}>Disc</Text>
-                    </View>
-                    <View style={[styles.tableColHeader, { width: '23%' }]}>
-                        <Text style={{ fontSize: 10, textAlign: 'center', paddingVertical: 4, fontWeight: 'extrabold' }}>Amount(IDR)</Text>
-                    </View>
-                </View>
-
-                {order?.order_list?.map((item, index) => (
-                    <View style={styles.tableRow}>
-                        <View style={styles.tableColHeaderNumber}>
-                            <Text style={{ fontSize: 8, textAlign: 'center' }}>{index + 1}</Text>
-                        </View>
-                        <View style={[styles.tableColHeader, { width: '25%' }]}>
-                            <Text style={{ fontSize: 8, textAlign: 'left' }}>{item?.name}</Text>
-                        </View>
-                        <View style={[styles.tableColHeader, { width: '7%' }]}>
-                            <Text style={{ fontSize: 8, textAlign: 'center' }}>{item?.qty}</Text>
-                        </View>
-                        <View style={[styles.tableColHeader, { width: '15%' }]}>
-                            <Text style={{ fontSize: 8, textAlign: 'center' }}>{item?.uom ?? '-'}</Text>
-                        </View>
-                        <View style={[styles.tableColHeader, { width: '20%' }]}>
-                            <Text style={{ fontSize: 8, textAlign: 'center' }}>{DigitFormatter(item?.price)}</Text>
-                        </View>
-                        <View style={[styles.tableColHeader, { width: '10%' }]}>
-                            <Text style={{ fontSize: 8, textAlign: 'center' }}>{item?.disc}</Text>
-                        </View>
-                        <View style={[styles.tableColHeader, { width: '23%' }]}>
-                            <Text style={{ fontSize: 8, textAlign: 'right' }}>{DigitFormatter(Number(item?.price * item?.qty - (item?.disc ?? 0)))}</Text>
-                        </View>
-                    </View>
-                ))}
-
-                <View style={styles.tableRow}>
-                    <View style={[styles.tableColHeaderTop, { width: '52%' }]}>
-                        <Text style={{ fontSize: 8 }}>Bank Account</Text>
-                    </View>
-                    <View style={[styles.tableColHeader, { width: '30%' }]}>
-                        <Text style={{ fontSize: 8, textAlign: 'center' }}>Sub Total</Text>
-                    </View>
-                    <View style={[styles.tableColHeader, { width: '23%' }]}>
-                        <Text style={{ fontSize: 8, textAlign: 'right' }}>{order?.total_bill}</Text>
-                    </View>
-                </View>
-                <View style={styles.tableRow}>
-                    <View style={[styles.tableColHeaderCenter, { width: '52%' }]}>
-                        <Text style={{ fontSize: 8 }}>Mandiri: 103 00000 89777 A/N. Kreasi Nurwidhi Grup</Text>
-                    </View>
-                    <View style={[styles.tableColHeader, { width: '30%' }]}>
-                        <Text style={{ fontSize: 8, textAlign: 'center' }}>Tax</Text>
-                    </View>
-                    <View style={[styles.tableColHeader, { width: '23%' }]}>
-                        <Text style={{ fontSize: 8, textAlign: 'right' }}>{order?.tax ? DigitFormatter(Number(order?.total_bill.replaceAll('.', '') * 0.11).toFixed(0)) : '0'}</Text>
-                    </View>
-                </View>
-                <View style={styles.tableRow}>
-                    <View style={[styles.tableColHeaderBottom, { width: '52%' }]}>
-                        <Text style={{ fontSize: 8 }}> </Text>
-                    </View>
-                    <View style={[styles.tableColHeader, { width: '30%' }]}>
-                        <Text style={{ fontSize: 8, textAlign: 'center' }}>Grand Total</Text>
-                    </View>
-                    <View style={[styles.tableColHeader, { width: '23%' }]}>
-                        <Text style={{ fontSize: 8, textAlign: 'right' }}>{DigitFormatter(Number(order?.total_bill.replaceAll('.', '') * (order?.tax ? 1.11 : 1)).toFixed(0))}</Text>
-                    </View>
-                </View>
-            </View>
-            {footer()}
-        </Page>
-    </Document>
-
-    const DeliveryNote = <Document>
-        <Page size="A5" orientation='landscape' style={styles.page}>
+    const dnHeader = () => {
+        return (
             <View style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
                 <div style={{ width: '25%', marginRight: 20 }}>
                     <Image style={{ height: 50, width: 100 }} src={IMGJAA} />
@@ -336,7 +248,10 @@ const PdfDocument = ({ order, type }) => {
                     </Text>
                 </div>
             </View>
-            <div style={{ width: '100%', borderBottomWidth: 2, borderBottomColor: 'black', marginTop: 8, marginBottom: 8 }}></div>
+        )
+    }
+    const dnInfo = () => {
+        return (
             <View style={styles.section}>
                 <div style={{ width: '100%', display: 'flex', flexDirection: 'row' }}>
                     <div style={{ width: '60%', display: 'flex', flexDirection: 'col' }}>
@@ -372,73 +287,204 @@ const PdfDocument = ({ order, type }) => {
                     </div>
                 </div>
             </View>
-
-            {/* Table Header */}
-            <View style={styles.table}>
-                <View style={styles.tableRow}>
-                    <View style={styles.tableColHeaderNumber}>
-                        <Text style={{ fontSize: 10, paddingVertical: 4, fontWeight: 'extrabold', textAlign: 'center' }}>No</Text>
-                    </View>
-                    <View style={[styles.tableColHeader, { width: '35%' }]}>
-                        <Text style={{ fontSize: 10, paddingVertical: 4, fontWeight: 'extrabold', textAlign: 'center' }}>Description</Text>
-                    </View>
-                    <View style={[styles.tableColHeader, { width: '15%' }]}>
-                        <Text style={{ fontSize: 10, paddingVertical: 4, fontWeight: 'extrabold', textAlign: 'center' }}>Size</Text>
-                    </View>
-                    <View style={[styles.tableColHeader, { width: '7%' }]}>
-                        <Text style={{ fontSize: 10, paddingVertical: 4, fontWeight: 'extrabold', textAlign: 'center' }}>Qty</Text>
-                    </View>
-                    <View style={[styles.tableColHeader, { width: '23%' }]}>
-                        <Text style={{ fontSize: 10, paddingVertical: 4, fontWeight: 'extrabold', textAlign: 'center' }}>Amount(IDR)</Text>
-                    </View>
-                    <View style={[styles.tableColHeader, { width: '23%' }]}>
-                        <Text style={{ fontSize: 10, paddingVertical: 4, fontWeight: 'extrabold', textAlign: 'center' }}>Total</Text>
-                    </View>
+        )
+    }
+    const dnTableHeader = () => {
+        return (
+            <View style={styles.tableRow}>
+                <View style={styles.tableColHeaderNumber}>
+                    <Text style={{ fontSize: 10, paddingVertical: 4, fontWeight: 'extrabold', textAlign: 'center' }}>No</Text>
                 </View>
-
-                {order?.order_list?.map((item, index) => (
-                    <View style={styles.tableRow}>
-                        <View style={styles.tableColHeaderNumber}>
-                            <Text style={{ fontSize: 8 }}>{index + 1}</Text>
-                        </View>
-                        <View style={[styles.tableColHeader, { width: '35%' }]}>
-                            <Text style={{ fontSize: 8 }}>{item?.name}</Text>
-                        </View>
-                        <View style={[styles.tableColHeader, { width: '15%' }]}>
-                            <Text style={{ fontSize: 8 }}>{item?.size ?? '-'}</Text>
-                        </View>
-                        <View style={[styles.tableColHeader, { width: '7%' }]}>
-                            <Text style={{ fontSize: 8, textAlign: 'center' }}>{item?.qty}</Text>
-                        </View>
-                        <View style={[styles.tableColHeader, { width: '23%' }]}>
-                            <Text style={{ fontSize: 8, textAlign: 'right' }}>{DigitFormatter(Number(item?.price))}</Text>
-                        </View>
-                        <View style={[styles.tableColHeader, { width: '23%' }]}>
-                            <Text style={{ fontSize: 8, textAlign: 'right' }}>{DigitFormatter(Number(item?.price * item?.qty))}</Text>
-                        </View>
-                    </View>
-                ))}
-
-                <View style={styles.tableRow}>
-                    <View style={[styles.tableColHeader, { width: '55%' }]}>
-                        <Text style={{ fontSize: 8 }}>Total</Text>
-                    </View>
-                    <View style={[styles.tableColHeader, { width: '7%' }]}>
-                        <Text style={{ fontSize: 8, textAlign: 'center' }}>{totalQty ?? '-'}</Text>
-                    </View>
-                    <View style={[styles.tableColHeader, { width: '23%' }]}>
-                        <Text></Text>
-                    </View>
-                    <View style={[styles.tableColHeader, { width: '23%' }]}>
-                        <Text style={{ fontSize: 8, textAlign: 'right' }}>{order?.total_bill}</Text>
-                    </View>
+                <View style={[styles.tableColHeader, { width: '35%' }]}>
+                    <Text style={{ fontSize: 10, paddingVertical: 4, fontWeight: 'extrabold', textAlign: 'center' }}>Description</Text>
+                </View>
+                <View style={[styles.tableColHeader, { width: '15%' }]}>
+                    <Text style={{ fontSize: 10, paddingVertical: 4, fontWeight: 'extrabold', textAlign: 'center' }}>Size</Text>
+                </View>
+                <View style={[styles.tableColHeader, { width: '7%' }]}>
+                    <Text style={{ fontSize: 10, paddingVertical: 4, fontWeight: 'extrabold', textAlign: 'center' }}>Qty</Text>
+                </View>
+                <View style={[styles.tableColHeader, { width: '23%' }]}>
+                    <Text style={{ fontSize: 10, paddingVertical: 4, fontWeight: 'extrabold', textAlign: 'center' }}>Amount(IDR)</Text>
+                </View>
+                <View style={[styles.tableColHeader, { width: '23%' }]}>
+                    <Text style={{ fontSize: 10, paddingVertical: 4, fontWeight: 'extrabold', textAlign: 'center' }}>Total</Text>
                 </View>
             </View>
-            <View>
-                <Text>{`Notes : ${order?.notes}`}</Text>
-            </View>
-            {footer()}
-        </Page>
+        )
+    }
+
+    const Invoice = <Document>
+        {groupedOrders.map((group, pageIndex) => (
+            <Page key={pageIndex} size="A5" orientation="landscape" style={styles.page}>
+                {invoicePageHeader()}
+                <View style={{ width: '100%', borderBottomWidth: 2, borderBottomColor: 'black', marginTop: 8, marginBottom: 8 }}></View>
+                {pageIndex === 0 && invoiceOrderInformation()}
+
+                <View style={styles.table}>
+                    {invoiceTableHeader()}
+                    {group.map((item, index) => (
+                        <View style={styles.tableRow} key={index}>
+                            <View style={styles.tableColHeaderNumber}>
+                                <Text style={{ fontSize: 8, textAlign: 'center' }}>
+                                    {index + 1 + pageIndex * itemsPerPage}
+                                </Text>
+                            </View>
+                            <View style={[styles.tableColHeader, { width: '25%' }]}>
+                                <Text style={{ fontSize: 8, textAlign: 'left' }}>{item?.name}</Text>
+                            </View>
+                            <View style={[styles.tableColHeader, { width: '7%' }]}>
+                                <Text style={{ fontSize: 8, textAlign: 'center' }}>{item?.qty}</Text>
+                            </View>
+                            <View style={[styles.tableColHeader, { width: '15%' }]}>
+                                <Text style={{ fontSize: 8, textAlign: 'center' }}>{item?.uom ?? '-'}</Text>
+                            </View>
+                            <View style={[styles.tableColHeader, { width: '20%' }]}>
+                                <Text style={{ fontSize: 8, textAlign: 'center' }}>{DigitFormatter(item?.price)}</Text>
+                            </View>
+                            <View style={[styles.tableColHeader, { width: '10%' }]}>
+                                <Text style={{ fontSize: 8, textAlign: 'center' }}>{item?.disc}</Text>
+                            </View>
+                            <View style={[styles.tableColHeader, { width: '23%' }]}>
+                                <Text style={{ fontSize: 8, textAlign: 'right' }}>
+                                    {DigitFormatter(Number(item?.price * item?.qty - (item?.disc ?? 0)))}
+                                </Text>
+                            </View>
+                        </View>
+                    ))}
+                    {pageIndex === groupedOrders.length - 1 && (
+                        <>
+                            <View style={styles.tableRow}>
+                                <View style={[styles.tableColHeaderTop, { width: '52%' }]}>
+                                    <Text style={{ fontSize: 8 }}>Bank Account</Text>
+                                </View>
+                                <View style={[styles.tableColHeader, { width: '30%' }]}>
+                                    <Text style={{ fontSize: 8, textAlign: 'center' }}>Sub Total</Text>
+                                </View>
+                                <View style={[styles.tableColHeader, { width: '23%' }]}>
+                                    <Text style={{ fontSize: 8, textAlign: 'right' }}>{order?.total_bill}</Text>
+                                </View>
+                            </View>
+                            <View style={styles.tableRow}>
+                                <View style={[styles.tableColHeaderCenter, { width: '52%' }]}>
+                                    <Text style={{ fontSize: 8 }}>Mandiri: 103 00000 89777 A/N. Kreasi Nurwidhi Grup</Text>
+                                </View>
+                                <View style={[styles.tableColHeader, { width: '30%' }]}>
+                                    <Text style={{ fontSize: 8, textAlign: 'center' }}>Tax</Text>
+                                </View>
+                                <View style={[styles.tableColHeader, { width: '23%' }]}>
+                                    <Text style={{ fontSize: 8, textAlign: 'right' }}>
+                                        {order?.tax ? DigitFormatter(Number(order?.total_bill.replaceAll('.', '') * 0.11).toFixed(0)) : '0'}
+                                    </Text>
+                                </View>
+                            </View>
+                            <View style={styles.tableRow}>
+                                <View style={[styles.tableColHeaderBottom, { width: '52%' }]}>
+                                    <Text style={{ fontSize: 8 }}> </Text>
+                                </View>
+                                <View style={[styles.tableColHeader, { width: '30%' }]}>
+                                    <Text style={{ fontSize: 8, textAlign: 'center' }}>Grand Total</Text>
+                                </View>
+                                <View style={[styles.tableColHeader, { width: '23%' }]}>
+                                    <Text style={{ fontSize: 8, textAlign: 'right' }}>
+                                        {DigitFormatter(Number(order?.total_bill.replaceAll('.', '') * 1.11).toFixed(0))}
+                                    </Text>
+                                </View>
+                            </View>
+                        </>
+                    )}
+                </View>
+                {pageIndex === groupedOrders.length - 1 && footer()}
+                <Text
+                    style={{
+                        position: 'absolute',
+                        bottom: 10,
+                        right: 20,
+                        fontSize: 8,
+                    }}
+                >
+                    Halaman {pageIndex + 1} dari {groupedOrders.length}
+                </Text>
+            </Page>
+        ))}
+    </Document>
+
+    const DeliveryNote = <Document>
+        {groupedOrders.map((group, pageIndex) => (
+            <Page key={pageIndex} size="A5" orientation="landscape" style={styles.page}>
+                {dnHeader()}
+                <View style={{ width: '100%', borderBottomWidth: 2, borderBottomColor: 'black', marginTop: 8, marginBottom: 8 }}></View>
+
+                {/* TAMPILIN ORDER INFO CUMA DI PAGE PERTAMA */}
+                {pageIndex === 0 && dnInfo()}
+
+                <View style={styles.table}>
+                    {dnTableHeader()}
+                    {group.map((item, index) => (
+                        <View style={styles.tableRow} key={index}>
+                            <View style={styles.tableColHeaderNumber}>
+                                <Text style={{ fontSize: 8 }}>{index + 1 + pageIndex * itemsPerPage}</Text>
+                            </View>
+                            <View style={[styles.tableColHeader, { width: '35%' }]}>
+                                <Text style={{ fontSize: 8 }}>{item?.name}</Text>
+                            </View>
+                            <View style={[styles.tableColHeader, { width: '15%' }]}>
+                                <Text style={{ fontSize: 8 }}>{item?.size ?? '-'}</Text>
+                            </View>
+                            <View style={[styles.tableColHeader, { width: '7%' }]}>
+                                <Text style={{ fontSize: 8, textAlign: 'center' }}>{item?.qty}</Text>
+                            </View>
+                            <View style={[styles.tableColHeader, { width: '23%' }]}>
+                                <Text style={{ fontSize: 8, textAlign: 'right' }}>{DigitFormatter(Number(item?.price))}</Text>
+                            </View>
+                            <View style={[styles.tableColHeader, { width: '23%' }]}>
+                                <Text style={{ fontSize: 8, textAlign: 'right' }}>{DigitFormatter(Number(item?.price * item?.qty))}</Text>
+                            </View>
+                        </View>
+                    ))}
+                    {pageIndex === groupedOrders.length - 1 && (
+                        <>
+                            <View style={styles.tableRow}>
+                                <View style={[styles.tableColHeader, { width: '55%' }]}>
+                                    <Text style={{ fontSize: 8 }}>Total</Text>
+                                </View>
+                                <View style={[styles.tableColHeader, { width: '7%' }]}>
+                                    <Text style={{ fontSize: 8, textAlign: 'center' }}>{totalQty ?? '-'}</Text>
+                                </View>
+                                <View style={[styles.tableColHeader, { width: '23%' }]}>
+                                    <Text></Text>
+                                </View>
+                                <View style={[styles.tableColHeader, { width: '23%' }]}>
+                                    <Text style={{ fontSize: 8, textAlign: 'right' }}>{order?.total_bill}</Text>
+                                </View>
+                            </View>
+                        </>
+                    )}
+                </View>
+
+                {/* Notes & Footer Hanya di Halaman Terakhir */}
+                {pageIndex === groupedOrders.length - 1 && (
+                    <>
+                        <View>
+                            <Text>{`Notes : ${order?.notes}`}</Text>
+                        </View>
+                        {footer()}
+                    </>
+                )}
+
+                {/* Pagination di pojokan kanan bawah */}
+                <Text
+                    style={{
+                        position: 'absolute',
+                        bottom: 10,
+                        right: 20,
+                        fontSize: 8,
+                    }}
+                >
+                    Halaman {pageIndex + 1} dari {groupedOrders.length}
+                </Text>
+            </Page>
+        ))}
     </Document>
 
     return docType === 'INVOICE' ? Invoice : DeliveryNote

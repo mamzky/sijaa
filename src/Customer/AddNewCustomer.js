@@ -166,6 +166,7 @@ function AddNewCustomer() {
                                 <Form.Control
                                     type="input"
                                     as="textarea" rows={3}
+                                    maxLength={50}
                                     name='customerAddress'
                                     value={address}
                                     onChange={(e) => {

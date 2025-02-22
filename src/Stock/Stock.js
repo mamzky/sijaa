@@ -232,12 +232,18 @@ function Stock() {
                         width: '30%',
                         fontSize: 24
                       }}
-                      type='input'
-                      name='newStock'
+                      type="input"
+                      name="newStock"
                       value={newStock}
                       onChange={(e) => {
-                        const digitOnly = OnlyDigit(e.target.value)
-                        setNewStock(digitOnly)
+                        let value = OnlyDigit(e.target.value);
+
+                        // Prevent angka pertama jadi 0 kecuali inputnya cuma "0"
+                        if (value.length > 1 && value.startsWith("0")) {
+                          value = value.slice(1);
+                        }
+
+                        setNewStock(value);
                       }}
                     />
                   </div>
@@ -315,7 +321,7 @@ function Stock() {
                         <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Produk</th>
                         <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7" style={{ textAlign: 'center' }}>Jumlah Stock</th>
                         <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7" style={{ textAlign: 'center' }}>Update Terakhir</th>
-                        <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"></th>
+                        <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 w-1/4 "></th>
                       </tr>
                     </thead>
                     <tbody>
@@ -346,15 +352,15 @@ function Stock() {
                             <td>
                               <div className="ps-3 py-1">
                                 <div className="d-flex flex-column">
-                                  <h6 className="mb-0 text-sm" style={{ textAlign: 'center' }}>{item?.latest_update}</h6>
-                                  <span style={{ alignSelf: 'center', fontSize: 11 }}>{`Last Update ${item?.updated_at} (${item?.updated_by ?? '-'})`}</span>
+                                  <h6 className="mb-0 text-sm" style={{ textAlign: 'center' }}>{item?.latest_update ?? 'Input Baru'}</h6>
+                                  <span style={{ alignSelf: 'center', fontSize: 11 }}>{`Last Update ${moment(item?.updated_at ?? item?.created_at).format('DD MMMM YYYY HH:mm')} (${item?.updated_by ?? item?.created_by})`}</span>
                                 </div>
                               </div>
                             </td>
-                            <td>
+                            <td className='w-1/4'>
                               <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
                                 <Button
-                                  style={{ width: '60%', marginTop: 10 }}
+                                  style={{ width: '100%', marginTop: 10 }}
                                   onClick={() => {
                                     setSelectedProduct(item)
                                     setModalUpdateStock(true)
