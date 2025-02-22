@@ -68,7 +68,7 @@ const PackingDetailPage = () => {
             const querySnapshot = await getDocs(q)
             const result = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data()}))[0]
             const holder = {...result, 
-                qty: result?.qty - qty,
+                qty: Number(result?.qty) - qty,
                 updated_at: moment().format('DD/MMM/YYYY HH:mm'),
                 updated_by: localStorage.getItem(Constant.USERNAME) ?? '-',
                 latest_update: `order number ${orderNumber}, ${qty} pcs`

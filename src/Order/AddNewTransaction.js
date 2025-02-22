@@ -1,16 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { Alert, Button, CloseButton, Col, Dropdown, DropdownDivider, Form, Modal, Row, Spinner } from 'react-bootstrap'
-import TopNavBar from '../Components/TopNavBar'
-import SideNavBar from '../Components/SideNavBar'
-import SmallImageCard from '../Components/SmallImageCard'
-import CustomTable from '../Components/CustomTable'
+import { Alert, Button, CloseButton, Col, Dropdown, Form, Modal, Row, Spinner } from 'react-bootstrap'
 import { useNavigate, useParams } from 'react-router-dom'
 import { DigitFormatter, OnlyDigit } from '../Utils/General'
 import { empty, isEmpty, isNil } from 'ramda'
 import { db } from '../Config/FirebaseConfig';
 import { collection, getDocs, addDoc, doc, updateDoc, query, where } from 'firebase/firestore'
 import moment from 'moment/moment'
-import { CUSTOMER_COLLECTION, EMPLOYEE_COLLECTION, LOG_COLLECTION, PRODUCT_COLLECTION, ORDER_COLLECTION } from '../Utils/DataUtils'
+import { CUSTOMER_COLLECTION, EMPLOYEE_COLLECTION, PRODUCT_COLLECTION, ORDER_COLLECTION } from '../Utils/DataUtils'
 import Constant from '../Utils/Constants'
 import { addLog, calculateTotal } from '../Utils/Utils'
 import Select from 'react-select'
@@ -49,7 +45,6 @@ function AddNewOrder() {
     const [orderDate, setOrderDate] = useState(new Date());
     const [orderType, setOrdertype] = useState('')
     const [dp, setDp] = useState(0)
-    const [isActive, setIsActive] = useState(true)
 
     // MODAL
     const [selectedProduct, setSeletedProduct] = useState('')

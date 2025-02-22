@@ -119,7 +119,7 @@ function ProductDetail() {
                 centered>
                 <Modal.Header>
                     <Modal.Title>
-                        Produk Baru
+                        Edit Produk
                     </Modal.Title>
                     <CloseButton onClick={() => setShowModal(false)} />
                 </Modal.Header>
@@ -177,6 +177,10 @@ function ProductDetail() {
                             <h4 style={{ marginTop: -20 }}>{DigitFormatter(productData?.base_price)}</h4>
                         </div>
                         <div>
+                            <p>Harga Jual</p>
+                            <h4 style={{ marginTop: -20 }}>{isEmpty(productData?.sell_price) ? '-' : DigitFormatter(productData?.sell_price)}</h4>
+                        </div>
+                        <div>
                             <p>Supplier</p>
                             <h4 style={{ marginTop: -20 }}>{productData?.supplier}</h4>
                         </div>
@@ -232,8 +236,6 @@ function ProductDetail() {
                                     placeholder="Masukan nama produk"
                                 />
                             </Form.Group>
-
-
                             {/* PRICE */}
                             <Form.Group className="col-lg-6 col-md-3" controlId='productName'>
                                 <Form.Label>Harga dasar</Form.Label>

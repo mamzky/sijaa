@@ -33,6 +33,8 @@ function OrderDetail() {
     const [closeOrderModal, setCloseOrderModal] = useState(false)
     const [closeOrderNote, setCloseOrderNote] = useState('')
 
+    const [selectedProduct, setSelectedProduct] = useState([])
+
     // validationFlag
     const { order_number } = useParams()
 
@@ -322,6 +324,9 @@ function OrderDetail() {
                                         <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Harga</th>
                                         <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Diskon</th>
                                         <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Total</th>
+                                        {/* {['DISTRIBUTED'].includes(orderData?.status) &&
+                                            <th></th>
+                                        } */}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -370,22 +375,57 @@ function OrderDetail() {
                                                         </div>
                                                     </div>
                                                 </td>
+                                                {/* {['DISTRIBUTED'].includes(orderData?.status) &&
+                                                    <td className='w-1 self-center'>
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={selectedProduct.includes(item.id)}
+                                                            onChange={() => {
+                                                                if (selectedProduct.includes(item.id)) {
+                                                                    console.log('HRE', selectedProduct.filter(e => e !== item?.id));
 
+                                                                    setSelectedProduct(selectedProduct.filter(e => e !== item?.id))
+                                                                } else {
+                                                                    console.log('INI', [...selectedProduct, item?.id]);
+
+                                                                    setSelectedProduct([...selectedProduct, item?.id])
+                                                                }
+                                                            }}
+                                                        />
+                                                    </td>
+                                                } */}
                                             </tr>
                                         )
                                     })}
 
                                 </tbody>
                             </table>
-                            {['DELIVERED'].includes(orderData?.status) &&
-                                <Button variant="success" style={{ height: 32, marginLeft: 4 }}
-                                    onClick={() => {
-                                        setCloseOrderModal(true)
-                                    }}
-                                >
-                                    Close Order
-                                </Button>
-                            }
+                            <div style={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                width: '100%',
+                                justifyContent: 'space-between',
+                                padding: 12
+                            }}>
+                                {/* {['DISTRIBUTED'].includes(orderData?.status) &&
+                                    <Button variant="success" style={{ padding: 8 }}
+                                        onClick={() => {
+                                            setCloseOrderModal(true)
+                                        }}
+                                    >
+                                        Close Order
+                                    </Button>
+                                }
+                                {['DISTRIBUTED'].includes(orderData?.status) &&
+                                    <Button variant="success" style={{ padding: 8 }}
+                                        onClick={() => {
+                                            // setCloseOrderModal(true)
+                                        }}
+                                    >
+                                        Payment
+                                    </Button>
+                                } */}
+                            </div>
                         </div>
                     </div>
                 </div>

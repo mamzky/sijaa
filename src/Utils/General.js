@@ -1,6 +1,4 @@
 export const DigitFormatter = (number) => {
-    console.log('NUMBER', number);
-
     if (isNaN(number)) {
         return "Invalid number";
     }
