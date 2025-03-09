@@ -76,7 +76,10 @@ const DeliveryDetail = () => {
     newData.status = 'DONE'
     newData.updated_at = moment().toString()
     newData.delivery_note = deliveryNote ?? 'Sales Canvaser'
-
+    const soldOrderList = data?.order_list?.map((val) => {
+      return {...val, sold: true, updated_at: new Date().toISOString()}
+    })
+    newData.order_list = soldOrderList
     const oldData = doc(db, ORDER_COLLECTION, orderData?.id)
     updateDoc(oldData, newData)
       .then((val) => {

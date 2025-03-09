@@ -49,7 +49,6 @@ function Product() {
 
   const handleDeleteClick = (product) => {
     setSelectedProduct(product);
-    console.log('SELECTEDPRODUCT', product);
     setShowDeleteModal(true);
   };
 

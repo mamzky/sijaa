@@ -93,7 +93,6 @@ function ProductDetail() {
         const result = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
         if (!querySnapshot.empty) {
             setProductData(result[0])
-            console.log('RESULT', result);
             setIsLoading(false)
         } else {
             setIsLoading(false)

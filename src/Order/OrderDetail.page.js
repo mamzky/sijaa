@@ -14,6 +14,7 @@ import { CUSTOMER_COLLECTION, LOG_COLLECTION, PRODUCT_COLLECTION, ORDER_COLLECTI
 import Constant from '../Utils/Constants'
 import { addLog, calculateTotal } from '../Utils/Utils'
 import AppColors from '../Utils/Colors'
+import { toast } from 'react-toastify'
 
 function OrderDetail() {
 
@@ -41,11 +42,8 @@ function OrderDetail() {
 
     // NEW STATE
     const [orderData, setOrderData] = useState()
-    const [isEdit, setIsEdit] = useState(false)
-
-    // ORDER DATA
-    const [isActive, setIsActive] = useState(false)
-
+    const [originalOrderData, setOriginalOrderData] = useState()
+    const [hasItemNotSold, setHasItemNotSold] = useState(false)
 
     const summaryItem = (title, value) => {
         return (
@@ -68,8 +66,10 @@ function OrderDetail() {
         const result = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
         if (!querySnapshot.empty) {
             setOrderData(result[0])
-            setIsActive(result[0].status)
-            console.log('RESULT', result[0]);
+            setOriginalOrderData(result[0])
+            if (result[0]) {
+                setHasItemNotSold(result[0]?.order_list?.some(item => !item.sold))
+            }
             setIsLoading(false)
         } else {
             setIsLoading(false)
@@ -84,25 +84,39 @@ function OrderDetail() {
         const oldData = doc(db, ORDER_COLLECTION, orderData?.id)
         updateDoc(oldData, newData)
             .then((val) => {
+                window.location.reload()
                 setIsLoading(false)
                 setUpdateModal(false)
                 addLog('UPDATE STATUS ORDER', `${localStorage.getItem(Constant.USERNAME)} update status order menjadi ${newData?.status}`)
-                window.location.reload(false)
             })
     }
 
-    const closeOrder = () => {
-        const holderOrder = { ...orderData, notes: closeOrderNote, status: 'DONE', updated_at: new Date().toISOString(), updated_by: localStorage.getItem(Constant.USERNAME) }
+    const updateOrder = () => {
+        setIsLoading(true)
+        const setSoldOrder = orderData?.order_list?.map((val) => {
+            return selectedProduct?.includes(val?.id) ? { ...val, sold: true, updated_at: new Date().toISOString() } : val
+        })
+        const unpaidItem = setSoldOrder?.some(item => !item.sold)
+        
+        const newOrderData = { ...orderData, order_list: setSoldOrder, notes: closeOrderNote, status: unpaidItem ? orderData?.status : 'DONE' }
         const oldOrderDoc = doc(db, ORDER_COLLECTION, orderData?.id)
-        updateDoc(oldOrderDoc, holderOrder)
+        updateDoc(oldOrderDoc, newOrderData)
             .then(() => {
-                console.log('DONE');
+                setCloseOrderModal(false)
+                setIsLoading(false)
+                setCloseOrderNote('')
                 window.location.reload()
             })
             .catch((err) => {
+                setIsLoading(false)
+                toast.error('Terjadi Kesalahan, silahkan ulangi beberapa saat dan reload halaman')
                 console.log('ERR', err);
             })
+    }
 
+    const isSold = (id) => {
+        const sold = originalOrderData?.order_list?.find((e) => e.id === id)?.sold ?? false
+        return sold
     }
 
     return (
@@ -193,10 +207,10 @@ function OrderDetail() {
                 </Modal.Footer>
             </Modal>
             <Modal show={closeOrderModal} onHide={() => setCloseOrderModal(false)}>
-                <Modal.Header>Selesaikan Order</Modal.Header>
+                <Modal.Header>Simpan Perubahan Order</Modal.Header>
                 <Modal.Body>
                     <Form.Group style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
-                        <Form.Label>Close Order Note</Form.Label>
+                        <Form.Label>Catatan Order</Form.Label>
                         <Form.Control
                             style={{ width: '100%' }}
                             type="input"
@@ -205,7 +219,7 @@ function OrderDetail() {
                             onChange={(e) => {
                                 setCloseOrderNote(e.target.value)
                             }}
-                            placeholder="Keterangan Close Order"
+                            placeholder="Catatan Order"
                         />
                     </Form.Group>
                 </Modal.Body>
@@ -215,8 +229,7 @@ function OrderDetail() {
                         setCloseOrderNote('')
                     }}>Cancel</Button>
                     <Button variant="danger" onClick={() => {
-                        setCloseOrderModal(false)
-                        closeOrder()
+                        updateOrder()
                     }}>Ya, Selesaikan</Button>
                 </Modal.Footer>
             </Modal>
@@ -239,9 +252,7 @@ function OrderDetail() {
                             {/* NAME */}
                             <Form.Group className="col-lg-6 col-md-3" style={{ marginBottom: 20 }} controlId='productName'>
                                 <Form.Label>Nama Customer</Form.Label>
-
                                 <h4 style={{ marginTop: -10, marginBottom: -10 }}>{orderData?.customer?.name}</h4>
-
                             </Form.Group>
 
                             {/* PHONE */}
@@ -324,76 +335,103 @@ function OrderDetail() {
                                         <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Harga</th>
                                         <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Diskon</th>
                                         <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Total</th>
-                                        {/* {['DISTRIBUTED'].includes(orderData?.status) &&
-                                            <th></th>
-                                        } */}
+                                        <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Lunas</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {orderData?.order_list?.map((item, index) => {
                                         return (
                                             <tr>
-                                                <td>
+                                                <td style={{ backgroundColor: selectedProduct.includes(item.id) ? '#d6d6d6' : 'white' }}>
                                                     <div className="ps-3 py-1">
                                                         <div className="d-flex flex-column justify-content-center">
                                                             <h6 className="mb-0 text-sm">{index + 1}</h6>
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td>
+                                                <td style={{ backgroundColor: selectedProduct.includes(item.id) ? '#d6d6d6' : 'white' }}>
                                                     <div className="ps-3 py-1">
                                                         <div className="d-flex flex-column justify-content-center">
                                                             <h6 className="mb-0 text-sm">{item?.name}</h6>
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td>
+                                                <td style={{ backgroundColor: selectedProduct.includes(item.id) ? '#d6d6d6' : 'white' }}>
                                                     <div className="ps-3 py-1">
                                                         <div className="d-flex flex-column">
                                                             <h6 className="mb-0 text-sm">{item?.qty}</h6>
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td>
+                                                <td style={{ backgroundColor: selectedProduct.includes(item.id) ? '#d6d6d6' : 'white' }}>
                                                     <div className="ps-3 py-1">
                                                         <div className="d-flex flex-column">
-                                                            <h6 className="mb-0 text-sm">{`Rp${DigitFormatter(item?.price)}`}</h6>
+                                                            {isSold(item?.id) ?
+                                                                <h6 className="mb-0 text-sm">{`Rp${DigitFormatter(item?.price)}`}</h6>
+                                                                :
+                                                                <Form.Control
+                                                                    disabled={isSold(item?.id)}
+                                                                    type="input"
+                                                                    name='contactEmail'
+                                                                    id='price'
+                                                                    value={DigitFormatter(item?.price)}
+                                                                    onChange={(e) => {
+                                                                        const changedPrice = orderData?.order_list?.map((val) => {
+                                                                            return val?.id === item?.id ? { ...item, price: OnlyDigit(e?.target.value) } : val
+                                                                        })
+                                                                        const newOrderData = { ...orderData, order_list: changedPrice }
+                                                                        setOrderData(newOrderData)
+                                                                    }}
+                                                                    placeholder="Masukan email"
+                                                                />
+                                                            }
+
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td>
+                                                <td style={{ backgroundColor: selectedProduct.includes(item.id) ? '#d6d6d6' : 'white' }}>
                                                     <div className="ps-3 py-1">
                                                         <div className="d-flex flex-column">
                                                             <h6 className="mb-0 text-sm">{`Rp${DigitFormatter(item?.discount)}`}</h6>
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td>
+                                                <td style={{ backgroundColor: selectedProduct.includes(item.id) ? '#d6d6d6' : 'white' }}>
                                                     <div className="ps-3 py-1">
                                                         <div className="d-flex flex-column">
                                                             <h6 className="mb-0 text-sm">{`Rp${DigitFormatter(item?.qty * item.price - item?.discount)}`}</h6>
                                                         </div>
                                                     </div>
                                                 </td>
-                                                {/* {['DISTRIBUTED'].includes(orderData?.status) &&
-                                                    <td className='w-1 self-center'>
+                                                <td style={{ backgroundColor: selectedProduct.includes(item.id) ? '#d6d6d6' : 'white' }} className='w-1 self-center flex fflex-row justify-center'
+                                                >
+                                                    {isSold(item?.id) ?
+                                                        <div style={{ display: 'flex', flex: 1, flexDirection: 'column', justifyContent: 'center' }}>
+                                                            <span style={{ fontSize: 12 }}>{`Dibayar pada`}</span>
+                                                            <span style={{ fontSize: 12 }}>{`${moment(item?.updated_at)?.format('DD/MM/YYYY HH:mm')}`}</span>
+                                                        </div>
+                                                        :
                                                         <input
+                                                            style={{
+                                                                alignSelf: 'center',
+                                                                alignContent: 'center',
+                                                                width: '100%',
+
+                                                            }}
+                                                            disabled={isSold(item?.id)}
                                                             type="checkbox"
                                                             checked={selectedProduct.includes(item.id)}
                                                             onChange={() => {
                                                                 if (selectedProduct.includes(item.id)) {
-                                                                    console.log('HRE', selectedProduct.filter(e => e !== item?.id));
-
                                                                     setSelectedProduct(selectedProduct.filter(e => e !== item?.id))
                                                                 } else {
-                                                                    console.log('INI', [...selectedProduct, item?.id]);
-
                                                                     setSelectedProduct([...selectedProduct, item?.id])
                                                                 }
                                                             }}
                                                         />
-                                                    </td>
-                                                } */}
+                                                    }
+
+                                                </td>
                                             </tr>
                                         )
                                     })}
@@ -407,24 +445,17 @@ function OrderDetail() {
                                 justifyContent: 'space-between',
                                 padding: 12
                             }}>
-                                {/* {['DISTRIBUTED'].includes(orderData?.status) &&
-                                    <Button variant="success" style={{ padding: 8 }}
-                                        onClick={() => {
-                                            setCloseOrderModal(true)
-                                        }}
-                                    >
-                                        Close Order
-                                    </Button>
+                                {hasItemNotSold &&
+                                    <div style={{ display: 'flex', flexDirection: 'row-reverse', width: '100%' }}>
+                                        <Button variant="success" style={{ padding: 8, width: 200 }}
+                                            onClick={() => {
+                                                setCloseOrderModal(true)
+                                            }}
+                                        >
+                                            Save
+                                        </Button>
+                                    </div>
                                 }
-                                {['DISTRIBUTED'].includes(orderData?.status) &&
-                                    <Button variant="success" style={{ padding: 8 }}
-                                        onClick={() => {
-                                            // setCloseOrderModal(true)
-                                        }}
-                                    >
-                                        Payment
-                                    </Button>
-                                } */}
                             </div>
                         </div>
                     </div>

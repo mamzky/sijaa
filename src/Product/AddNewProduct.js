@@ -78,7 +78,6 @@ function AddNewProduct() {
                     window.scrollTo(0, 0)
                 } else {
                     if (isEmpty(productName)) {
-                        console.log(productName);
                         setErrorName(true)
                         window.scrollTo(0, 0)
                     } else if (isEmpty(productBasePrice)) {
@@ -122,10 +121,6 @@ function AddNewProduct() {
             })
             .finally(() => setShowModal(false))
     }
-
-    useEffect(() => {
-        console.log('ID', id);
-    }, [])
 
     return (
         <div>
