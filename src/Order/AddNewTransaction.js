@@ -631,7 +631,6 @@ function AddNewOrder() {
                                                             onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#F5F5F5')}
                                                             onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '')}
                                                             onClick={() => {
-                                                                console.log('ITEM', item);
                                                                 setIsEditItem(true)
                                                                 setSeletedProduct(item.item)
                                                                 setQtySelectedItem(item.qty)

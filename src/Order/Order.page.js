@@ -12,6 +12,7 @@ import { DigitFormatter, PaymentTypeList, StatusTypeList, filterByList } from '.
 import { isEmpty } from 'ramda'
 import Select from 'react-select'
 import Constant from '../Utils/Constants'
+import { toast } from 'react-toastify'
 
 function Order() {
 
@@ -25,9 +26,9 @@ function Order() {
   const [modalDelete, setModalDelete] = useState(false)
   const [cancelReason, setCancelReason] = useState('')
   const [selectedOrder, setSelectedOrder] = useState(null)
+  const [searchOrderNumber, setSearchOrderNumber] = useState('')
+  const [selectedCustomer, setSelectedCustomer] = useState()
 
-  // FILTER
-  const [filterField, setFilterField] = useState('')
 
   const getCustomer = async () => {
     const data = await getDocs(customerCollectionRef)
@@ -39,101 +40,27 @@ function Order() {
   useEffect(() => {
     setLoading(true)
     getCustomer()
+    getListOrder()
+  }, [])
+
+  const getListOrder = () => {
     getDocs(orderCollectionRef).then((res) => {
       const rawData = res?.docs?.map((doc) => ({ ...doc?.data(), id: doc?.id })).filter((e) => e.status !== 'DELETED')
       setOrderData(rawData?.sort((a, b) => new Date(b?.created_at) - new Date(a?.created_at)))
     })
       .catch((err) => {
+        toast.error('Terjadi Kesalahan, silahkan ulangi beberapa saat dan reload halaman')
         console.log('ERR 2', err);
       })
       .finally(() => {
         setLoading(false)
       })
-  }, [])
-
-  const filterByOrderNumber = async (order_number) => {
-    const q = query(collection(db, ORDER_COLLECTION)
-      , where('order_number', '==', order_number))
-    const querySnapshot = await getDocs(q)
-    const result = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-    setOrderData(result)
-  }
-
-  const searchElement = () => {
-    switch (filterField) {
-      case 'Nomor Order':
-        return (
-          <Form.Control
-            isInvalid={false}
-            type="input"
-            name='filterOrder'
-            onChange={(e) => {
-              setTimeout(() => {
-                filterByOrderNumber(e.target.value)
-              }, 500);
-            }}
-            placeholder="Pencarian..."
-          />
-        )
-        break;
-      case 'Customer':
-        return (
-          <Select
-            options={customerList}
-            placeholder="Pilih customer"
-            onChange={(e) => {
-              // setSelectedCustomer(e.id)
-            }}
-          />
-        )
-        break;
-      case 'Jenis':
-        return (
-          <Select
-            options={PaymentTypeList}
-            placeholder="Jenis Pembayaran"
-            onChange={(e) => {
-              // setSelectedCustomer(e.id)
-            }}
-          />
-        )
-        break;
-      case 'Tanggal':
-        return (
-          <Form.Control
-            type="date"
-            // name='orderDate'
-            // value={orderDate}
-            onChange={(e) => {
-              // setOrderDate(e.target.value)
-            }}
-            placeholder="Tanggal order"
-          />
-        )
-        break;
-      case 'Status':
-        return (
-          <Select
-            options={StatusTypeList}
-            placeholder="Status Order"
-            onChange={(e) => {
-              console.log(e)
-            }}
-          />
-        )
-        break;
-      default:
-        return (
-          null
-        )
-        break;
-    }
   }
 
   const cancelOrder = async () => {
     setModalDelete(false)
     setLoading(true)
-    const holderOrder = { ...selectedOrder, cancel_reason: cancelReason, status: 'DELETED', deleted_at: new Date().toISOString() , deleted_by: localStorage.getItem(Constant.USERNAME)}
+    const holderOrder = { ...selectedOrder, cancel_reason: cancelReason, status: 'DELETED', deleted_at: new Date().toISOString(), deleted_by: localStorage.getItem(Constant.USERNAME) }
     const oldOrderDoc = doc(db, ORDER_COLLECTION, selectedOrder?.id)
     updateDoc(oldOrderDoc, holderOrder)
       .then(() => {
@@ -145,7 +72,41 @@ function Order() {
     setLoading(false)
   }
 
+  const searchOrderbyId = (id) => {
+    return orderData.filter((e) => e?.order_number?.toString()?.toUpperCase()?.includes(id?.toUpperCase()))
+  }
 
+  const searchByCustomerId = async (id) => {
+    setLoading(true)
+    const q = query(collection(db, ORDER_COLLECTION)
+      , where('customer_id', '==', id))
+    const querySnapshot = await getDocs(q)
+    const result = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+    if (!querySnapshot.empty) {
+      console.log('RESULT', result);
+      setOrderData(result)
+      setLoading(false)
+    } else {
+      setLoading(false)
+      console.log('FAILED');
+    }
+  }
+
+  useEffect(() => {
+    if (searchOrderNumber?.length > 0) {
+      setOrderData(searchOrderbyId(searchOrderNumber))
+    } else {
+      getListOrder()
+    }
+  }, [searchOrderNumber])
+
+  useEffect(() => {
+    if (Boolean(selectedCustomer)) {
+      searchByCustomerId(selectedCustomer)
+    } else {
+      getListOrder()
+    }
+  }, [selectedCustomer])
 
   return (
     <div>
@@ -183,25 +144,34 @@ function Order() {
           </div>
         </div>
 
-        <Row style={{ marginTop: 20, marginBottom: -20 }}>
-          <Dropdown className='col-lg-2'>
-            <Dropdown.Toggle className='col-lg-12' variant="success" id="dropdown-basic">
-              {isEmpty(filterField) ? 'Filter' : filterField}
-            </Dropdown.Toggle>
-
-            <Dropdown.Menu>
-              {filterByList.map(({ label, value }) => {
-                return (
-                  <Dropdown.Item
-                    onClick={() => setFilterField(label)}
-                  >{label}</Dropdown.Item>
-                )
-              })}
-            </Dropdown.Menu>
-          </Dropdown>
-          <Form.Group className="col-lg-4 col-md-3" controlId='filterOrder'>
-            {searchElement()}
-          </Form.Group>
+        <Row style={{ marginTop: 20, marginBottom: -20, gap: 8 }}>
+          <Form.Control
+            style={{ width: '30%' }}
+            type="input"
+            name='searchByOrderNumber'
+            value={searchOrderNumber}
+            onChange={(e) => {
+              setSearchOrderNumber(e.target.value)
+            }}
+            placeholder="Cari Berdasarkan Order Number"
+          />
+          <Form.Select
+            style={{ width: "20%" }}
+            name="customerSelect"
+            value={selectedCustomer}
+            onChange={(e) => setSelectedCustomer(e.target.value)}
+            placeholder='Semua Customer'
+          >
+            <option value="">Semua Customer</option>
+            {customerList
+              ?.slice()
+              .sort((a, b) => a.label.localeCompare(b.label))
+              .map((customer) => (
+                <option key={customer?.value?.customer_code} value={customer?.value?.customer_code}>
+                  {customer.label}
+                </option>
+              ))}
+          </Form.Select>
         </Row>
 
         <div class="row mt-4">
@@ -220,7 +190,7 @@ function Order() {
                     <th className="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"></th>
                   </tr>
                 </thead>
-                <tbody style={{ visibility: orderData.length > 0 }}>
+                <tbody style={{ visibility: orderData?.length > 0 }}>
                   {orderData?.map((item, index) => {
                     return (
                       <tr>
@@ -274,7 +244,11 @@ function Order() {
                         <td>
                           <div className="ps-3 py-1">
                             <div className="d-flex flex-column">
-                              <h6 className="mb-0 text-sm">{isNaN(calculateTotal(item?.order_list)) ? `-` : `Rp${DigitFormatter(calculateTotal(item?.order_list))}`}</h6>
+                              {item?.status === 'DELIVERED' ?
+                                <h6 className="mb-0 text-sm">-</h6>
+                                :
+                                <h6 className="mb-0 text-sm">{isNaN(calculateTotal(item?.order_list)) ? `-` : `Rp${DigitFormatter(calculateTotal(item?.order_list))}`}</h6>
+                              }
                             </div>
                           </div>
                         </td>

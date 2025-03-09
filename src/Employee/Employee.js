@@ -46,12 +46,6 @@ function Employee() {
     setEmployee(sortedData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)))
   }
 
-  const tampilpopup = () => {
-    // Melakukan sesuatu dengan data JSON, misalnya menampilkan di konsol
-    setShowModal(true);
-    // Jika Anda ingin melakukan sesuatu yang lain dengan data JSON, Anda bisa menambahkan kode di sini
-  };
-
   const deletekaryawan = async () => {
     console.log(selectedEmployee);
     const productDoc = doc(db, EMPLOYEE_COLLECTION, selectedEmployee.id);
@@ -62,16 +56,6 @@ function Employee() {
       setIsLoading(false);
     });
   };
-  //   const deletekaryawan = async () => {
-  //     console.log(selectedEmployee);
-  //     const productDoc = doc(db, EMPLOYEE_COLLECTION, selectedEmployee.employeeId);
-  //     await deleteDoc(productDoc).then(() => {
-  //         addLog('DELETE PRODUCT', `${localStorage.getItem(Constant.USERNAME)} deleted product "${selectedEmployee?.employeeName}"`);
-  //         getEmployee();
-  //         setDeleteEmployee(false);
-  //         setIsLoading(false);
-  //     });
-  // };
 
   const handleDeleteClick = (employee) => {
     setSelectedEmployee(employee);

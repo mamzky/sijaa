@@ -70,7 +70,6 @@ function CustomerDetail() {
         const result = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
         if (!querySnapshot.empty) {
             setCustomerData(result[0])
-            console.log('RESULT', result[0]);
             setIsLoading(false)
         } else {
             setIsLoading(false)
@@ -89,7 +88,6 @@ function CustomerDetail() {
         const result = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
         if (!querySnapshot.empty) {
             setOrderData(result)
-            console.log('RESULT', result);
             setIsLoading(false)
         } else {
             setOrderData([])
@@ -141,7 +139,6 @@ function CustomerDetail() {
     const deleteCustomer = async () => {
         setIsLoading(true)
         const selectedCustomer = doc(db, CUSTOMER_COLLECTION, customerData?.id)
-        console.log('SELECTED', selectedCustomer)
         await deleteDoc(selectedCustomer)
             .then((res) => {
                 toast.success('Berhasil menghapus data')

@@ -24,22 +24,12 @@ const ContactDetail = () => {
     const [contactPhone, setContactPhone] = useState('')
     const [contactEmail, setContactEmail] = useState('')    
     const [contactAddress, setContactAddress] = useState('')
-    
-
     const [showModal, setShowModal] = useState(false)
     const [isLoading, setIsLoading] = useState()
-
-
     const [isEdit, setIsEdit] = useState(false)
 
-
-    const [formData, setFormData] = useState({})
     const getContactDetail = async (contact_id) => {
         setIsLoading(true)
-        console.log('contactId', contact_id)
-
-   
-
         const q = query(collection(db, CONTACT_COLLECTION)
             , where('contactId', '==', contact_id))
         await getDocs(q)

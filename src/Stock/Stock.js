@@ -112,10 +112,8 @@ function Stock() {
         }
       })
       setProductOptions(optionsHolder)
-      console.log('PROD', optionsHolder);
 
       setProductList(mergedData)
-      console.log('RESULT STOCKS', mergedData);
     } else {
       setProductList([])
       console.log('FAILED');

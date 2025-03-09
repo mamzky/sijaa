@@ -33,16 +33,6 @@ function StockCustomer() {
         const querySnapshot = await getDocs(q)
         const result = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
         if (!querySnapshot.empty) {
-            console.log('RESULT', result);
-            console.log('FLAT MAP', result.flatMap(order =>
-                order.order_list.map(item => ({
-                    id: item.id,
-                    order_number: { number: order.order_number, created_at: order.created_at },
-                    created_at: order.created_at,
-                    name: item.name,
-                    total_qty: item.qty
-                }))
-            ));
 
             const mergedData = Object.values(
                 result.flatMap(order =>
@@ -64,7 +54,6 @@ function StockCustomer() {
                 }, {})
             );
             setProductList(mergedData)
-            console.log('RESULT STOCKS', mergedData);
         } else {
             setOrderData([])
             console.log('FAILED');
