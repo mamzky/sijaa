@@ -50,7 +50,6 @@ function Order() {
     })
       .catch((err) => {
         toast.error('Terjadi Kesalahan, silahkan ulangi beberapa saat dan reload halaman')
-        console.log('ERR 2', err);
       })
       .finally(() => {
         setLoading(false)
@@ -83,7 +82,6 @@ function Order() {
     const querySnapshot = await getDocs(q)
     const result = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
     if (!querySnapshot.empty) {
-      console.log('RESULT', result);
       setOrderData(result)
       setLoading(false)
     } else {

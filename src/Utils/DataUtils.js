@@ -3,7 +3,7 @@ import { db } from '../Config/FirebaseConfig';
 import { collection, getDocs, addDoc, doc, query, where, updateDoc } from 'firebase/firestore'
 import Constant from './Constants';
 
-const isInDevelopment = false
+const isInDevelopment = true
 
 export const PRODUCT_COLLECTION = isInDevelopment ? "DEV_product" : "product"
 export const CUSTOMER_COLLECTION = isInDevelopment ? "DEV_customer" : "customer"

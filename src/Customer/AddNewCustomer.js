@@ -58,7 +58,6 @@ function AddNewCustomer() {
             created_at: new Date().toISOString(),
             created_by: localStorage.getItem(Constant.USERNAME) ?? '-'
         }).then((res) => {
-            console.log(res);
             addLog(localStorage.getItem(Constant.USERNAME), `create customer ${customerName}`)
             navigate('/customer')
         })

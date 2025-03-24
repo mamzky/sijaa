@@ -73,13 +73,11 @@ function CustomerDetail() {
             setIsLoading(false)
         } else {
             setIsLoading(false)
-            console.log('FAILED');
         }
     }
     const getOrderList = async () => {
         const data = await getDocs(orderCollectionRef)
         const sortedData = data.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
-        console.log(sortedData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)));
         setOrderData(sortedData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)))
 
         const q = query(collection(db, ORDER_COLLECTION)
@@ -92,7 +90,6 @@ function CustomerDetail() {
         } else {
             setOrderData([])
             setIsLoading(false)
-            console.log('FAILED');
         }
     }
 
