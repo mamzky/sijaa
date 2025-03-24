@@ -32,8 +32,6 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    console.log(formData);
     const q = query(collection(db, USER_COLLECTION),
       where('username', '==', formData.username),
       where('password', '==', formData.password))
@@ -42,8 +40,6 @@ function Login() {
       const querySnapshot = await getDocs(q);
 
       if (!querySnapshot.empty) {
-        // Data exists
-        // console.log('Data exists:', querySnapshot.docs.map(doc => doc.data()));
         const user = querySnapshot.docs.map(doc => doc.data())[0]
         localStorage.setItem(Constant.USERNAME, user?.username)
         localStorage.setItem(Constant.ROLE, user?.roleId)
@@ -52,7 +48,6 @@ function Login() {
         navigate('/')
         toast.success(`Berhasil login! Selamat datang ${user?.username}`)
       } else {
-        // Data does not exist
         console.log('Data does not exist');
         setFailLogin(true)
       }

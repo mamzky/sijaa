@@ -387,7 +387,11 @@ const PdfDocument = ({ order, type }) => {
                                 </View>
                                 <View style={[styles.tableColHeader, { width: '23%' }]}>
                                     <Text style={{ fontSize: 8, textAlign: 'right' }}>
-                                        {DigitFormatter(Number(order?.total_bill.replaceAll('.', '') * 1.11).toFixed(0))}
+                                        {order.withTax ? 
+                                     DigitFormatter(Number(order?.total_bill.replaceAll('.', '') * 1.11).toFixed(0))
+                                     :
+                                     DigitFormatter(Number(order?.total_bill.replaceAll('.', '')).toFixed(0))   
+                                    }
                                     </Text>
                                 </View>
                             </View>

@@ -56,7 +56,6 @@ function StockCustomer() {
             setProductList(mergedData)
         } else {
             setOrderData([])
-            console.log('FAILED');
         }
     }
 

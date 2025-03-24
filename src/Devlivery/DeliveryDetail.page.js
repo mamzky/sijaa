@@ -426,7 +426,6 @@ const DeliveryDetail = () => {
         <Modal.Footer>
           <Button variant="danger" onClick={() => setShowModalCloseSales(false)}>Batal</Button>
           <Button variant="success" onClick={() => {
-            console.log('orderData', orderData);
             handleCloseDelivery(orderData)
           }}>Selesai</Button>
         </Modal.Footer>
