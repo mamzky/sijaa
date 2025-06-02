@@ -41,7 +41,7 @@ function StockCustomer() {
                         order_number: { number: order.order_number, created_at: order.created_at },
                         created_at: order.created_at,
                         name: item.name,
-                        total_qty: item.qty * (order.status === "RETUR" ? -1 : 1) // Kurangi jika status RETUR
+                        total_qty: item.qty * (order.status === "RETUR" ? -1 : 1)
                     }))
                 ).reduce((acc, item) => {
                     if (!acc[item.id]) {
@@ -53,6 +53,8 @@ function StockCustomer() {
                     return acc;
                 }, {})
             );
+            console.log('MERGE DATA', mergedData);
+            
             setProductList(mergedData)
         } else {
             setOrderData([])

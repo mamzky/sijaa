@@ -1,6 +1,6 @@
 import moment from 'moment';
 import { db } from '../Config/FirebaseConfig';
-import { collection, getDocs, addDoc, doc, query, where, updateDoc } from 'firebase/firestore'
+import { collection, getDocs, doc, query, where, updateDoc } from 'firebase/firestore'
 import Constant from './Constants';
 
 const isInDevelopment = false
