@@ -109,7 +109,7 @@ function SideNavBar() {
               </a>
             </li>
             {/* ORDER */}
-            {role !== "SLS" && (
+            
               <li className={`nav-item`}>
                 <a
                   className={`nav-link text-white bg-gradient-primary ${
@@ -127,7 +127,6 @@ function SideNavBar() {
                   <span className="nav-link-text ms-1">Order</span>
                 </a>
               </li>
-            )}
             {/* PACKING */}
             {role !== "SLS" && (
               <li className={`nav-item`}>
